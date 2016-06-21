@@ -1,0 +1,53 @@
+TODO:
+ 
+Cancelled or far future:
+ - Add toolbar next to category in filters: [All | Any | Single]
+ - Show "Cancel & discard changes" only if some tags were actually modified
+ - Allow to modify window width
+ - Limit number of writes in CurrentCraftSettings window
+ - Base it on plugin settings: when editor is locked the "close" should be locked as well
+ 
+ 
+Done:
+ - Add tooltip that will show big thumbnail, name and description
+ - Add double-click to load
+ - Correct bug: select "all" in "-Archived?", click cancel, open window. The filter returns to default
+ - Correct the way how min width is computed if there is gui scaling
+ - Correct bug: open ships with tags -> change name (no save !) -> launch -> revert -> save. Bug: tags are not saved
+ - Add icons to toolbar
+ - Add darker background when windows are displayed
+ - Remove "Edit" skin from manage window
+ - Remember skin between editor opens
+ - Check if parts used in craft are available due to science
+ - Add performance logs while loading crafts
+ - Hide tags filtering if no craft has assigned tag & display only used tags
+ - Focus text search window when window is opened
+ - Solve problem with strange height of some scroll windows
+ - Lock editor when managing tags
+ - Add "new tag" field to the window with tags for current craft
+ - Add Delete button
+ - Make all windows inherit from common class
+ - Show warning when craft is going to be loaded and current craft is unsaved
+ - Allow to discard changes made in tags
+ - Refactor script.cs, introduce Debug & Release versions
+ - change everything except MonBehavior to camelCase
+ - Draw tags as categories in craft list
+ - Introduce plugin settings: it will have "Debug" option + default available tags
+ - Save tags for stock crafts inside save folder instead of shared folder
+ - When editor is locked the "close" should be locked as well
+ - add "Status\Archived" to default tags, change the prefix "Building Stage\" to "Status\"
+ - In "Filter" window show tags in categories. In each category add special filtering option <with no tag from this category>
+ - make changes to make it possible to chave "archived" tag that will be quite natural to use
+ - Load craft lazily - first load metadata if it exists (it should contain the craft name as well), then filter the crafts
+ 	and lastly load full craft's data only if it is on the list
+ - make the window wider on wider monitors
+ - Correct craft renaming (make sure tags are properly written)
+ - If craft name in settings file is incorrect then correct it automatically
+ - Correct bug that settings are marked as dirty in each frame
+ - Solve problem with overlap labels
+ - Solve problem with accident part clicks when window is hidden
+ - Allow to Scale UI
+ - Correct display of group names on craft list
+ - when existing ship is saved with changed name the tags should be saved as well
+ - automatically deselect <none> when any other tag is selected + the other way round
+ - Show "The filter is applied [clear]" instead of current message & behaviour

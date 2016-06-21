@@ -9,13 +9,13 @@ namespace KspCraftOrganizer
 		MIXED
 	}
 
-	public class TagModel{
+	public class OrganizerTagModel{
 		private string _name;
 		private TagState _tagState = TagState.UNSET_IN_ALL;
-		private KspCraftOrganizerService service;
+		private OrganizerService service;
 		private bool _selectedForFiltering = false;
 
-		public TagModel(KspCraftOrganizerService service, string name){
+		public OrganizerTagModel(OrganizerService service, string name){
 			this._name = name;
 			this.service = service;
 			this.inRenameMode = false;

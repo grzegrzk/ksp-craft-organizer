@@ -7,7 +7,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>KspCraftOrganizerPlugin</RootNamespace>
     <AssemblyName>KspCraftOrganizerPlugin</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -20,7 +20,7 @@
     <ConsolePause>false</ConsolePause>
     <CustomCommands>
       <CustomCommands>
-        <Command type="AfterBuild" command="cp &quot;${TargetFile}&quot; &quot;/Users/nal/Library/Application Support/Steam/steamapps/common/Kerbal Space Program/GameData/KspCraftOrganizerPlugin/Plugins&quot;" />
+        <Command type="AfterBuild" command="echo &quot;${TargetFile}&quot; &quot;/Users/nal/Library/Application Support/Steam/steamapps/common/Kerbal Space Program/GameData/KspCraftOrganizerPlugin/Plugins&quot;" />
       </CustomCommands>
     </CustomCommands>
     <LangVersion>3</LangVersion>
@@ -36,32 +36,56 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="UnityEngine">
+      <HintPath>..\..\..\Library\Application Support\Steam\steamapps\common\Kerbal Space Program\KSP.app\Contents\Resources\Data\Managed\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>..\..\..\Library\Application Support\Steam\steamapps\common\Kerbal Space Program\KSP.app\Contents\Resources\Data\Managed\UnityEngine.UI.dll</HintPath>
+    </Reference>
     <Reference Include="KSPCore">
       <HintPath>..\..\..\Library\Application Support\Steam\steamapps\common\Kerbal Space Program\KSP.app\Contents\Resources\Data\Managed\KSPCore.dll</HintPath>
     </Reference>
     <Reference Include="KSPUtil">
       <HintPath>..\..\..\Library\Application Support\Steam\steamapps\common\Kerbal Space Program\KSP.app\Contents\Resources\Data\Managed\KSPUtil.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine">
-      <HintPath>..\..\..\Library\Application Support\Steam\steamapps\common\Kerbal Space Program\KSP.app\Contents\Resources\Data\Managed\UnityEngine.dll</HintPath>
-    </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath>..\..\..\Library\Application Support\Steam\steamapps\common\Kerbal Space Program\KSP.app\Contents\Resources\Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.UI">
-      <HintPath>..\..\..\Library\Application Support\Steam\steamapps\common\Kerbal Space Program\KSP.app\Contents\Resources\Data\Managed\UnityEngine.UI.dll</HintPath>
+  </ItemGroup> 
+  <ItemGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <Reference Include="KramaxReloadExtensions">
+      <HintPath>..\..\..\Library\Application Support\Steam\steamapps\common\Kerbal Space Program\GameData\KramaxPluginReload\Plugins\KramaxReloadExtensions.dll</HintPath>
     </Reference>
   </ItemGroup>
+  <ItemGroup Condition=" '$(Configuration)' == 'Release' ">
+  </ItemGroup>
   <ItemGroup>
+    <Compile Include="MainRelease.cs" />
+    <Compile Include="MainDebug.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="KspCraftOrganizerScript.cs" />
-    <Compile Include="KspCraftOrganizerService.cs" />
-    <Compile Include="KspCraftOrganizerTagModel.cs" />
-    <Compile Include="KspCraftOrganizerCraftModel.cs" />
-    <Compile Include="IKspCraftOrganizerDao.cs" />
-    <Compile Include="KspCraftorganizerDaoKspImpl.cs" />
-    <Compile Include="KspCraftorganizerDaoMockImpl.cs" />
-    <Compile Include="KspCraftOrganizerCOLogger.cs" />
+    <Compile Include="OrganizerService.cs" />
+    <Compile Include="OrganizerTagModel.cs" />
+    <Compile Include="OrganizerCraftModel.cs" />
+    <Compile Include="IKspAl.cs" />
+    <Compile Include="KspAlImpl.cs" />
+    <Compile Include="KspALMock.cs" />
+    <Compile Include="COLogger.cs" />
+    <Compile Include="OrganizerWindow.cs" />
+    <Compile Include="CurrentCraftSettingsWindow.cs" />
+    <Compile Include="Globals.cs" />
+    <Compile Include="CurrentCraftSettingsService.cs" />
+    <Compile Include="SettingsService.cs" />
+    <Compile Include="BaseWindow.cs" />
+    <Compile Include="FileLocationService.cs" />
+    <Compile Include="EditorListenerService.cs" />
+    <Compile Include="OrganizerWindowTagsManagementBar.cs" />
+    <Compile Include="OrganizerWindowCraftList.cs" />
+    <Compile Include="ShouldCurrentCraftBeSavedQuestionWindow.cs" />
+    <Compile Include="MainImpl.cs" />
+    <Compile Include="TagsGrouper.cs" />
+    <Compile Include="OrganizerGroupTagModel.cs" />
+    <Compile Include="ScaledGuiScope.cs" />
+    <Compile Include="ParagraphBoxDrawer.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
