@@ -1,0 +1,17 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KspCraftOrganizerPlugin", "KspCraftOrganizerPlugin\KspCraftOrganizerPlugin.csproj", "{F74B58A2-814B-4572-B886-E7F3C0ADDD2A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F74B58A2-814B-4572-B886-E7F3C0ADDD2A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F74B58A2-814B-4572-B886-E7F3C0ADDD2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F74B58A2-814B-4572-B886-E7F3C0ADDD2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F74B58A2-814B-4572-B886-E7F3C0ADDD2A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
