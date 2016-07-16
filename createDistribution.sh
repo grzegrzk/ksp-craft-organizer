@@ -1,14 +1,14 @@
 #!/bin/bash
 
 rm -rf ./dist
-mkdir -p ./dist/KspCraftOrganizerPlugin/Plugins
-mkdir -p ./dist/KspCraftOrganizerPlugin/icons
+mkdir -p ./dist/KspCraftOrganizer/Plugins
+mkdir -p ./dist/KspCraftOrganizer/icons
 
-cp -r ./icons/*.png ./dist/KspCraftOrganizerPlugin/icons/
+cp -r ./icons/*.png ./dist/KspCraftOrganizer/icons/
 
 xbuild /p:Configuration=Release
-cp ./KspCraftOrganizerPlugin/bin/Release/KspCraftOrganizerPlugin.dll ./dist/KspCraftOrganizerPlugin/Plugins
+cp ./KspCraftOrganizerPlugin/bin/Release/KspCraftOrganizerPlugin.dll ./dist/KspCraftOrganizer/Plugins
 
 pushd ./dist
-zip -r KspCraftOrganizerPlugin.zip KspCraftOrganizerPlugin
+zip -r KspCraftOrganizer.zip KspCraftOrganizer
 popd

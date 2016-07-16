@@ -140,7 +140,7 @@ namespace KspCraftOrganizer {
 		}
 
 		public string getThisPluginDirectory() {
-			return Globals.combinePaths(ksp.getApplicationRootPath(), "GameData", "KspCraftOrganizerPlugin");
+			return Globals.combinePaths(ksp.getApplicationRootPath(), "GameData", "KspCraftOrganizer");
 		}
 
 		public string getPluginSettingsPath() {
