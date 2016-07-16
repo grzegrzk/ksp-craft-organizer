@@ -9,6 +9,8 @@ cp -r ./icons/*.png ./dist/KspCraftOrganizer/icons/
 xbuild /p:Configuration=Release
 cp ./KspCraftOrganizerPlugin/bin/Release/KspCraftOrganizerPlugin.dll ./dist/KspCraftOrganizer/Plugins
 
+cp ./LICENSE ./dist/KspCraftOrganizer/LICENSE.txt
+
 pushd ./dist
 zip -r KspCraftOrganizer.zip KspCraftOrganizer
 popd
