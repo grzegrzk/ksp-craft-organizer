@@ -86,6 +86,7 @@
     <Compile Include="OrganizerGroupTagModel.cs" />
     <Compile Include="ScaledGuiScope.cs" />
     <Compile Include="ParagraphBoxDrawer.cs" />
+    <Compile Include="OrganizerServiceCraftList.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

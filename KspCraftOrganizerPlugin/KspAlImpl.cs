@@ -304,6 +304,7 @@ namespace KspCraftOrganizer
 		public string getSavePathForCraftName(string shipName) {
 			return ShipConstruction.GetSavePath(shipName);
 		}
+
 		public void saveCurrentCraft() {
 			string savePath = ShipConstruction.GetSavePath(EditorLogic.fetch.ship.shipName);
 			COLogger.logDebug("Saving current shipt to " + savePath);

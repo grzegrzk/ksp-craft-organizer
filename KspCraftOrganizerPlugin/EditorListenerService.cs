@@ -63,14 +63,14 @@ namespace KspCraftOrganizer {
 			GameEvents.onEditorUndo.Add(this.onEditorUndo);
 
 			onShipSaved += delegate (string path, bool craftSavedToNewFile) {
-				COLogger.logDebug("On Saved to " + path + ", is new file: " + craftSavedToNewFile);
+				COLogger.logDebug("[Event spy]On Saved to " + path + ", is new file: " + craftSavedToNewFile);
 			};
 
 			onShipLoaded += delegate (string path) {
-				COLogger.logDebug("On Loaded from " + path);
+				COLogger.logDebug("[Event spy]On Loaded from " + path);
 			};
 			onEditorStarted += delegate () {
-				COLogger.logDebug("On Editor started");
+				COLogger.logDebug("[Event spy]On Editor started");
 			};
 
 			if (EditorLogic.fetch.ship == null) {
@@ -80,12 +80,15 @@ namespace KspCraftOrganizer {
 				originalShipRealFileOrNull = null;
 				newEditor = true;
 			} else {
-				COLogger.logDebug("Ship name in editor: " + EditorLogic.fetch.ship.shipName + ", number of parts: " + EditorLogic.fetch.ship.Count + ", file:" + EditorDriver.filePathToLoad);
 				_lastSavedShipName = EditorLogic.fetch.ship.shipName;
 				_lastShipNameInEditor = EditorLogic.fetch.ship.shipName;
-				string file = EditorDriver.filePathToLoad;
-				originalShipRealFileOrNull = file;
 				newEditor = EditorLogic.fetch.ship.Count == 0;
+				string file = EditorDriver.filePathToLoad;
+				if (newEditor) {
+					file = null;
+				}
+				originalShipRealFileOrNull = file;
+				COLogger.logDebug("Ship name in editor: " + _lastSavedShipName + ", number of parts: " + EditorLogic.fetch.ship.Count + ", file:" + originalShipRealFileOrNull);
 				if (!newEditor && onShipLoaded != null) {
 					onShipLoaded(file);
 				}
@@ -170,7 +173,7 @@ namespace KspCraftOrganizer {
 			if (File.Exists(fileSavePath)) {
 				lastSaveDate = File.GetLastWriteTime(fileSavePath);
 			} else {
-				COLogger.logDebug("Cannot find file " + fileSavePath);
+				COLogger.logDebug("Cannot update last save date because file does not exist " + fileSavePath);
 				lastSaveDate = new DateTime(0);
 			}
 		}
@@ -183,29 +186,36 @@ namespace KspCraftOrganizer {
 		public void fireEventIfShipHasBeenSaved() {
 
 			string fileSavePath = fileLocattion.getCraftSaveFilePathForShipName(lastShipNameInEditor);
-			if (File.Exists(fileSavePath) && File.GetLastWriteTime(fileSavePath) > lastSaveDate) {
-				COLogger.logDebug("Craft file for " + lastShipNameInEditor + " changed, previous save date: " + lastSaveDate + ", current save date: " + File.GetLastWriteTime(fileSavePath));
-				if (onShipSaved != null) {
-					onShipSaved(fileSavePath, 
-					            _lastSavedShipName != lastShipNameInEditor || 
-					            newEditor || 
-					            (originalShipRealFileOrNull != null && originalShipRealFileOrNull != fileSavePath));
-				}
+			if (File.Exists(fileSavePath)) {
+				DateTime newWriteTime = File.GetLastWriteTime(fileSavePath);
+				if (newWriteTime > lastSaveDate) {
+					COLogger.logDebug("Craft file for " + lastShipNameInEditor + " changed, previous save date: " + lastSaveDate + ", current save date: " + File.GetLastWriteTime(fileSavePath));
+					if (onShipSaved != null) {
+						onShipSaved(fileSavePath,
+									_lastSavedShipName != lastShipNameInEditor ||
+									newEditor ||
+									(originalShipRealFileOrNull != null && originalShipRealFileOrNull != fileSavePath));
+					}
 
-				lastSaveDate = File.GetLastWriteTime(fileSavePath);
-				_lastSavedShipName = lastShipNameInEditor;
-				originalShipRealFileOrNull = null;
-				newEditor = false;
-				isModifiedSinceSave = false;
+					lastSaveDate = File.GetLastWriteTime(fileSavePath);
+					_lastSavedShipName = lastShipNameInEditor;
+					originalShipRealFileOrNull = null;
+					newEditor = false;
+					isModifiedSinceSave = false;
+				} else {
+					COLogger.logDebug("It was detected that file was not saved because it is not newer, new date: " + newWriteTime + ", old date: " + lastSaveDate + ", file: " + fileSavePath);
+				}
+			} else {
+				COLogger.logDebug("It was detected that file was not saved because it does not exist: " + fileSavePath);
 			}
 
 		}
 
 
 		private void processOnShipNameChanged(string newName) {
-			COLogger.logDebug("processOnShipNameChanged");
-
 			if (lastShipNameInEditor != newName) {
+				COLogger.logDebug("processOnShipNameChanged, old name: " + lastShipNameInEditor + ", new name: " + newName);
+
 				fireEventIfShipHasBeenSaved();
 
 				_lastShipNameInEditor = newName;

@@ -7,20 +7,19 @@ using UnityEngine;
 namespace KspCraftOrganizer
 {
 
-	public class OrganizerService
-	{
+	public class OrganizerService {
 		private IKspAl ksp = IKspAlProvider.instance;
-		private List<OrganizerCraftModel> cachedAvailableCrafts;
-		private OrganizerCraftModel[] cachedFilteredCrafts;
+		//private List<OrganizerCraftModel> cachedAvailableCrafts;
+		//private OrganizerCraftModel[] cachedFilteredCrafts;
 		private SortedList<string, OrganizerTagModel> _availableTags;
-		private OrganizerCraftModel _primaryCraft;
-		private bool _selectAllFiltered;
-		private bool _forceUncheckSelectAllFiltered;
+		//private OrganizerCraftModel _primaryCraft;
+		//private bool _selectAllFiltered;
+		//private bool _forceUncheckSelectAllFiltered;
 		private string _craftNameFilter;
 		private bool filterChanged;
-		private int cachedSelectedCraftsCount;
-		private CraftType _craftType;
-		private Dictionary<CraftType, List<OrganizerCraftModel>> craftTypeToAvailableCraftsLazy = new Dictionary<CraftType, List<OrganizerCraftModel>> ();
+		//private int cachedSelectedCraftsCount;
+		//private CraftType _craftType;
+		//private Dictionary<CraftType, List<OrganizerCraftModel>> craftTypeToAvailableCraftsLazy = new Dictionary<CraftType, List<OrganizerCraftModel>> ();
 		private bool _profileSettingsFileIsDirtyDoNotEditDirectly;
 		private GuiStyleOption _selectedGuiStyle;
 		private SortedList<string, OrganizerTagModel> _usedTags = new SortedList<string, OrganizerTagModel>();
@@ -29,23 +28,23 @@ namespace KspCraftOrganizer
 
 		private SettingsService settingsService = SettingsService.instance;
 		private FileLocationService fileLocationService = FileLocationService.instance;
+		private OrganizerServiceCraftList craftList;
 
-		public OrganizerService(){
-			_craftType = ksp.getCurrentCraftType();
+		public OrganizerService() {
+			this.craftList = new OrganizerServiceCraftList(this);
+			//_craftType = ksp.getCurrentCraftType();
 			groupTags = new OrganizerTagGroupsModel(this);
-			ProfileSettingsDto profileSettigngs = settingsService.readProfileSettings ();
+			ProfileSettingsDto profileSettigngs = settingsService.readProfileSettings();
 			_availableTags = new SortedList<string, OrganizerTagModel>();
 			_selectedGuiStyle = profileSettigngs.selectedGuiStyle;
 			if (_selectedGuiStyle == null) {
 				_selectedGuiStyle = GuiStyleOption.Ksp;
 			}
-			foreach(string tagName in profileSettigngs.availableTags){
-				addAvailableTag (tagName);
+			foreach (string tagName in profileSettigngs.availableTags) {
+				addAvailableTag(tagName);
 			}
-			foreach (string tagName in profileSettigngs.selectedFilterTags)
-			{
-				if (!_availableTags.ContainsKey(tagName))
-				{
+			foreach (string tagName in profileSettigngs.selectedFilterTags) {
+				if (!_availableTags.ContainsKey(tagName)) {
 					addAvailableTag(tagName);
 				}
 				_availableTags[tagName].selectedForFiltering = true;
@@ -55,31 +54,35 @@ namespace KspCraftOrganizer
 			markProfileSettingsAsNotDirty("Constructor - fresh settings were just read");
 		}
 
-
-		public ICollection<OrganizerTagModel> availableTags{
-			get{
+		public bool selectAllFiltered {
+			get {
+				return craftList.selectAllFiltered;
+			}
+		}
+		public ICollection<OrganizerTagModel> availableTags {
+			get {
 				return new ReadOnlyCollection<OrganizerTagModel>(new List<OrganizerTagModel>(_availableTags.Values));
 			}
 		}
 
-		public string craftNameFilter { 
-			get { 
+		public string craftNameFilter {
+			get {
 				return _craftNameFilter;
-			}  
-			set{ 
+			}
+			set {
 				if (_craftNameFilter != value) {
 					_craftNameFilter = value;
-					markFilterAsChanged ();
+					markFilterAsChanged();
 				}
-			} 
+			}
 		}
 
-		public void markFilterAsChanged(){
+		public void markFilterAsChanged() {
 			filterChanged = true;
 			markProfileSettingsAsDirty("Filter changed");
 		}
 
-		private bool profileSettingsFileIsDirty { get { return _profileSettingsFileIsDirtyDoNotEditDirectly; }}
+		private bool profileSettingsFileIsDirty { get { return _profileSettingsFileIsDirtyDoNotEditDirectly; } }
 
 		private void markProfileSettingsAsNotDirty(string reason) {
 			COLogger.logTrace("marking profile settings as NOT dirty, reason: " + reason);
@@ -91,47 +94,53 @@ namespace KspCraftOrganizer
 			_profileSettingsFileIsDirtyDoNotEditDirectly = true;
 		}
 
-		public void updateFilteredCrafts(){
-			if (filterChanged) {
-				this.cachedFilteredCrafts = null;
-			}
-		}
+		//public void updateFilteredCrafts(){
+		//	if (filterChanged) {
+		//		this.cachedFilteredCrafts = null;
+		//	}
+		//}
 
 
-		public bool craftListModifiedDueToFilter { get; private set; }
+		public bool craftsAreFiltered { get { return craftList.craftsAreFiltered; } }
 
-		public OrganizerCraftModel[] filteredCrafts{
+		public OrganizerCraftModel[] filteredCrafts {
 			get {
-				if(cachedFilteredCrafts == null){
-					cachedFilteredCrafts = createFilteredCrafts();
-				}
-				return cachedFilteredCrafts;
+				return craftList.filteredCrafts;
 			}
 		}
 
-		private OrganizerCraftModel[] createFilteredCrafts(){
-			List<OrganizerCraftModel> filtered = new List<OrganizerCraftModel> ();
-			string upperFilter = craftNameFilter.ToUpper();
-			craftListModifiedDueToFilter = true;
-			foreach(OrganizerCraftModel craft in availableCrafts){
-				bool shouldBeVisibleByDefault;
-				if (doesCraftPassFilter (upperFilter, craft, out shouldBeVisibleByDefault)) {
-					filtered.Add (craft);
-					if (!shouldBeVisibleByDefault) {
-						craftListModifiedDueToFilter = false;
-					}
-				} else {
-					if (shouldBeVisibleByDefault) {
-						craftListModifiedDueToFilter = false;
-					}
-					if (craft.isSelectedPrimary) {
-						primaryCraft = null;
-					}
-					craft.setSelectedInternal (false);
-				}
-			}
-			return filtered.ToArray();
-		}
+		//public OrganizerCraftModel[] filteredCrafts{
+		//	get {
+		//		if(cachedFilteredCrafts == null){
+		//			cachedFilteredCrafts = createFilteredCrafts();
+		//		}
+		//		return cachedFilteredCrafts;
+		//	}
+		//}
+
+		//private OrganizerCraftModel[] createFilteredCrafts(){
+		//	List<OrganizerCraftModel> filtered = new List<OrganizerCraftModel> ();
+		//	string upperFilter = craftNameFilter.ToUpper();
+		//	craftListModifiedDueToFilter = true;
+		//	foreach(OrganizerCraftModel craft in availableCrafts){
+		//		bool shouldBeVisibleByDefault;
+		//		if (doesCraftPassFilter (upperFilter, craft, out shouldBeVisibleByDefault)) {
+		//			filtered.Add (craft);
+		//			if (!shouldBeVisibleByDefault) {
+		//				craftListModifiedDueToFilter = false;
+		//			}
+		//		} else {
+		//			if (shouldBeVisibleByDefault) {
+		//				craftListModifiedDueToFilter = false;
+		//			}
+		//			if (craft.isSelectedPrimary) {
+		//				primaryCraft = null;
+		//			}
+		//			craft.setSelectedInternal (false);
+		//		}
+		//	}
+		//	return filtered.ToArray();
+		//}
 
 		internal GuiStyleOption selectedGuiStyle {
 			get {
@@ -165,46 +174,54 @@ namespace KspCraftOrganizer
 			return pass;
 		}
 
-		public List<OrganizerCraftModel> availableCrafts{
+		//public List<OrganizerCraftModel> availableCrafts{
+		//	get {
+		//		if(cachedAvailableCrafts == null){
+		//			cachedAvailableCrafts = getCraftsOfType (_craftType);
+		//		}
+		//		return cachedAvailableCrafts;
+		//	}
+		//}
+
+
+		public List<OrganizerCraftModel> availableCrafts {
 			get {
-				if(cachedAvailableCrafts == null){
-					cachedAvailableCrafts = getCraftsOfType (_craftType);
-				}
-				return cachedAvailableCrafts;
+				return craftList.availableCrafts;
 			}
 		}
-		private List<OrganizerCraftModel> getCraftsOfType(CraftType type){
-			if (!craftTypeToAvailableCraftsLazy.ContainsKey(type)) {
-				craftTypeToAvailableCraftsLazy.Add(type, fetchAvailableCrafts(type));
-			}
-			return craftTypeToAvailableCraftsLazy[type];
-		}
 
-		private List<OrganizerCraftModel> fetchAvailableCrafts(CraftType type)
-		{
-			COLogger.logDebug("fetching '" + type + "' crafts from disk");
+		//private List<OrganizerCraftModel> getCraftsOfType(CraftType type){
+		//	if (!craftTypeToAvailableCraftsLazy.ContainsKey(type)) {
+		//		craftTypeToAvailableCraftsLazy.Add(type, fetchAvailableCrafts(type));
+		//	}
+		//	return craftTypeToAvailableCraftsLazy[type];
+		//}
 
-			string craftDirectory = fileLocationService.getCraftDirectoryForCraftType(type);
-			List<OrganizerCraftModel> toRetList = new List<OrganizerCraftModel>();
-			toRetList.AddRange(fetchAvailableCrafts(craftDirectory, type, false));
-			if (ksp.isShowStockCrafts())
-			{
-				craftDirectory = fileLocationService.getStockCraftDirectoryForCraftType(type);
-				toRetList.AddRange(fetchAvailableCrafts(craftDirectory, type, true));
-			}
+		//private List<OrganizerCraftModel> fetchAvailableCrafts(CraftType type)
+		//{
+		//	COLogger.logDebug("fetching '" + type + "' crafts from disk");
+
+		//	string craftDirectory = fileLocationService.getCraftDirectoryForCraftType(type);
+		//	List<OrganizerCraftModel> toRetList = new List<OrganizerCraftModel>();
+		//	toRetList.AddRange(fetchAvailableCrafts(craftDirectory, type, false));
+		//	if (ksp.isShowStockCrafts())
+		//	{
+		//		craftDirectory = fileLocationService.getStockCraftDirectoryForCraftType(type);
+		//		toRetList.AddRange(fetchAvailableCrafts(craftDirectory, type, true));
+		//	}
 
 
-			toRetList.Sort(delegate (OrganizerCraftModel c1, OrganizerCraftModel c2)
-			{
-				int craftComparisonResult = -c1.isAutosaved.CompareTo(c2.isAutosaved);
-				if (craftComparisonResult == 0)
-				{
-					craftComparisonResult = c1.name.CompareTo(c2.name);
-				}
-				return craftComparisonResult;
-			});
-			return toRetList;
-		}
+		//	toRetList.Sort(delegate (OrganizerCraftModel c1, OrganizerCraftModel c2)
+		//	{
+		//		int craftComparisonResult = -c1.isAutosaved.CompareTo(c2.isAutosaved);
+		//		if (craftComparisonResult == 0)
+		//		{
+		//			craftComparisonResult = c1.name.CompareTo(c2.name);
+		//		}
+		//		return craftComparisonResult;
+		//	});
+		//	return toRetList;
+		//}
 
 		internal Texture2D getThumbnailForFile(string craftFile) {
 			return ksp.getThumbnail(fileLocationService.getThumbUrl(craftFile));
@@ -212,31 +229,31 @@ namespace KspCraftOrganizer
 
 		public bool doNotWriteTagSettingsToDisk { get; internal set; }
 
-		private OrganizerCraftModel[] fetchAvailableCrafts(String craftDirectory, CraftType type, bool isStock){
-			COLogger.logDebug ("fetching '" + type + "' crafts from disk from " + craftDirectory);
-			float startLoadingTime = Time.realtimeSinceStartup;
-			string[] craftFiles = fileLocationService.getAllCraftFilesInDirectory(craftDirectory);
-			OrganizerCraftModel[] toRet = new OrganizerCraftModel[craftFiles.Length];
+		//private OrganizerCraftModel[] fetchAvailableCrafts(String craftDirectory, CraftType type, bool isStock){
+		//	COLogger.logDebug ("fetching '" + type + "' crafts from disk from " + craftDirectory);
+		//	float startLoadingTime = Time.realtimeSinceStartup;
+		//	string[] craftFiles = fileLocationService.getAllCraftFilesInDirectory(craftDirectory);
+		//	OrganizerCraftModel[] toRet = new OrganizerCraftModel[craftFiles.Length];
 
-			for (int i = 0; i < craftFiles.Length; ++i) {
-				toRet[i] = new OrganizerCraftModel(this, craftFiles[i]);
-				toRet[i].isAutosaved = ksp.getAutoSaveCraftName() == Path.GetFileNameWithoutExtension(craftFiles[i]);
-				toRet[i].isStock = isStock;
+		//	for (int i = 0; i < craftFiles.Length; ++i) {
+		//		toRet[i] = new OrganizerCraftModel(this, craftFiles[i]);
+		//		toRet[i].isAutosaved = ksp.getAutoSaveCraftName() == Path.GetFileNameWithoutExtension(craftFiles[i]);
+		//		toRet[i].isStock = isStock;
 
-				CraftSettingsDto craftSettings = settingsService.readCraftSettingsForCraftFile (toRet[i].craftFile);
-				foreach (string craftTag in craftSettings.tags) {
-					addAvailableTag (craftTag);
-					toRet[i].addTag (craftTag);
-				}
-				toRet[i].nameFromSettingsFile = craftSettings.craftName;
-				toRet[i].craftSettingsFileIsDirty = false;
+		//		CraftSettingsDto craftSettings = settingsService.readCraftSettingsForCraftFile (toRet[i].craftFile);
+		//		foreach (string craftTag in craftSettings.tags) {
+		//			addAvailableTag (craftTag);
+		//			toRet[i].addTag (craftTag);
+		//		}
+		//		toRet[i].nameFromSettingsFile = craftSettings.craftName;
+		//		toRet[i].craftSettingsFileIsDirty = false;
 
-				toRet[i].finishCreationMode();
-			}
-			float endLoadingTime = Time.realtimeSinceStartup;
-			COLogger.logDebug("Finished fetching " + craftFiles.Length + " crafts, it took " + (endLoadingTime - startLoadingTime) + "s");
-			return toRet;
-		}
+		//		toRet[i].finishCreationMode();
+		//	}
+		//	float endLoadingTime = Time.realtimeSinceStartup;
+		//	COLogger.logDebug("Finished fetching " + craftFiles.Length + " crafts, it took " + (endLoadingTime - startLoadingTime) + "s");
+		//	return toRet;
+		//}
 
 		public CraftDaoDto getCraftInfo(string craftFilePath) {
 			return ksp.getCraftInfo(craftFilePath);
@@ -271,69 +288,95 @@ namespace KspCraftOrganizer
 			groupTags.setGroupHasSelectedNoneFilter(groupName, tagsInGroup);
 		}
 
-		public OrganizerCraftModel primaryCraft {
-			set {
-				if (_primaryCraft != null) {
-					_primaryCraft.setSelectedPrimaryInternal(false);
-				}
-				_primaryCraft = value;
-				if (_primaryCraft != null) {
-					_primaryCraft.setSelectedPrimaryInternal(true);
-				}
-			}
-			get {
-				return _primaryCraft;
-			}
+		//public OrganizerCraftModel primaryCraft {
+		//	set {
+		//		if (_primaryCraft != null) {
+		//			_primaryCraft.setSelectedPrimaryInternal(false);
+		//		}
+		//		_primaryCraft = value;
+		//		if (_primaryCraft != null) {
+		//			_primaryCraft.setSelectedPrimaryInternal(true);
+		//		}
+		//	}
+		//	get {
+		//		return _primaryCraft;
+		//	}
+		//}
+
+		//public void renameCraft(OrganizerCraftModel model, string newName){
+		//	string newFile = fileLocationService.renameCraft(model.craftFile, newName);
+		//	model.setCraftFileInternal(newFile);
+		//	model.craftDto.name = newName;
+		//}
+
+
+		//internal void deleteCraft(OrganizerCraftModel model) {
+		//	fileLocationService.deleteCraft(model.craftFile);
+		//	availableCrafts.Remove(model);
+		//}
+
+		public void unselectAllCrafts() {
+			craftList.unselectAllCrafts();
 		}
 
-		public void renameCraft(OrganizerCraftModel model, string newName){
-			string newFile = fileLocationService.renameCraft(model.craftFile, newName);
-			model.setCraftFileInternal(newFile);
-			model.craftDto.name = newName;
-		}
+		//public void unselectAllCrafts(){
+		//	foreach (OrganizerCraftModel craft in filteredCrafts) {
+		//		craft.isSelected = false;
+		//	}
+		//}
 
+		public void update(bool selectAll) {
+			string upperFilter = craftNameFilter.ToUpper();
+			craftList.update(delegate (OrganizerCraftModel craft, out bool shouldBeVisibleByDefault){ 
+				return doesCraftPassFilter(upperFilter, craft, out shouldBeVisibleByDefault); 
+			}, selectAll, filterChanged);
 
-		internal void deleteCraft(OrganizerCraftModel model) {
-			fileLocationService.deleteCraft(model.craftFile);
-			availableCrafts.Remove(model);
-		}
-
-		public void unselectAllCrafts(){
-			foreach (OrganizerCraftModel craft in filteredCrafts) {
-				craft.isSelected = false;
-			}
-		}
-
-		public bool updateSelectedCrafts (bool selectAll){
-			if (_forceUncheckSelectAllFiltered) {
-				_selectAllFiltered = false;
-				_forceUncheckSelectAllFiltered = false;
-			} else {
-				if (_selectAllFiltered != selectAll || selectAll) {
-					foreach (OrganizerCraftModel craft in filteredCrafts) {
-						craft.isSelected = selectAll;
-					}
-					_selectAllFiltered = selectAll;
-				}
-			}
-			cachedSelectedCraftsCount = 0;
 			foreach (OrganizerTagModel tag in _availableTags.Values) {
 				tag.countOfSelectedCraftsWithThisTag = 0;
 			}
-			foreach(OrganizerCraftModel craft in filteredCrafts){
+			foreach (OrganizerCraftModel craft in filteredCrafts) {
 				if (craft.isSelected) {
-					cachedSelectedCraftsCount += 1;
 					foreach (string tag in craft.tags) {
-						++_availableTags [tag].countOfSelectedCraftsWithThisTag;
+						++_availableTags[tag].countOfSelectedCraftsWithThisTag;
 					}
 				}
 			}
 			foreach (OrganizerTagModel tag in _availableTags.Values) {
-				tag.updateTagState ();
+				tag.updateTagState();
 			}
 
-			return _selectAllFiltered;
 		}
+
+		//public bool updateSelectedCrafts (bool selectAll){
+		//	if (_forceUncheckSelectAllFiltered) {
+		//		_selectAllFiltered = false;
+		//		_forceUncheckSelectAllFiltered = false;
+		//	} else {
+		//		if (_selectAllFiltered != selectAll || selectAll) {
+		//			foreach (OrganizerCraftModel craft in filteredCrafts) {
+		//				craft.isSelected = selectAll;
+		//			}
+		//			_selectAllFiltered = selectAll;
+		//		}
+		//	}
+		//	cachedSelectedCraftsCount = 0;
+		//	foreach (OrganizerTagModel tag in _availableTags.Values) {
+		//		tag.countOfSelectedCraftsWithThisTag = 0;
+		//	}
+		//	foreach(OrganizerCraftModel craft in filteredCrafts){
+		//		if (craft.isSelected) {
+		//			cachedSelectedCraftsCount += 1;
+		//			foreach (string tag in craft.tags) {
+		//				++_availableTags [tag].countOfSelectedCraftsWithThisTag;
+		//			}
+		//		}
+		//	}
+		//	foreach (OrganizerTagModel tag in _availableTags.Values) {
+		//		tag.updateTagState ();
+		//	}
+
+		//	return _selectAllFiltered;
+		//}
 
 		public ICollection<OrganizerTagModel> usedTags {
 			get {
@@ -359,12 +402,12 @@ namespace KspCraftOrganizer
 		}
 
 		public void onOneCraftUnselected(){
-			_forceUncheckSelectAllFiltered = true;
+			craftList.forceUncheckSelectAllFiltered = true;
 		}
 
 		public int selectedCraftsCount { 
 			get {
-				return cachedSelectedCraftsCount;
+				return craftList.selectedCraftsCount;
 			} 
 		}
 
@@ -403,10 +446,10 @@ namespace KspCraftOrganizer
 
 		public void removeTag(string tag){
 			if (_availableTags.ContainsKey (tag)) {
-				foreach (OrganizerCraftModel craft in getCraftsOfType(CraftType.SPH)) {
+				foreach (OrganizerCraftModel craft in craftList.getCraftsOfType(CraftType.SPH)) {
 					craft.removeTag (tag);
 				}
-				foreach (OrganizerCraftModel craft in getCraftsOfType(CraftType.VAB)) {
+				foreach (OrganizerCraftModel craft in craftList.getCraftsOfType(CraftType.VAB)) {
 					craft.removeTag (tag);
 				}
 				_availableTags.Remove (tag);
@@ -415,13 +458,13 @@ namespace KspCraftOrganizer
 		}
 
 		public void renameTag(string oldName, string newName){
-			foreach (OrganizerCraftModel craft in getCraftsOfType(CraftType.SPH)) {
+			foreach (OrganizerCraftModel craft in craftList.getCraftsOfType(CraftType.SPH)) {
 				if (craft.containsTag (oldName)) {
 					craft.addTag (newName);
 					craft.removeTag (oldName);
 				}
 			}
-			foreach (OrganizerCraftModel craft in getCraftsOfType(CraftType.VAB)) {
+			foreach (OrganizerCraftModel craft in craftList.getCraftsOfType(CraftType.VAB)) {
 				if (craft.containsTag (oldName)) {
 					craft.addTag (newName);
 					craft.removeTag (oldName);
@@ -440,30 +483,55 @@ namespace KspCraftOrganizer
 			markProfileSettingsAsDirty("Tag renamed");
 		}
 
+		public OrganizerCraftModel primaryCraft {
+			get {
+				return craftList.primaryCraft;
+			}
+			set {
+				craftList.primaryCraft = value;
+			}
+		}
+
+		public void renameCraft(OrganizerCraftModel craft, string newName) {
+			craftList.renameCraft(craft, newName);
+		}
+
+		public void deleteCraft(OrganizerCraftModel craft) {
+			craftList.deleteCraft(craft);
+		}
 
 		public CraftType craftType {
 			get {
-				return _craftType;
+				return craftList.craftType;
 			}
-
 			set {
-				if (value != _craftType) {
-					_craftType = value;
-					clearCaches ();
-					if (this._primaryCraft != null)
-					{
-						this._primaryCraft.setSelectedPrimaryInternal(false);
-					}
-					this._primaryCraft = null;
-				}
+				craftList.craftType = value;
 			}
 		}
 
-		private void clearCaches(){
-			this.cachedAvailableCrafts = null;
-			this.cachedFilteredCrafts = null;
-			this.cachedSelectedCraftsCount = 0;
-		}
+		//public CraftType craftType {
+		//	get {
+		//		return _craftType;
+		//	}
+
+		//	set {
+		//		if (value != _craftType) {
+		//			_craftType = value;
+		//			clearCaches ();
+		//			if (this._primaryCraft != null)
+		//			{
+		//				this._primaryCraft.setSelectedPrimaryInternal(false);
+		//			}
+		//			this._primaryCraft = null;
+		//		}
+		//	}
+		//}
+
+		//private void clearCaches(){
+		//	this.cachedAvailableCrafts = null;
+		//	this.cachedFilteredCrafts = null;
+		//	this.cachedSelectedCraftsCount = 0;
+		//}
 
 		public bool isCraftAlreadyLoadedInWorkspace(){
 			return ksp.isCraftAlreadyLoadedInWorkspace ();
@@ -500,7 +568,7 @@ namespace KspCraftOrganizer
 				markProfileSettingsAsNotDirty("Settings were just written to the disk");
 			}
 			if (!doNotWriteTagSettingsToDisk) {
-				foreach (List<OrganizerCraftModel> crafts in craftTypeToAvailableCraftsLazy.Values) {
+				foreach (List<OrganizerCraftModel> crafts in craftList.alreadyLoadedCrafts) {
 					foreach (OrganizerCraftModel craft in crafts) {
 						if (craft.craftSettingsFileIsDirty) {
 							CraftSettingsDto dto = new CraftSettingsDto();

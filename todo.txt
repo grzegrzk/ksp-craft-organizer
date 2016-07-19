@@ -1,4 +1,14 @@
 TODO:
+ - The tags selected in a single group should display crafts with any of the selected tags
+ - Correct bug with tags not being saved in this scenario: open craft -> change name -> save -> go to different building using "go to" plugin
+ - Remember selected filter separately for VABinVAB/SPHinVAB/VABinSPH/SPHinSPH
+ - Add above the craft list a list of non-default selected tags with possibility to clear them, like:
+ 	Bodies: [Eve x] [Duna x] BuildingStage: [Final x] [Clear All] [>>]
+ - Cache cost/part count/etc in separate file so loading is much faster
+ - Add button "+" inside craft that will add tag in a given category
+ - Add button "+" inside craft that will add tag in any category
+ - Add button "x" next to each tag in craft that will remove it
+ - Add dropdown box for each tag that will allow it to be changed to different one in the same category
  
 Cancelled or far future:
  - Add toolbar next to category in filters: [All | Any | Single]
@@ -37,7 +47,7 @@ Done:
  - When editor is locked the "close" should be locked as well
  - add "Status\Archived" to default tags, change the prefix "Building Stage\" to "Status\"
  - In "Filter" window show tags in categories. In each category add special filtering option <with no tag from this category>
- - make changes to make it possible to chave "archived" tag that will be quite natural to use
+ - make changes to make it possible to have "archived" tag that will be quite natural to use
  - Load craft lazily - first load metadata if it exists (it should contain the craft name as well), then filter the crafts
  	and lastly load full craft's data only if it is on the list
  - make the window wider on wider monitors

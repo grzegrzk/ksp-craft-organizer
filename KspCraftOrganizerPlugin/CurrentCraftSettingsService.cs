@@ -108,7 +108,7 @@ namespace KspCraftOrganizer
 					addTagIfNeeded(tag);
 				}
 
-				COLogger.logDebug("Reading current's craft tags from assuming its file " + craftListenerService.originalShipFile);
+				COLogger.logDebug("Reading current's craft tags assuming its file is " + craftListenerService.originalShipFile);
 				if (!craftListenerService.isNewEditor() && File.Exists(craftListenerService.originalShipFile)) {
 					foreach (string tag in settingsService.readCraftSettingsForCraftFile(craftListenerService.originalShipFile).tags) {
 						addTagIfNeeded(tag);

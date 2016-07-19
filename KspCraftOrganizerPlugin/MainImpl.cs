@@ -80,7 +80,7 @@ namespace KspCraftOrganizer {
 		}
 
 		private void CleanUp() {
-			COLogger.logDebug("Craft organizer plugin - CleanUp");
+			COLogger.logDebug("Craft organizer plugin - CleanUp in " + EditorDriver.editorFacility);
 			EditorListenerService.instance.processOnEditorExit();
 
 			foreach (ApplicationLauncherButton button in appLauncherButtons) {
@@ -106,12 +106,12 @@ namespace KspCraftOrganizer {
 		}
 
 		public void OnDestroy() {
-			COLogger.logDebug("Craft organizer plugin - OnDestroy");
+			COLogger.logDebug("Craft organizer plugin - OnDestroy in " + EditorDriver.editorFacility);
 			CleanUp();
 		}
 
 		public void OnDisable() {
-			COLogger.logDebug("Craft organizer plugin - OnDisable");
+			COLogger.logDebug("Craft organizer plugin - OnDisable in " + EditorDriver.editorFacility);
 		}
 	}
 }

@@ -75,12 +75,15 @@ namespace KspCraftOrganizer {
 		override public void update() {
 			base.update();
 			if (windowDisplayed) {
-				model.updateFilteredCrafts();
+				model.update(selectAllFiltered);
+				this.selectAllFiltered = model.selectAllFiltered;
+
+				//model.updateFilteredCrafts();
 				if (model.primaryCraft == null) {
 					this.selectedCraftName = "";
 				}
 				model.selectedGuiStyle = GuiStyleOption.SKIN_STATES[selectedGuiSkin];
-				selectAllFiltered = model.updateSelectedCrafts(selectAllFiltered);
+				//selectAllFiltered = model.updateSelectedCrafts(selectAllFiltered);
 				model.updateUsedTags();
 				guiStyleOption = GuiStyleOption.SKIN_STATES[selectedGuiSkin];
 			}
@@ -136,7 +139,7 @@ namespace KspCraftOrganizer {
 				int sphOrVab = GUILayout.Toolbar(Array.IndexOf(SPH_VAB_STATES, model.craftType), SPH_VAB, GUILayout.Width(150), GUILayout.ExpandWidth(false));
 				model.craftType = SPH_VAB_STATES[sphOrVab];
 
-				bool displayCraftsFilteredWarning = !model.craftListModifiedDueToFilter;
+				bool displayCraftsFilteredWarning = model.craftsAreFiltered;
 				if (!displayCraftsFilteredWarning) {
 					GUI.BeginClip(Globals.ZERO_RECT);
 				}
