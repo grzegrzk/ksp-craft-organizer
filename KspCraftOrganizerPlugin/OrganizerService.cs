@@ -7,40 +7,22 @@ namespace KspCraftOrganizer
 
 	public class OrganizerService {
 		private IKspAl ksp = IKspAlProvider.instance;
-		private SortedList<string, OrganizerTagModel> _availableTags;
-		private string _craftNameFilter;
-		private bool filterChanged;
 		private bool _profileSettingsFileIsDirtyDoNotEditDirectly;
 		private GuiStyleOption _selectedGuiStyle;
-		private SortedList<string, OrganizerTagModel> _usedTags = new SortedList<string, OrganizerTagModel>();
-
-		private OrganizerTagGroupsModel groupTags;
 
 		private SettingsService settingsService = SettingsService.instance;
 		private FileLocationService fileLocationService = FileLocationService.instance;
 		private OrganizerServiceCraftList craftList;
+		private OrganizerServiceFilter filter;
 
 		public OrganizerService() {
 			this.craftList = new OrganizerServiceCraftList(this);
-			//_craftType = ksp.getCurrentCraftType();
-			groupTags = new OrganizerTagGroupsModel(this);
-			ProfileSettingsDto profileSettigngs = settingsService.readProfileSettings();
-			_availableTags = new SortedList<string, OrganizerTagModel>();
-			_selectedGuiStyle = profileSettigngs.selectedGuiStyle;
+			ProfileSettingsDto profileSettings = settingsService.readProfileSettings();
+			this.filter = new OrganizerServiceFilter(this, profileSettings);
+			_selectedGuiStyle = profileSettings.selectedGuiStyle;
 			if (_selectedGuiStyle == null) {
 				_selectedGuiStyle = GuiStyleOption.Ksp;
 			}
-			foreach (string tagName in profileSettigngs.availableTags) {
-				addAvailableTag(tagName);
-			}
-			foreach (string tagName in profileSettigngs.selectedFilterTags) {
-				if (!_availableTags.ContainsKey(tagName)) {
-					addAvailableTag(tagName);
-				}
-				_availableTags[tagName].selectedForFiltering = true;
-			}
-			groupTags.setInitialGroupsWithSelectedNone(profileSettigngs.filterGroupsWithSelectedNoneOption);
-			craftNameFilter = profileSettigngs.selectedTextFilter;
 			markProfileSettingsAsNotDirty("Constructor - fresh settings were just read");
 		}
 
@@ -49,27 +31,28 @@ namespace KspCraftOrganizer
 				return craftList.selectAllFiltered;
 			}
 		}
+
 		public ICollection<OrganizerTagModel> availableTags {
 			get {
-				return new ReadOnlyCollection<OrganizerTagModel>(new List<OrganizerTagModel>(_availableTags.Values));
+				return filter.availableTags;
 			}
 		}
 
 		public string craftNameFilter {
 			get {
-				return _craftNameFilter;
+				return filter.craftNameFilter;
 			}
 			set {
-				if (_craftNameFilter != value) {
-					_craftNameFilter = value;
-					markFilterAsChanged();
-				}
+				filter.craftNameFilter = value;
 			}
 		}
 
 		public void markFilterAsChanged() {
-			filterChanged = true;
-			markProfileSettingsAsDirty("Filter changed");
+			filter.markFilterAsChanged();
+		}
+
+		public List<OrganizerCraftModel> getCraftsOfType(CraftType type) {
+			return craftList.getCraftsOfType(type);
 		}
 
 		private bool profileSettingsFileIsDirty { get { return _profileSettingsFileIsDirtyDoNotEditDirectly; } }
@@ -79,7 +62,7 @@ namespace KspCraftOrganizer
 			_profileSettingsFileIsDirtyDoNotEditDirectly = false;
 		}
 
-		private void markProfileSettingsAsDirty(string reason) {
+		public void markProfileSettingsAsDirty(string reason) {
 			COLogger.logTrace("marking profile settings as dirty, reason: " + reason);
 			_profileSettingsFileIsDirtyDoNotEditDirectly = true;
 		}
@@ -104,26 +87,6 @@ namespace KspCraftOrganizer
 			}
 		}
 
-		bool doesCraftPassFilter (string upperFilter, OrganizerCraftModel craft, out bool shouldBeVisibleByDefault)
-		{
-			shouldBeVisibleByDefault = true;
-			bool pass = true;
-			pass = pass && ( craft.nameToDisplay.ToUpper ().Contains (upperFilter) || craftNameFilter == "");
-			foreach (OrganizerTagModel tag in _availableTags.Values) {
-				if (tag.selectedForFiltering) {
-					pass = pass && (craft.containsTag(tag.name));
-				}
-				if (YesNoTag.isByDefaultNegativeTag(tag.name) && craft.containsTag(tag.name)){
-					shouldBeVisibleByDefault = false;
-				}
-				if (YesNoTag.isByDefaultPositiveTag(tag.name) && !craft.containsTag(tag.name)) {
-					shouldBeVisibleByDefault = false;
-				}
-			}
-			pass = pass && groupTags.doesCraftPassFilter(craft);
-			return pass;
-		}
-
 		public List<OrganizerCraftModel> availableCrafts {
 			get {
 				return craftList.availableCrafts;
@@ -134,86 +97,41 @@ namespace KspCraftOrganizer
 			return ksp.getThumbnail(fileLocationService.getThumbUrl(craftFile));
 		}
 
-		public bool doNotWriteTagSettingsToDisk { get; internal set; }
+		public bool doNotWriteTagSettingsToDisk { get; set; }
 
 		public CraftDaoDto getCraftInfo(string craftFilePath) {
 			return ksp.getCraftInfo(craftFilePath);
 		}
 
 		public void clearFilters() {
-			craftNameFilter = "";
-			groupTags.clearFilters();
-			foreach (OrganizerTagModel tag in availableTags) {
-				tag.selectedForFiltering = false;
-				if (YesNoTag.isByDefaultNegativeTag(tag.name)) {
-					List<string> singleList = new List<string>();
-					singleList.Add(tag.name);
-					groupTags.setGroupHasSelectedNoneFilter(tag.name, singleList);
-				}
-				if (YesNoTag.isByDefaultPositiveTag(tag.name)) {
-					tag.selectedForFiltering = true;
-				}
-			}
+			filter.clearFilters();
 		}
-
 
 		public ICollection<string> beginNewTagGroupsFilterSpecification() {
-			return groupTags.beginNewFilterSpecification();
-		}
-
-		public void endFilterSpecification() {
-			groupTags.endFilterSpecification();
+			return filter.beginNewTagGroupsFilterSpecification();
 		}
 
 		public void setGroupHasSelectedNoneFilter(string groupName, ICollection<string> tagsInGroup) {
-			groupTags.setGroupHasSelectedNoneFilter(groupName, tagsInGroup);
+			filter.setGroupHasSelectedNoneFilter(groupName, tagsInGroup);
+		}
+
+		public void endFilterSpecification() {
+		 	filter.endFilterSpecification();
 		}
 
 		public void unselectAllCrafts() {
 			craftList.unselectAllCrafts();
 		}
-		public void update(bool selectAll) {
-			string upperFilter = craftNameFilter.ToUpper();
-			craftList.update(delegate (OrganizerCraftModel craft, out bool shouldBeVisibleByDefault){ 
-				return doesCraftPassFilter(upperFilter, craft, out shouldBeVisibleByDefault); 
-			}, selectAll, filterChanged);
 
-			foreach (OrganizerTagModel tag in _availableTags.Values) {
-				tag.countOfSelectedCraftsWithThisTag = 0;
-			}
-			foreach (OrganizerCraftModel craft in filteredCrafts) {
-				if (craft.isSelected) {
-					foreach (string tag in craft.tags) {
-						++_availableTags[tag].countOfSelectedCraftsWithThisTag;
-					}
-				}
-			}
-			foreach (OrganizerTagModel tag in _availableTags.Values) {
-				tag.updateTagState();
-			}
+		public void update(bool selectAll) {
+			OrganizerServiceCraftList.CraftFilterPredicate filterPredicate = filter.createCraftFilterPredicate();
+			craftList.update(filterPredicate, selectAll, filter.filterChanged);
+			filter.update();
 
 		}
-
 		public ICollection<OrganizerTagModel> usedTags {
 			get {
-				return new ReadOnlyCollection<OrganizerTagModel>(_usedTags.Values);
-			}
-		}
-
-		public void updateUsedTags(){
-			_usedTags.Clear();
-			foreach (OrganizerCraftModel craft in availableCrafts) {
-				foreach(string tag in craft.tags) {
-					if (!_usedTags.ContainsKey(tag)) {
-						_usedTags.Add(tag, _availableTags[tag]);
-					}
-				}
-			}
-
-			foreach (OrganizerTagModel tag in availableTags) {
-				if (!_usedTags.ContainsKey(tag.name)) {
-					tag.selectedForFiltering = false;
-				}
+				return filter.usedTags;
 			}
 		}
 
@@ -227,9 +145,8 @@ namespace KspCraftOrganizer
 			} 
 		}
 
-
 		public OrganizerTagModel getTag(string tag) {
-			return _availableTags[tag];
+			return filter.getTag(tag);
 		}
 
 		public void setTagToAllSelectedCrafts(OrganizerTagModel tag){
@@ -248,55 +165,20 @@ namespace KspCraftOrganizer
 			}
 		}
 
-		public bool doesTagExist(string tag){
-			return _availableTags.ContainsKey (tag);
+		public bool doesTagExist(string tag) {
+			return filter.doesTagExist(tag);
 		}
 
-		public OrganizerTagModel addAvailableTag(string newTag){
-			if (!_availableTags.ContainsKey (newTag)) {
-				_availableTags.Add (newTag, new OrganizerTagModel (this, newTag));
-				markProfileSettingsAsDirty("New available tag");
-			}
-			return _availableTags [newTag];
+		public OrganizerTagModel addAvailableTag(string newTag) {
+			return filter.addAvailableTag(newTag);
 		}
 
-		public void removeTag(string tag){
-			if (_availableTags.ContainsKey (tag)) {
-				foreach (OrganizerCraftModel craft in craftList.getCraftsOfType(CraftType.SPH)) {
-					craft.removeTag (tag);
-				}
-				foreach (OrganizerCraftModel craft in craftList.getCraftsOfType(CraftType.VAB)) {
-					craft.removeTag (tag);
-				}
-				_availableTags.Remove (tag);
-				markProfileSettingsAsDirty("Tag removed");
-			}
+		public void removeTag(string tag) {
+			filter.removeTag(tag);
 		}
 
-		public void renameTag(string oldName, string newName){
-			foreach (OrganizerCraftModel craft in craftList.getCraftsOfType(CraftType.SPH)) {
-				if (craft.containsTag (oldName)) {
-					craft.addTag (newName);
-					craft.removeTag (oldName);
-				}
-			}
-			foreach (OrganizerCraftModel craft in craftList.getCraftsOfType(CraftType.VAB)) {
-				if (craft.containsTag (oldName)) {
-					craft.addTag (newName);
-					craft.removeTag (oldName);
-				}
-			}
-			bool selectForFilterAfterInsertion = false;
-			if (_availableTags.ContainsKey (oldName)) {
-				selectForFilterAfterInsertion = _availableTags [oldName].selectedForFiltering;
-				_availableTags.Remove (oldName);
-			}
-			if (!_availableTags.ContainsKey (newName)) {
-				OrganizerTagModel newTag = new OrganizerTagModel (this, newName);
-				newTag.selectedForFiltering = selectForFilterAfterInsertion;
-				_availableTags.Add (newName, newTag);
-			}
-			markProfileSettingsAsDirty("Tag renamed");
+		public void renameTag(string oldName, string newName) {
+			filter.renameTag(oldName, newName);
 		}
 
 		public OrganizerCraftModel primaryCraft {
@@ -342,18 +224,18 @@ namespace KspCraftOrganizer
 				if (doNotWriteTagSettingsToDisk) {
 					dto.availableTags = settingsService.readProfileSettings().availableTags;
 				} else {
-					dto.availableTags = _availableTags.Keys;
+					dto.availableTags = filter.availableTagsNames;
 				}
 
 				List<string> selectedTags = new List<string> ();
-				foreach(OrganizerTagModel tag in _availableTags.Values) {
+				foreach(OrganizerTagModel tag in filter.availableTags) {
 					if (tag.selectedForFiltering) {
 						selectedTags.Add (tag.name);
 					}
 				}
-				dto.filterGroupsWithSelectedNoneOption = groupTags.groupsWithSelectedNoneOption;
+				dto.filterGroupsWithSelectedNoneOption = filter.groupsWithSelectedNoneOption;
 				dto.selectedFilterTags = selectedTags.ToArray();
-				dto.selectedTextFilter = craftNameFilter;
+				dto.selectedTextFilter = filter.craftNameFilter;
 				dto.selectedGuiStyle = _selectedGuiStyle;
 				settingsService.writeProfileSettings(dto);
 
