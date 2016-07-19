@@ -7,7 +7,6 @@ namespace KspCraftOrganizer {
 	public class OrganizerServiceCraftList {
 
 		public delegate bool CraftFilterPredicate(OrganizerCraftModel craft, out bool shouldBeVisibleByDefault);
-		//public delegate bool CraftSelectionPredicate(OrganizerCraftModel craft);
 
 		private List<OrganizerCraftModel> cachedAvailableCrafts;
 		private OrganizerCraftModel[] cachedFilteredCrafts;
@@ -45,13 +44,6 @@ namespace KspCraftOrganizer {
 			updateSelectedCrafts(selectAll);
 		}
 
-		//public void updateFilteredCrafts() {
-		//	if (filterChanged) {
-		//		this.cachedFilteredCrafts = null;
-		//	}
-		//}
-
-
 		public bool craftsAreFiltered { get; private set; }//was: craftListModifiedDueToFilter
 
 		public OrganizerCraftModel[] filteredCrafts {
@@ -63,11 +55,8 @@ namespace KspCraftOrganizer {
 			}
 		}
 
-		//public OrganizerCraftModel[] filteredCrafts { get; private set; }
-
 		private OrganizerCraftModel[] createFilteredCrafts(CraftFilterPredicate craftFilterPredicate) {
 			List<OrganizerCraftModel> filtered = new List<OrganizerCraftModel>();
-			//string upperFilter = craftNameFilter.ToUpper();
 			craftsAreFiltered = false;
 			foreach (OrganizerCraftModel craft in availableCrafts) {
 				bool shouldBeVisibleByDefault;
@@ -88,25 +77,6 @@ namespace KspCraftOrganizer {
 			}
 			return filtered.ToArray();
 		}
-
-		//bool doesCraftPassFilter(string upperFilter, OrganizerCraftModel craft, out bool shouldBeVisibleByDefault) {
-		//	shouldBeVisibleByDefault = true;
-		//	bool pass = true;
-		//	pass = pass && (craft.nameToDisplay.ToUpper().Contains(upperFilter) || craftNameFilter == "");
-		//	foreach (OrganizerTagModel tag in _availableTags.Values) {
-		//		if (tag.selectedForFiltering) {
-		//			pass = pass && (craft.containsTag(tag.name));
-		//		}
-		//		if (YesNoTag.isByDefaultNegativeTag(tag.name) && craft.containsTag(tag.name)) {
-		//			shouldBeVisibleByDefault = false;
-		//		}
-		//		if (YesNoTag.isByDefaultPositiveTag(tag.name) && !craft.containsTag(tag.name)) {
-		//			shouldBeVisibleByDefault = false;
-		//		}
-		//	}
-		//	pass = pass && groupTags.doesCraftPassFilter(craft);
-		//	return pass;
-		//}
 
 		public List<OrganizerCraftModel> availableCrafts {
 			get {
@@ -172,35 +142,6 @@ namespace KspCraftOrganizer {
 			return toRet;
 		}
 
-		//public void clearFilters() {
-		//	craftNameFilter = "";
-		//	groupTags.clearFilters();
-		//	foreach (OrganizerTagModel tag in availableTags) {
-		//		tag.selectedForFiltering = false;
-		//		if (YesNoTag.isByDefaultNegativeTag(tag.name)) {
-		//			List<string> singleList = new List<string>();
-		//			singleList.Add(tag.name);
-		//			groupTags.setGroupHasSelectedNoneFilter(tag.name, singleList);
-		//		}
-		//		if (YesNoTag.isByDefaultPositiveTag(tag.name)) {
-		//			tag.selectedForFiltering = true;
-		//		}
-		//	}
-		//}
-
-
-		//public ICollection<string> beginNewTagGroupsFilterSpecification() {
-		//	return groupTags.beginNewFilterSpecification();
-		//}
-
-		//public void endFilterSpecification() {
-		//	groupTags.endFilterSpecification();
-		//}
-
-		//public void setGroupHasSelectedNoneFilter(string groupName, ICollection<string> tagsInGroup) {
-		//	groupTags.setGroupHasSelectedNoneFilter(groupName, tagsInGroup);
-		//}
-
 		public OrganizerCraftModel primaryCraft {
 			set {
 				if (_primaryCraft != null) {
@@ -247,22 +188,11 @@ namespace KspCraftOrganizer {
 				}
 			}
 			cachedSelectedCraftsCount = 0;
-			//foreach (OrganizerTagModel tag in _availableTags.Values) {
-			//	tag.countOfSelectedCraftsWithThisTag = 0;
-			//}
 			foreach (OrganizerCraftModel craft in filteredCrafts) {
 				if (craft.isSelected) {
 					cachedSelectedCraftsCount += 1;
-					//foreach (string tag in craft.tags) {
-					//	++_availableTags[tag].countOfSelectedCraftsWithThisTag;
-					//}
 				}
 			}
-			//foreach (OrganizerTagModel tag in _availableTags.Values) {
-			//	tag.updateTagState();
-			//}
-
-			//return _selectAllFiltered;
 		}
 
 		public ICollection<List<OrganizerCraftModel>> alreadyLoadedCrafts {

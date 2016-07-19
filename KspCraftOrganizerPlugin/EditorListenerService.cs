@@ -160,7 +160,6 @@ namespace KspCraftOrganizer {
 				isModifiedSinceSave = false;
 
 				updateLastSaveDate();
-				//UpdateLastSaveTimeFromOriginalShipFile();
 
 				if (onShipLoaded != null) {
 					onShipLoaded(file);
