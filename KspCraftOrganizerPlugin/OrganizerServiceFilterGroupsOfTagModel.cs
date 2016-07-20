@@ -17,6 +17,16 @@ namespace KspCraftOrganizer {
 		public void update() {
 			ICollection<OrganizerTagModel> usedTags = parent.usedTags;
 			this.tagsGrouper = new TagsGrouper<OrganizerTagModel>(usedTags, t => t.name);
+
+			List<string> groupsToRemove = new List<string>();
+			foreach (string g in groupsWithSelectedNone.Keys) {
+				if (!tagsGrouper.groupExists(g)) {
+					groupsToRemove.Add(g);
+				}
+			}
+			foreach (string g in groupsToRemove) {
+				groupsWithSelectedNone.Remove(g);
+			}
 		}
 
 		public ICollection<TagGroup<OrganizerTagModel>> groups {
@@ -32,6 +42,7 @@ namespace KspCraftOrganizer {
 		}
 
 		public void setInitialGroupsWithSelectedNone(ICollection<string> filterGroupsWithSelectedNoneOption) {
+			groupsWithSelectedNone.Clear();
 			foreach (string groupName in filterGroupsWithSelectedNoneOption) {
 				if (!groupsWithSelectedNone.ContainsKey(groupName)) {
 					groupsWithSelectedNone.Add(groupName, groupName);
@@ -69,6 +80,7 @@ namespace KspCraftOrganizer {
 
 		public bool doesCraftPassFilter(OrganizerCraftModel craft, out bool shouldBeVisibleByDefault) {
 			if (tagsGrouper == null) {
+				COLogger.logError("tagsGrouper == null!");
 				shouldBeVisibleByDefault = false;
 				return false;
 			}
@@ -103,7 +115,6 @@ namespace KspCraftOrganizer {
 					break;
 				}
 
-
 			}
 
 			foreach (OrganizerTagModel tag in tagsGrouper.restTags) {
@@ -113,6 +124,10 @@ namespace KspCraftOrganizer {
 					}
 				}	
 			}
+
+			//if (craft.name.Contains("Station")) {
+			//	COLogger.logDebug("For craft " + craft.name + " pass = " + pass + "\n" + Globals.join(groupsWithSelectedNone, s=>s.Key, ", ") + "\n" + Globals.join(tagsGrouper.groups, g => g.name, ", "));
+			//}
 
 			return pass;
 		}

@@ -25,7 +25,7 @@ namespace KspCraftOrganizer
 			bool first = true;
 			foreach (T element in collection) {
 				if (!first) {
-					sb.Append(", ");
+					sb.Append(spearator);
 				}
 				sb.Append(function(element));
 				first = false;

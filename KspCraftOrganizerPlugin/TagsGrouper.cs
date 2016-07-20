@@ -158,6 +158,10 @@ namespace KspCraftOrganizer {
 			}
 		}
 		public float restTagsGuiHeight { get; set; }
+
+		internal bool groupExists(string g) {
+			return _tagGroups.ContainsKey(g);
+		}
 	}
 }
 

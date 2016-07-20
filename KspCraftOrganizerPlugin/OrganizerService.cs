@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using UnityEngine;
 
@@ -24,6 +25,8 @@ namespace KspCraftOrganizer
 				_selectedGuiStyle = GuiStyleOption.Ksp;
 			}
 			markProfileSettingsAsNotDirty("Constructor - fresh settings were just read");
+
+			this.filter.init();
 		}
 
 		public bool selectAllFiltered {
@@ -51,6 +54,10 @@ namespace KspCraftOrganizer
 			if (filter != null) {//may happen in constructor
 				filter.markFilterAsChanged();
 			}
+		}
+
+		public void markFilterAsUpToDate() {
+			filter.markFilterAsUpToDate();
 		}
 
 		public List<OrganizerCraftModel> getCraftsOfType(CraftType type) {
@@ -124,11 +131,16 @@ namespace KspCraftOrganizer
 		}
 
 		public void update(bool selectAll) {
-			OrganizerServiceCraftList.CraftFilterPredicate filterPredicate = filter.createCraftFilterPredicate();
-			craftList.update(filterPredicate, selectAll, filter.filterChanged);
 			filter.update();
-
+			craftList.update(selectAll, filter.filterChanged);
 		}
+
+		public OrganizerServiceCraftList.CraftFilterPredicate craftFilterPredicate {
+			get {
+				return filter.createCraftFilterPredicate();
+			}
+		}
+
 
 		public ICollection<OrganizerTagModel> usedTags {
 			get {
@@ -204,7 +216,10 @@ namespace KspCraftOrganizer
 				return craftList.craftType;
 			}
 			set {
-				craftList.craftType = value;
+				if (craftList.craftType != value) {
+					filter.onCraftTypeChanged(craftList.craftType, value);
+					craftList.craftType = value;
+				}
 			}
 		}
 
@@ -228,15 +243,7 @@ namespace KspCraftOrganizer
 					dto.availableTags = filter.availableTagsNames;
 				}
 
-				List<string> selectedTags = new List<string> ();
-				foreach(OrganizerTagModel tag in filter.availableTags) {
-					if (tag.selectedForFiltering) {
-						selectedTags.Add (tag.name);
-					}
-				}
-				dto.filterGroupsWithSelectedNoneOption = filter.groupsWithSelectedNoneOption;
-				dto.selectedFilterTags = selectedTags.ToArray();
-				dto.selectedTextFilter = filter.craftNameFilter;
+				dto.allFilter = filter.getFilterDto();
 				dto.selectedGuiStyle = _selectedGuiStyle;
 				settingsService.writeProfileSettings(dto);
 

@@ -14,7 +14,6 @@ namespace KspCraftOrganizer {
 		private int cachedSelectedCraftsCount;
 		private CraftType _craftType;
 		private Dictionary<CraftType, List<OrganizerCraftModel>> craftTypeToAvailableCraftsLazy = new Dictionary<CraftType, List<OrganizerCraftModel>>();
-		private CraftFilterPredicate craftFilter = delegate (OrganizerCraftModel craft, out bool shouldBeVisibleByDefault) { shouldBeVisibleByDefault = true; return false;};
 			
 		private IKspAl ksp = IKspAlProvider.instance;
 		private FileLocationService fileLocationService = FileLocationService.instance;
@@ -23,7 +22,7 @@ namespace KspCraftOrganizer {
 
 		public OrganizerServiceCraftList(OrganizerService parent) {
 			this.parent = parent;
-			_craftType = ksp.getCurrentCraftType();
+			_craftType = ksp.getCurrentEditorFacilityType();
 		}
 
 		public bool selectAllFiltered {
@@ -36,26 +35,27 @@ namespace KspCraftOrganizer {
 			set; 
 		}
 
-		public void update(CraftFilterPredicate craftFilter, bool selectAll, bool filterChanged) {
-			this.craftFilter = craftFilter;
-			if (this.filteredCrafts == null || filterChanged) {
-				this.cachedFilteredCrafts = createFilteredCrafts(craftFilter);
+		public void update(bool selectAll, bool filterChanged) {
+			if (this.cachedFilteredCrafts == null || filterChanged) {
+				this.cachedFilteredCrafts = createFilteredCrafts(parent.craftFilterPredicate);
+				parent.markFilterAsUpToDate();
 			}
 			updateSelectedCrafts(selectAll);
 		}
 
-		public bool craftsAreFiltered { get; private set; }//was: craftListModifiedDueToFilter
+		public bool craftsAreFiltered { get; private set; }
 
 		public OrganizerCraftModel[] filteredCrafts {
 			get {
 				if (cachedFilteredCrafts == null) {
-					cachedFilteredCrafts = createFilteredCrafts(craftFilter);
+					return new OrganizerCraftModel[0];
 				}
 				return cachedFilteredCrafts;
 			}
 		}
 
 		private OrganizerCraftModel[] createFilteredCrafts(CraftFilterPredicate craftFilterPredicate) {
+			COLogger.logDebug("Creating filtered crafts");
 			List<OrganizerCraftModel> filtered = new List<OrganizerCraftModel>();
 			craftsAreFiltered = false;
 			foreach (OrganizerCraftModel craft in availableCrafts) {
@@ -215,7 +215,7 @@ namespace KspCraftOrganizer {
 			set {
 				if (value != _craftType) {
 					_craftType = value;
-					clearCaches();
+					clearCaches("New craft type: " + value);
 					if (this._primaryCraft != null) {
 						this._primaryCraft.setSelectedPrimaryInternal(false);
 					}
@@ -224,7 +224,8 @@ namespace KspCraftOrganizer {
 			}
 		}
 
-		private void clearCaches() {
+		private void clearCaches(string reason) {
+			COLogger.logDebug("Clearing caches in OrganizerServiceCraftList, reason: " + reason);
 			this.cachedAvailableCrafts = null;
 			this.cachedFilteredCrafts = null;
 			this.cachedSelectedCraftsCount = 0;

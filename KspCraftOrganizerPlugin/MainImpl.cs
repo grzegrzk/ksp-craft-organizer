@@ -34,6 +34,7 @@ namespace KspCraftOrganizer {
 			}
 
 			EditorListenerService.instance.start();
+			IKspAlProvider.instance.start();
 
 		}
 
@@ -87,6 +88,7 @@ namespace KspCraftOrganizer {
 				ApplicationLauncher.Instance.RemoveModApplication(button);
 			}
 			EditorListenerService.instance.destroy();
+			IKspAlProvider.instance.destroy();
 
 		}
 

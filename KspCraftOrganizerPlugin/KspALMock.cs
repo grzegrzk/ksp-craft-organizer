@@ -7,6 +7,12 @@ namespace KspCraftOrganizer
 {
 	public class KspAlMock: IKspAl{
 
+		public void start() {
+		}
+
+		public void destroy() {
+		}
+
 		public string getBaseCraftDirectory(){
 			return "/Users/nal/Library/Application Support/Steam/steamapps/common/Kerbal Space Program/saves/sandbox/Ships";
 		}
@@ -29,7 +35,7 @@ namespace KspCraftOrganizer
 			return true;
 		}
 
-		public CraftType getCurrentCraftType(){
+		public CraftType getCurrentEditorFacilityType(){
 			return CraftType.SPH;
 		}
 
@@ -52,10 +58,20 @@ namespace KspCraftOrganizer
 			List<string> tags = new List<string> ();
 			tags.AddRange(defaultTags);
 			settings.availableTags = tags.ToArray();
-			settings.selectedFilterTags = new string[]{ };
+			settings.allFilter = new ProfileAllFilterSettingsDto();
+
+			fillFilterSettings(settings.allFilter.filterSphInSph);
+			fillFilterSettings(settings.allFilter.filterSphInVab);
+			fillFilterSettings(settings.allFilter.filterVabInSph);
+			fillFilterSettings(settings.allFilter.filterVabInVab);
+
+			return settings;
+		}
+
+		void fillFilterSettings(ProfileFilterSettingsDto settings) {
+			settings.selectedFilterTags = new string[] { };
 			settings.selectedTextFilter = "";
 			settings.filterGroupsWithSelectedNoneOption = new List<string>();
-			return settings;
 		}
 
 		public void renameCraftInsideFile(string fileName, string newName){

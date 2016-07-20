@@ -1,33 +1,105 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using UnityEngine;
 
 namespace KspCraftOrganizer {
-	
+
 	public class OrganizerServiceFilter {
 
+		private IKspAl ksp = IKspAlProvider.instance;
 		private SortedList<string, OrganizerTagModel> _availableTags;
 		private string _craftNameFilter;
 		private SortedList<string, OrganizerTagModel> _usedTags = new SortedList<string, OrganizerTagModel>();
 		public OrganizerServiceFilterGroupsOfTagModel groupsModel { get; private set; }
 		private OrganizerService parent;
+		private ProfileAllFilterSettingsDto allFiltersDto;
+
 
 		public OrganizerServiceFilter(OrganizerService parent, ProfileSettingsDto profileSettigngs) {
 			this.parent = parent;
+			this.allFiltersDto = profileSettigngs.allFilter;
+
 			groupsModel = new OrganizerServiceFilterGroupsOfTagModel(parent);
 
 			_availableTags = new SortedList<string, OrganizerTagModel>();
 			foreach (string tagName in profileSettigngs.availableTags) {
 				addAvailableTag(tagName);
 			}
-			foreach (string tagName in profileSettigngs.selectedFilterTags) {
-				if (!_availableTags.ContainsKey(tagName)) {
-					addAvailableTag(tagName);
-				}
-				_availableTags[tagName].selectedForFiltering = true;
+
+			craftNameFilter = "";
+		}
+
+		public ProfileAllFilterSettingsDto getFilterDto(){
+			assignCurrentFilterSettingsToDto(getFilterDtoFor(parent.craftType));
+			return allFiltersDto;
+		}
+
+		public void init() {
+			applyFilterSettings(getFilterDtoFor(parent.craftType));
+		}
+
+
+		void applyFilterSettings(ProfileFilterSettingsDto dto) {
+			foreach (OrganizerTagModel tag in _availableTags.Values) {
+				tag.selectedForFiltering = false;
 			}
-			groupsModel.setInitialGroupsWithSelectedNone(profileSettigngs.filterGroupsWithSelectedNoneOption);
-			craftNameFilter = profileSettigngs.selectedTextFilter;
+
+			foreach (string tagName in dto.selectedFilterTags) {
+				if (_availableTags.ContainsKey(tagName)) {
+					_availableTags[tagName].selectedForFiltering = true;
+				}
+			}
+
+			groupsModel.setInitialGroupsWithSelectedNone(dto.filterGroupsWithSelectedNoneOption);
+			craftNameFilter = dto.selectedTextFilter;
+			if (craftNameFilter == null) {
+				craftNameFilter = "";
+			}
+
+
+			COLogger.logDebug("applyFilterSettings, selected tags: " + Globals.join(dto.selectedFilterTags, s => s, ", "));
+			COLogger.logDebug("applyFilterSettings, groupsWithSelectedNoneOption: " + Globals.join(dto.filterGroupsWithSelectedNoneOption, s => s, ", "));
+		}
+
+		public void onCraftTypeChanged(CraftType oldCraftType, CraftType newCraftType) {
+			COLogger.logDebug("filter.onCraftTypeChanged, old: " + oldCraftType + ", new : " + newCraftType);
+			assignCurrentFilterSettingsToDto(getFilterDtoFor(oldCraftType));
+			applyFilterSettings(getFilterDtoFor(newCraftType));
+			COLogger.logDebug("filter.onCraftTypeChanged -- end");
+		}
+
+		private ProfileFilterSettingsDto getFilterDtoFor(CraftType craftType) {
+			if (ksp.getCurrentEditorFacilityType() == CraftType.VAB) {
+				if (craftType == CraftType.VAB) {
+					return allFiltersDto.filterVabInVab;
+				} else {
+					return allFiltersDto.filterSphInVab;
+				}
+			} else {
+				if (craftType == CraftType.VAB) {
+					return allFiltersDto.filterVabInSph;
+				} else {
+					return allFiltersDto.filterSphInSph;
+				}
+			}
+		}
+
+		private void assignCurrentFilterSettingsToDto(ProfileFilterSettingsDto dto) {
+			List<string> selectedTags = new List<string>();
+			foreach (OrganizerTagModel tag in availableTags) {
+				if (tag.selectedForFiltering) {
+					selectedTags.Add(tag.name);
+				}
+			}
+			dto.filterGroupsWithSelectedNoneOption = new List<string>(groupsWithSelectedNoneOption);
+			dto.selectedFilterTags = selectedTags.ToArray();
+			dto.selectedTextFilter = craftNameFilter;
+			if (dto.selectedTextFilter == null) {
+				dto.selectedTextFilter = "";
+			}
+			COLogger.logDebug("assignCurrentFilterSettingsToDto, selected tags: " + Globals.join(selectedTags, s => s, ", "));
+			COLogger.logDebug("assignCurrentFilterSettingsToDto, groupsWithSelectedNoneOption: " + Globals.join(dto.filterGroupsWithSelectedNoneOption, s => s, ", "));
 		}
 
 		public ICollection<string> groupsWithSelectedNoneOption {
@@ -65,6 +137,11 @@ namespace KspCraftOrganizer {
 		public void markFilterAsChanged() {
 			filterChanged = true;
 			parent.markProfileSettingsAsDirty("Filter changed");
+		}
+
+
+		public void markFilterAsUpToDate() {
+			filterChanged = false;
 		}
 
 		public OrganizerServiceCraftList.CraftFilterPredicate createCraftFilterPredicate() {

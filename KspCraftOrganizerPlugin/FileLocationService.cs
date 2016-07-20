@@ -38,7 +38,7 @@ namespace KspCraftOrganizer {
 		}
 
 		public string getCraftSaveDirectory() {
-			return Path.Combine(ksp.getBaseCraftDirectory(), ksp.getCurrentCraftType().directoryName);
+			return Path.Combine(ksp.getBaseCraftDirectory(), ksp.getCurrentEditorFacilityType().directoryName);
 		}
 
 		public string getCraftSettingsFileForCraftFile(string craftFile) {

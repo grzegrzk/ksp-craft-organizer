@@ -8,16 +8,31 @@ namespace KspCraftOrganizer
 	public class KspAlImpl: IKspAl {
 
 		private static readonly String LOCK_NAME = "KspAlImpl";
+		private static readonly String SETTINGS_VER_1 = "1";
+		private static readonly String SETTINGS_VER_2 = "2";
 
 		private Dictionary<string, AvailablePart> _availablePartCache;
 		private EditorFacility editorFacility;
 
 		public KspAlImpl() {
 			onEditorStarted();
+		}
+
+		public void start() {
+			onEditorStarted();
 			GameEvents.onEditorStarted.Add(onEditorStarted);
 		}
 
+
+		public void destroy() {
+			GameEvents.onEditorStarted.Remove(onEditorStarted);
+		}
+
 		public void onEditorStarted() {
+			//
+			//If "Go To" mod is used and user goes from VAB->SPH then there is a bug that during "OnDestroy" events etc new facility is returned instead of old.
+			//This code corrects this by remembering facility at the beginning and returning it until it is truly changed.
+			//
 			this.editorFacility = EditorDriver.editorFacility;
 			COLogger.logDebug("Setting editor facility to " + this.editorFacility);
 		}
@@ -45,7 +60,7 @@ namespace KspCraftOrganizer
 			return HighLogic.CurrentGame.Parameters.Difficulty.AllowStockVessels;
 		}
 
-		public CraftType getCurrentCraftType(){
+		public CraftType getCurrentEditorFacilityType(){
 			return editorFacility == EditorFacility.SPH ? CraftType.SPH : CraftType.VAB;
 		}
 
@@ -157,24 +172,34 @@ namespace KspCraftOrganizer
 			ProfileSettingsDto settings = new ProfileSettingsDto ();
 
 			List<string> tags = new List<string> ();
-			List<string> selectedTags = new List<string>();
-			List<string> filterGroupsWithSelectedNoneOption = new List<string>();
-			string filterText = "";
 			GuiStyleOption style = GuiStyleOption.Ksp;
+
+			ProfileAllFilterSettingsDto allFilterSettings = new ProfileAllFilterSettingsDto();
 
 			if (File.Exists(fileName)) {
 				ConfigNode node = ConfigNode.Load(fileName);
 				if (node != null) {
+					string settingsVersion = node.GetValue("version");
+					if (settingsVersion == null || settingsVersion == "") {
+						settingsVersion = SETTINGS_VER_1;
+					}
+
+					if (settingsVersion == SETTINGS_VER_1) {
+						readFilterSettingsToDto(allFilterSettings.filterSphInSph, node, "");
+						readFilterSettingsToDto(allFilterSettings.filterSphInVab, node, "");
+						readFilterSettingsToDto(allFilterSettings.filterVabInSph, node, "");
+						readFilterSettingsToDto(allFilterSettings.filterVabInVab, node, "");
+					} else {
+						readFilterSettingsToDto(allFilterSettings.filterSphInSph, node, "SphInSph_");
+						readFilterSettingsToDto(allFilterSettings.filterSphInVab, node, "SphInVab_");
+						readFilterSettingsToDto(allFilterSettings.filterVabInSph, node, "VabInSph_");
+						readFilterSettingsToDto(allFilterSettings.filterVabInVab, node, "VabInVab_");
+					}
+
 					foreach (string tag in node.GetValues("availableTag")) {
 						tags.Add(tag);
 					}
-					foreach (string tag in node.GetValues("filterTag")) {
-						selectedTags.Add(tag);
-					}
-					foreach (string groupName in node.GetValues("filterGroupsWithSelectedNoneOption")) {
-						filterGroupsWithSelectedNoneOption.Add(groupName);
-					}
-					filterText = node.GetValue("filterText");
+
 					string styleId = node.GetValue("guiStyle");
 					foreach (GuiStyleOption candidateStyle in GuiStyleOption.SKIN_STATES) {
 						if (candidateStyle.id == styleId) {
@@ -187,30 +212,63 @@ namespace KspCraftOrganizer
 				tags.AddRange(defaultTags);
 			}
 			settings.availableTags = tags.ToArray();
-			settings.selectedFilterTags = selectedTags.ToArray();
-			settings.selectedTextFilter = filterText;
 			settings.selectedGuiStyle = style;
-			settings.filterGroupsWithSelectedNoneOption = filterGroupsWithSelectedNoneOption;
+			settings.allFilter = allFilterSettings;
 			return settings;
+		}
+
+		private void readFilterSettingsToDto(ProfileFilterSettingsDto dto, ConfigNode node, string optionsPrefix) {
+
+			List<string> selectedTags = new List<string>();
+			List<string> filterGroupsWithSelectedNoneOption = new List<string>();
+			string filterText = "";
+
+			foreach (string tag in node.GetValues(optionsPrefix + "filterTag")) {
+				selectedTags.Add(tag);
+			}
+			foreach (string groupName in node.GetValues(optionsPrefix + "filterGroupsWithSelectedNoneOption")) {
+				filterGroupsWithSelectedNoneOption.Add(groupName);
+			}
+			filterText = node.GetValue(optionsPrefix + "filterText");
+			if (filterText == null) {
+				filterText = "";
+			}
+
+			dto.selectedFilterTags = selectedTags.ToArray();
+			dto.selectedTextFilter = filterText;
+			dto.filterGroupsWithSelectedNoneOption = filterGroupsWithSelectedNoneOption;
 		}
 
 		public void writeProfileSettings(string fileName, ProfileSettingsDto toWrite) {
 			COLogger.logDebug("Writing profile settings to '" + fileName);
 			ConfigNode node = new ConfigNode();
+
+			node.AddValue("version", SETTINGS_VER_2);
+
 			foreach (string availableTag in toWrite.availableTags) {
 				node.AddValue("availableTag", availableTag);
 			}
-			foreach (string filterTag in toWrite.selectedFilterTags) {
-				node.AddValue("filterTag", filterTag);
-			}
-			foreach (string groupName in toWrite.filterGroupsWithSelectedNoneOption) {
-				node.AddValue("filterGroupsWithSelectedNoneOption", groupName);
-			}
-			node.AddValue("filterText", toWrite.selectedTextFilter);
+
+			writeFilterSettingsFromDto(toWrite.allFilter.filterSphInSph, node, "SphInSph_");
+			writeFilterSettingsFromDto(toWrite.allFilter.filterSphInVab, node, "SphInVab_");
+			writeFilterSettingsFromDto(toWrite.allFilter.filterVabInSph, node, "VabInSph_");
+			writeFilterSettingsFromDto(toWrite.allFilter.filterVabInVab, node, "VabInVab_");
+
 			if (toWrite.selectedGuiStyle != null) {
 				node.AddValue("guiStyle", toWrite.selectedGuiStyle.id);
 			}
 			saveNode(node, fileName);
+		}
+
+		private void writeFilterSettingsFromDto(ProfileFilterSettingsDto dto, ConfigNode node, string optionsPrefix) {
+			foreach (string filterTag in dto.selectedFilterTags) {
+				node.AddValue(optionsPrefix + "filterTag", filterTag);
+			}
+			foreach (string groupName in dto.filterGroupsWithSelectedNoneOption) {
+				node.AddValue(optionsPrefix + "filterGroupsWithSelectedNoneOption", groupName);
+			}
+			node.AddValue(optionsPrefix + "filterText", dto.selectedTextFilter);
+
 		}
 
 		private void saveNode(ConfigNode node, string file) {

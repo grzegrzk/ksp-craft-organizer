@@ -1,6 +1,4 @@
 TODO:
- - Correct bug with tags not being saved in this scenario: open craft -> change name -> save -> go to different building using "go to" plugin
- - Remember selected filter separately for VABinVAB/SPHinVAB/VABinSPH/SPHinSPH
  - Add above the craft list a list of non-default selected tags with possibility to clear them, like:
  	Bodies: [Eve x] [Duna x] BuildingStage: [Final x] [Clear All] [>>]
  - Cache cost/part count/etc in separate file so loading is much faster
@@ -18,6 +16,8 @@ Cancelled or far future:
  
  
 Done:
+ - Remember selected filter separately for VABinVAB/SPHinVAB/VABinSPH/SPHinSPH
+ - Correct bug with tags not being saved in this scenario: open craft -> change name -> save -> go to different building using "go to" plugin
  - The tags selected in a single group should display crafts with any of the selected tags
  - Add tooltip that will show big thumbnail, name and description
  - Add double-click to load

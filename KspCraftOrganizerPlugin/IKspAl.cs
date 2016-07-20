@@ -42,16 +42,30 @@ namespace KspCraftOrganizer {
 		
 	}
 
-	public class ProfileSettingsDto{
-		public ICollection<string> availableTags { get; set;}
-
+	public class ProfileFilterSettingsDto {
+		public string selectedTextFilter { get; set; }
+		
 		public string[] selectedFilterTags { get; set; }
 
-		public string selectedTextFilter { get; set; }
+		public ICollection<string> filterGroupsWithSelectedNoneOption { get; set; }
+
+	}
+
+
+	public class ProfileAllFilterSettingsDto {
+		public ProfileFilterSettingsDto filterVabInVab = new ProfileFilterSettingsDto();
+		public ProfileFilterSettingsDto filterVabInSph = new ProfileFilterSettingsDto();
+		public ProfileFilterSettingsDto filterSphInVab = new ProfileFilterSettingsDto();
+		public ProfileFilterSettingsDto filterSphInSph = new ProfileFilterSettingsDto();
+	}
+
+	public class ProfileSettingsDto {
+		public ICollection<string> availableTags { get; set; }
+
+		public ProfileAllFilterSettingsDto allFilter { get; set; }
 
 		public GuiStyleOption selectedGuiStyle { get; set; }
 
-		public ICollection<string> filterGroupsWithSelectedNoneOption { get; set; }
 	}
 
 	public class CraftSettingsDto{
@@ -93,11 +107,15 @@ namespace KspCraftOrganizer {
 	 */
 	public interface IKspAl{
 
+		void start();
+
+		void destroy();
+
 		PluginSettings getPluginSettings(string fileName);
 
 		string getBaseCraftDirectory ();
 
-		CraftType getCurrentCraftType ();
+		CraftType getCurrentEditorFacilityType ();
 
 		CraftDaoDto getCraftInfo (string craftFile);
 
