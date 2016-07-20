@@ -10,6 +10,17 @@ namespace KspCraftOrganizer
 		private static readonly String LOCK_NAME = "KspAlImpl";
 
 		private Dictionary<string, AvailablePart> _availablePartCache;
+		private EditorFacility editorFacility;
+
+		public KspAlImpl() {
+			onEditorStarted();
+			GameEvents.onEditorStarted.Add(onEditorStarted);
+		}
+
+		public void onEditorStarted() {
+			this.editorFacility = EditorDriver.editorFacility;
+			COLogger.logDebug("Setting editor facility to " + this.editorFacility);
+		}
 
 		public string getBaseCraftDirectory(){
 			return Globals.combinePaths(getApplicationRootPath(), "saves", getNameOfSaveFolder(), "Ships");
@@ -35,7 +46,7 @@ namespace KspCraftOrganizer
 		}
 
 		public CraftType getCurrentCraftType(){
-			return EditorDriver.editorFacility == EditorFacility.SPH ? CraftType.SPH : CraftType.VAB;
+			return editorFacility == EditorFacility.SPH ? CraftType.SPH : CraftType.VAB;
 		}
 
 		public CraftDaoDto getCraftInfo(string craftFile){

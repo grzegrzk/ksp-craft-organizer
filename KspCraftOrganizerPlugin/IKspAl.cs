@@ -139,7 +139,7 @@ namespace KspCraftOrganizer {
 
 		string getCurrentCraftName();
 
-		string getSavePathForCraftName(string shipName);
+		//string getSavePathForCraftName(string shipName);
 
 		void saveCurrentCraft();
 	}

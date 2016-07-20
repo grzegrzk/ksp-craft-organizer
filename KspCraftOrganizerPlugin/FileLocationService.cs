@@ -25,8 +25,8 @@ namespace KspCraftOrganizer {
 		}
 
 		public string getCraftSaveFilePathForShipName(string shipName) {
-			return ksp.getSavePathForCraftName(shipName);
-			//return Path.Combine(getFileSaveDirectory(), shipName) + ".craft";
+			//return ksp.getSavePathForCraftName(shipName);
+			return Path.Combine(getCraftSaveDirectory(), shipName) + ".craft";
 		}
 
 		public string getCraftFileFilter() {
