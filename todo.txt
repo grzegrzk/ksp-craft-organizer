@@ -1,5 +1,4 @@
 TODO:
- - The tags selected in a single group should display crafts with any of the selected tags
  - Correct bug with tags not being saved in this scenario: open craft -> change name -> save -> go to different building using "go to" plugin
  - Remember selected filter separately for VABinVAB/SPHinVAB/VABinSPH/SPHinSPH
  - Add above the craft list a list of non-default selected tags with possibility to clear them, like:
@@ -19,6 +18,7 @@ Cancelled or far future:
  
  
 Done:
+ - The tags selected in a single group should display crafts with any of the selected tags
  - Add tooltip that will show big thumbnail, name and description
  - Add double-click to load
  - Correct bug: select "all" in "-Archived?", click cancel, open window. The filter returns to default

@@ -171,23 +171,22 @@ namespace KspCraftOrganizer {
 						GUI.FocusControl(TEXT_FILTER_CONTROL_NAME);
 					}
 				}
-				ICollection<OrganizerTagModel> usedTags = model.usedTags;
-				if (usedTags.Count > 0) {
+
+				if (model.usedTags.Count > 0) {
+					OrganizerServiceFilterGroupsOfTagModel filterGroups = model.filterGroups;
 					GUILayout.Space(15);
 					GUILayout.Label("Filter crafts by tag:");
-					ICollection<string> previousNoneGoups = model.beginNewTagGroupsFilterSpecification();
-					TagsGrouper<OrganizerTagModel> tagsGroupger = new TagsGrouper<OrganizerTagModel>(usedTags, t=>t.name);
 					using (GUILayout.ScrollViewScope tagScrollScope = new GUILayout.ScrollViewScope(tagScrollPosition, false, false, GUILayout.MaxWidth(FILTER_TOOLBAR_WIDTH - 10))) {
 						tagScrollPosition = tagScrollScope.scrollPosition;
 						using (new GUILayout.VerticalScope(GUILayout.ExpandWidth(false))) {
-							foreach (TagGroup<OrganizerTagModel> tagGroup in tagsGroupger.groups) {
+							foreach (TagGroup<OrganizerTagModel> tagGroup in filterGroups.groups) {
 								GUILayout.Label(tagGroup.displayName + ":");
 								if (tagGroup.isYesNoGroup) {
 									OrganizerTagModel tag = tagGroup.firstTag.originalTag;
 									int thisYesNoTagState;
 									if (tag.selectedForFiltering) {
 										thisYesNoTagState = 0;
-									} else if (previousNoneGoups.Contains(tagGroup.name)) {
+									} else if (filterGroups.hasGroupSelectedNoneFilter(tagGroup.name)) {
 										thisYesNoTagState = 1;
 									} else {
 										thisYesNoTagState = 2;
@@ -196,41 +195,32 @@ namespace KspCraftOrganizer {
 									thisYesNoTagState = guiLayout_Radio_OrigSkin(thisYesNoTagState, 1, " not " + tagGroup.displayName);
 									thisYesNoTagState = guiLayout_Radio_OrigSkin(thisYesNoTagState, 2, " all");
 									tag.selectedForFiltering = thisYesNoTagState == 0;
-									if (thisYesNoTagState == 1) {
-										model.setGroupHasSelectedNoneFilter(tagGroup.name, tagGroup.tagsAsArrayOfStrings);
-									}
+									model.setGroupHasSelectedNoneFilter(tagGroup.name, thisYesNoTagState == 1);
 								} else {
-									bool someTagInGroupBecomeSelected = false;
 									foreach (TagInGroup<OrganizerTagModel> tagInGroup in tagGroup.tags) {
 										OrganizerTagModel tag = tagInGroup.originalTag;
-										bool oldSelected = tag.selectedForFiltering;
 										tag.selectedForFiltering = guiLayout_Toggle_OrigSkin(tag.selectedForFiltering, " " + tagInGroup.tagDisplayName);
-										if (!oldSelected && tag.selectedForFiltering) {
-											someTagInGroupBecomeSelected = true;
-										}
 										GUILayout.Space(5);
 									}
-									if (guiLayout_Toggle_OrigSkin(previousNoneGoups.Contains(tagGroup.name), " <with no tag assigned>")) {
-										if (!someTagInGroupBecomeSelected) {
-											model.setGroupHasSelectedNoneFilter(tagGroup.name, tagGroup.tagsAsArrayOfStrings);
-										}
-									}
+									bool noneSelected = guiLayout_Toggle_OrigSkin(filterGroups.hasGroupSelectedNoneFilter(tagGroup.name), " <with no tag assigned>");
+
+									model.setGroupHasSelectedNoneFilter(tagGroup.name, noneSelected);
+										
 								}
 							}
-							if (tagsGroupger.restTags.Count > 0) {
-								if (tagsGroupger.groups.Count > 0) {
+							if (filterGroups.restTags.Count > 0) {
+								if (filterGroups.groups.Count > 0) {
 									GUILayout.Label("Rest tags:");
 								} else {
 									GUILayout.Label("Tags:");
 								}
-								foreach (OrganizerTagModel tag in tagsGroupger.restTags) {
+								foreach (OrganizerTagModel tag in filterGroups.restTags) {
 									tag.selectedForFiltering = guiLayout_Toggle_OrigSkin(tag.selectedForFiltering, " " + tag.name);
 									GUILayout.Space(5);
 								}
 							}
 						}
 					}
-					model.endFilterSpecification();
 				}
 			}
 		}

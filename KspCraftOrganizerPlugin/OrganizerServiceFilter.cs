@@ -8,21 +8,15 @@ namespace KspCraftOrganizer {
 
 		private SortedList<string, OrganizerTagModel> _availableTags;
 		private string _craftNameFilter;
-		//private bool filterChanged;
 		private SortedList<string, OrganizerTagModel> _usedTags = new SortedList<string, OrganizerTagModel>();
-		private OrganizerTagGroupsModel groupTags;
+		public OrganizerServiceFilterGroupsOfTagModel groupsModel { get; private set; }
 		private OrganizerService parent;
 
 		public OrganizerServiceFilter(OrganizerService parent, ProfileSettingsDto profileSettigngs) {
 			this.parent = parent;
-			groupTags = new OrganizerTagGroupsModel(parent);
+			groupsModel = new OrganizerServiceFilterGroupsOfTagModel(parent);
 
-			//ProfileSettingsDto profileSettigngs = settingsService.readProfileSettings();
 			_availableTags = new SortedList<string, OrganizerTagModel>();
-			//_selectedGuiStyle = profileSettigngs.selectedGuiStyle;
-			//if (_selectedGuiStyle == null) {
-			//	_selectedGuiStyle = GuiStyleOption.Ksp;
-			//}
 			foreach (string tagName in profileSettigngs.availableTags) {
 				addAvailableTag(tagName);
 			}
@@ -32,13 +26,13 @@ namespace KspCraftOrganizer {
 				}
 				_availableTags[tagName].selectedForFiltering = true;
 			}
-			groupTags.setInitialGroupsWithSelectedNone(profileSettigngs.filterGroupsWithSelectedNoneOption);
+			groupsModel.setInitialGroupsWithSelectedNone(profileSettigngs.filterGroupsWithSelectedNoneOption);
 			craftNameFilter = profileSettigngs.selectedTextFilter;
 		}
 
 		public ICollection<string> groupsWithSelectedNoneOption {
 			get {
-				return groupTags.groupsWithSelectedNoneOption;
+				return groupsModel.groupsWithSelectedNoneOption;
 			}
 		}
 
@@ -84,31 +78,18 @@ namespace KspCraftOrganizer {
 			shouldBeVisibleByDefault = true;
 			bool pass = true;
 			pass = pass && (craft.nameToDisplay.ToUpper().Contains(upperFilter) || craftNameFilter == "");
-			foreach (OrganizerTagModel tag in _availableTags.Values) {
-				if (tag.selectedForFiltering) {
-					pass = pass && (craft.containsTag(tag.name));
-				}
-				if (YesNoTag.isByDefaultNegativeTag(tag.name) && craft.containsTag(tag.name)) {
-					shouldBeVisibleByDefault = false;
-				}
-				if (YesNoTag.isByDefaultPositiveTag(tag.name) && !craft.containsTag(tag.name)) {
-					shouldBeVisibleByDefault = false;
-				}
-			}
-			pass = pass && groupTags.doesCraftPassFilter(craft);
+			pass = groupsModel.doesCraftPassFilter(craft, out shouldBeVisibleByDefault) && pass;
 			return pass;
 		}
 
 
 		public void clearFilters() {
 			craftNameFilter = "";
-			groupTags.clearFilters();
+			groupsModel.clearFilters();
 			foreach (OrganizerTagModel tag in availableTags) {
 				tag.selectedForFiltering = false;
 				if (YesNoTag.isByDefaultNegativeTag(tag.name)) {
-					List<string> singleList = new List<string>();
-					singleList.Add(tag.name);
-					groupTags.setGroupHasSelectedNoneFilter(tag.name, singleList);
+					groupsModel.setGroupHasSelectedNoneFilter(tag.name, true);
 				}
 				if (YesNoTag.isByDefaultPositiveTag(tag.name)) {
 					tag.selectedForFiltering = true;
@@ -116,16 +97,8 @@ namespace KspCraftOrganizer {
 			}
 		}
 
-		public ICollection<string> beginNewTagGroupsFilterSpecification() {
-			return groupTags.beginNewFilterSpecification();
-		}
-
-		public void endFilterSpecification() {
-			groupTags.endFilterSpecification();
-		}
-
-		public void setGroupHasSelectedNoneFilter(string groupName, ICollection<string> tagsInGroup) {
-			groupTags.setGroupHasSelectedNoneFilter(groupName, tagsInGroup);
+		public void setGroupHasSelectedNoneFilter(string groupName, bool selectedNoneFilter) {
+			groupsModel.setGroupHasSelectedNoneFilter(groupName, selectedNoneFilter);
 		}
 
 		public void update() {
@@ -143,6 +116,7 @@ namespace KspCraftOrganizer {
 				tag.updateTagState();
 			}
 			updateUsedTags();
+			groupsModel.update();
 		}
 
 		public ICollection<OrganizerTagModel> usedTags {

@@ -83,11 +83,11 @@
     <Compile Include="ShouldCurrentCraftBeSavedQuestionWindow.cs" />
     <Compile Include="MainImpl.cs" />
     <Compile Include="TagsGrouper.cs" />
-    <Compile Include="OrganizerGroupTagModel.cs" />
     <Compile Include="ScaledGuiScope.cs" />
     <Compile Include="ParagraphBoxDrawer.cs" />
     <Compile Include="OrganizerServiceCraftList.cs" />
     <Compile Include="OrganizerServiceFilter.cs" />
+    <Compile Include="OrganizerServiceFilterGroupsOfTagModel.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

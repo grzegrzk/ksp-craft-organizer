@@ -48,7 +48,9 @@ namespace KspCraftOrganizer
 		}
 
 		public void markFilterAsChanged() {
-			filter.markFilterAsChanged();
+			if (filter != null) {//may happen in constructor
+				filter.markFilterAsChanged();
+			}
 		}
 
 		public List<OrganizerCraftModel> getCraftsOfType(CraftType type) {
@@ -107,16 +109,14 @@ namespace KspCraftOrganizer
 			filter.clearFilters();
 		}
 
-		public ICollection<string> beginNewTagGroupsFilterSpecification() {
-			return filter.beginNewTagGroupsFilterSpecification();
+		public void setGroupHasSelectedNoneFilter(string groupName, bool selectedNone) {
+			filter.setGroupHasSelectedNoneFilter(groupName, selectedNone);
 		}
 
-		public void setGroupHasSelectedNoneFilter(string groupName, ICollection<string> tagsInGroup) {
-			filter.setGroupHasSelectedNoneFilter(groupName, tagsInGroup);
-		}
-
-		public void endFilterSpecification() {
-		 	filter.endFilterSpecification();
+		public OrganizerServiceFilterGroupsOfTagModel filterGroups{
+			get {
+				return filter.groupsModel;
+			}
 		}
 
 		public void unselectAllCrafts() {
@@ -129,6 +129,7 @@ namespace KspCraftOrganizer
 			filter.update();
 
 		}
+
 		public ICollection<OrganizerTagModel> usedTags {
 			get {
 				return filter.usedTags;
