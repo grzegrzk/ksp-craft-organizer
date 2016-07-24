@@ -211,6 +211,8 @@ namespace KspCraftOrganizer
 			} else {
 				tags.AddRange(defaultTags);
 			}
+
+
 			settings.availableTags = tags.ToArray();
 			settings.selectedGuiStyle = style;
 			settings.allFilter = allFilterSettings;

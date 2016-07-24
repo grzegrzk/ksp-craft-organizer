@@ -43,6 +43,13 @@ namespace KspCraftOrganizer {
 	}
 
 	public class ProfileFilterSettingsDto {
+
+		public ProfileFilterSettingsDto() {
+			this.selectedTextFilter = "";
+			this.selectedFilterTags = new string[0];
+			this.filterGroupsWithSelectedNoneOption = new List<string>();
+		}
+
 		public string selectedTextFilter { get; set; }
 		
 		public string[] selectedFilterTags { get; set; }
