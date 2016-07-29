@@ -1,16 +1,18 @@
 #!/bin/bash
 
-rm -rf ./dist
-mkdir -p ./dist/KspCraftOrganizer/Plugins
-mkdir -p ./dist/KspCraftOrganizer/icons
+BASE_PLUGIN_DIR=./dist/KspCraftOrganizer
 
-cp -r ./icons/*.png ./dist/KspCraftOrganizer/icons/
+rm -rf ./dist
+mkdir -p $BASE_PLUGIN_DIR/Plugins
+mkdir -p $BASE_PLUGIN_DIR/icons
+
+cp -r ./icons/*.png $BASE_PLUGIN_DIR/icons/
 
 xbuild /p:Configuration=Release
-cp ./KspCraftOrganizerPlugin/bin/Release/KspCraftOrganizerPlugin.dll ./dist/KspCraftOrganizer/Plugins
+cp ./KspCraftOrganizerPlugin/bin/Release/KspCraftOrganizerPlugin.dll $BASE_PLUGIN_DIR/Plugins
 
-cp ./LICENSE ./dist/KspCraftOrganizer/LICENSE.txt
+cp ./LICENSE $BASE_PLUGIN_DIR/LICENSE.txt
 
 pushd ./dist
-zip -r KspCraftOrganizer.zip KspCraftOrganizer
+zip -r -X KspCraftOrganizer.zip KspCraftOrganizer
 popd
