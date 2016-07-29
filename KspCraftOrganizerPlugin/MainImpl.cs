@@ -20,6 +20,7 @@ namespace KspCraftOrganizer {
 
 		public void Start() {
 			COLogger.logDebug("Craft organizer plugin - start");
+			IKspAlProvider.instance.start();
 
 			ShouldCurrentCraftBeSavedQuestionWindow shouldCraftBeSavedQuestionWindow = addWindow(new ShouldCurrentCraftBeSavedQuestionWindow());
 			craftOrganizerWindow = addWindow(new OrganizerWindow(shouldCraftBeSavedQuestionWindow));
@@ -34,7 +35,6 @@ namespace KspCraftOrganizer {
 			}
 
 			EditorListenerService.instance.start();
-			IKspAlProvider.instance.start();
 
 		}
 

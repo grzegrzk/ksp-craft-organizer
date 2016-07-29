@@ -398,11 +398,17 @@ namespace KspCraftOrganizer {
 				float thumbSize = Math.Min(windowHeight/3, 560);
 				float thumbMargin = 10;
 				Vector2 tooltipPos = Event.current.mousePosition + new Vector2(10, 10);
-				Vector2 tooltipSize = new Vector2(tooltipTextWidth + thumbSize, Math.Max(drawer.contentSize.y, thumbSize + thumbMargin*2));
+				Vector2 tooltipSize = new Vector2(tooltipTextWidth + thumbSize + thumbMargin*2, Math.Max(drawer.contentSize.y, thumbSize + thumbMargin*2));
 				if (tooltipPos.y + tooltipSize.y > windowHeight) {
 					tooltipPos.y = windowHeight - tooltipSize.y - 10;
 					if (tooltipPos.y < 10) {
 						tooltipPos.y = 10;
+					}
+				}
+				if (tooltipPos.x + tooltipSize.x > windowWidth) {
+					tooltipPos.x = windowWidth - tooltipSize.x - 10;
+					if (tooltipPos.x < 10) {
+						tooltipPos.x = 10;
 					}
 				}
 

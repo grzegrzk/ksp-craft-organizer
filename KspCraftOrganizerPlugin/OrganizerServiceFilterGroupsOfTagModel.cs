@@ -11,7 +11,6 @@ namespace KspCraftOrganizer {
 
 		public OrganizerServiceFilterGroupsOfTagModel(OrganizerService parent) {
 			this.parent = parent;
-
 		}
 
 		public void update() {

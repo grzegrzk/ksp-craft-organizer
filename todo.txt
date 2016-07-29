@@ -1,13 +1,18 @@
 TODO:
- - Add above the craft list a list of non-default selected tags with possibility to clear them, like:
+ - Add mouse over image
+ - Allow to collapse tags on the filter list
+ - Allow to search tags on the "manage tags" list
+ - Create a list of non-default selected tags with possibility to clear them (show it above the craft list), like:
  	Bodies: [Eve x] [Duna x] BuildingStage: [Final x] [Clear All] [>>]
- - Cache cost/part count/etc in separate file so loading is much faster
+ - Create *categories
+ - Add help button to "manage tags"
  - Add button "+" inside craft that will add tag in a given category
  - Add button "+" inside craft that will add tag in any category
  - Add button "x" next to each tag in craft that will remove it
  - Add dropdown box for each tag that will allow it to be changed to different one in the same category
  
 Cancelled or far future:
+ - Cache cost/part count/etc in separate file so loading is much faster
  - Add toolbar next to category in filters: [All | Any | Single]
  - Show "Cancel & discard changes" only if some tags were actually modified
  - Allow to modify window width
@@ -16,6 +21,10 @@ Cancelled or far future:
  
  
 Done:
+ - Fix: list of crafts is not refreshed when craft is deleted
+ - Fix "unsaved changes" dialog displayed when user has unmodified new craft
+ - Fix bug with wrongly displayed tags in scenario: got to VAB -> open craft -> rename -> save -> assign new tags -> launch -> recover vessel -> go to VAB -> click "tags"
+ - Fix bug with image sometimes displayed outside tooltip
  - Remember selected filter separately for VABinVAB/SPHinVAB/VABinSPH/SPHinSPH
  - Correct bug with tags not being saved in this scenario: open craft -> change name -> save -> go to different building using "go to" plugin
  - The tags selected in a single group should display crafts with any of the selected tags

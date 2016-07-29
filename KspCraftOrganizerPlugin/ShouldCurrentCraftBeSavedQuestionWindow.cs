@@ -22,7 +22,7 @@ namespace KspCraftOrganizer {
 				if (GUILayout.Button("Cancel")) {
 					hideWindow();
 				}
-				if (GUILayout.Button("Don't Save")) {
+				if (GUILayout.Button("Don't Save and load new craft")) {
 					ksp.loadCraftToWorkspace(fileToLoad);
 					hideWindow();
 				}

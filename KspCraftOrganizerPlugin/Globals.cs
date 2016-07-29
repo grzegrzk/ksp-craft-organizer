@@ -20,12 +20,16 @@ namespace KspCraftOrganizer
 			return toRet;
 		}
 
-		public static string join<T>(ICollection<T> collection, Function<string, T> function, string spearator) { 
+		public static string join(ICollection<string> collection, string separator) {
+			return join(collection, s => s, separator);
+		}
+
+		public static string join<T>(ICollection<T> collection, Function<string, T> function, string separator) { 
 			StringBuilder sb = new StringBuilder();
 			bool first = true;
 			foreach (T element in collection) {
 				if (!first) {
-					sb.Append(spearator);
+					sb.Append(separator);
 				}
 				sb.Append(function(element));
 				first = false;

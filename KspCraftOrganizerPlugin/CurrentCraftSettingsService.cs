@@ -77,6 +77,7 @@ namespace KspCraftOrganizer
 				}
 				dto.craftName = ksp.getCurrentCraftName();
 				dto.tags = selectedTags.ToArray();
+				COLogger.logDebug("Selected tags that will be saved: " + Globals.join(dto.tags, ", "));
 
 				settingsService.writeCraftSettingsForCraftFile(fileLocationService.getCraftSettingsFileForCraftFile(craftFile), dto);
 			} 
@@ -110,13 +111,18 @@ namespace KspCraftOrganizer
 
 				COLogger.logDebug("Reading current's craft tags assuming its file is " + craftListenerService.originalShipFile);
 				if (!craftListenerService.isNewEditor() && File.Exists(craftListenerService.originalShipFile)) {
-					foreach (string tag in settingsService.readCraftSettingsForCraftFile(craftListenerService.originalShipFile).tags) {
+					ICollection<string> tags = settingsService.readCraftSettingsForCraftFile(craftListenerService.originalShipFile).tags;
+					foreach (string tag in tags) {
 						addTagIfNeeded(tag);
 						_availableTagsCache[tag].selectedDuringLastEdit = true;
 						_availableTagsCache[tag].selectedOriginally = true;
 						_availableTagsCache[tag].selected = true;
 					}
+					COLogger.logDebug("Tags from file " + Globals.join(tags, ", "));
+				} else {
+					COLogger.logDebug("Tags will not be read - editor is new or file '" + craftListenerService.originalShipFile + "' does not exist");
 				}
+
 			}
 		}
 

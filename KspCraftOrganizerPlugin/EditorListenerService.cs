@@ -83,7 +83,11 @@ namespace KspCraftOrganizer {
 				_lastSavedShipName = EditorLogic.fetch.ship.shipName;
 				_lastShipNameInEditor = EditorLogic.fetch.ship.shipName;
 				newEditor = EditorLogic.fetch.ship.Count == 0;
-				string file = EditorDriver.filePathToLoad;
+				string file = EditorDriver.filePathToLoad;//this path may be invalid when editor starts
+				if (Path.GetFullPath(fileLocattion.getCraftSaveFilePathForShipName(_lastSavedShipName)) != Path.GetFullPath(file)) {
+					COLogger.logDebug("Name of the ship is '" + _lastSavedShipName + "' but KSP claims it is loaded from '" + file + "' which is probably a bug. Assuming that file was loaded from autosave.");
+					file = fileLocattion.getAutoSaveShipPath();//this path may be invalid when we use dynamic plugin reload but it is relevant only during development so lets stick to it
+				}
 				if (newEditor) {
 					file = null;
 				}
@@ -134,6 +138,7 @@ namespace KspCraftOrganizer {
 			COLogger.logDebug("processOnEditorStarted");
 			fireEventIfShipHasBeenSaved();
 
+			isModifiedSinceSave = false;
 			newEditor = true;
 			updateLastSaveDate();
 			_lastSavedShipName = lastShipNameInEditor;
@@ -194,6 +199,8 @@ namespace KspCraftOrganizer {
 									_lastSavedShipName != lastShipNameInEditor ||
 									newEditor ||
 									(originalShipRealFileOrNull != null && originalShipRealFileOrNull != fileSavePath));
+					} else {
+						COLogger.logDebug("onShipSaved will not be called because it is null");
 					}
 
 					lastSaveDate = File.GetLastWriteTime(fileSavePath);

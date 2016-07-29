@@ -167,6 +167,7 @@ namespace KspCraftOrganizer {
 		internal void deleteCraft(OrganizerCraftModel model) {
 			fileLocationService.deleteCraft(model.craftFile);
 			availableCrafts.Remove(model);
+			clearCaches("craft deleted");
 		}
 
 		public void unselectAllCrafts() {
