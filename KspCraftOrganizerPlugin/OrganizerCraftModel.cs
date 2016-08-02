@@ -102,10 +102,10 @@ namespace KspCraftOrganizer
 
 		public string costToDisplay { get { 
 				float cost = this.cost;
-				if (cost > 10000000) {
+				if (cost > 10000000000) {
 					return roundDiv (cost, 1000000) + "M";
 				}
-				if (cost > 1000) {
+				if (cost > 1000000) {
 					return roundDiv (cost, 1000) + "k";
 				}
 				return roundDiv(cost, 1);
@@ -131,6 +131,9 @@ namespace KspCraftOrganizer
 				if (mass > 1000) {
 					return roundDiv (mass, 1000) + "kt";
 				}
+				if (mass < 1) {
+					return roundDiv(mass*1000, 1) + "kg";
+				}
 				return roundDiv(mass, 1) + "t";
 			}
 		}
@@ -140,7 +143,7 @@ namespace KspCraftOrganizer
 		public bool notEnoughScience { get { return craftDto.notEnoughScience; } }
 
 		private string roundDiv(float toDiv, int  divisor){
-			return (((double)toDiv) / divisor).ToString("#0.000");
+			return (((double)toDiv) / divisor).ToString("#,##0");
 		}
 
 		public void setSelectedPrimaryInternal(bool selectedPrimary){
