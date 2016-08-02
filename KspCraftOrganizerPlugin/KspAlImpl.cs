@@ -26,6 +26,7 @@ namespace KspCraftOrganizer
 
 		public void destroy() {
 			GameEvents.onEditorStarted.Remove(onEditorStarted);
+			unlockEditor();
 		}
 
 		public void onEditorStarted() {
@@ -221,16 +222,11 @@ namespace KspCraftOrganizer
 
 		private void readFilterSettingsToDto(ProfileFilterSettingsDto dto, ConfigNode node, string optionsPrefix) {
 
-			List<string> selectedTags = new List<string>();
-			List<string> filterGroupsWithSelectedNoneOption = new List<string>();
+			List<string> selectedTags = readAsListOfStrings(node, optionsPrefix + "filterTag");
+			List<string> filterGroupsWithSelectedNoneOption = readAsListOfStrings(node, optionsPrefix + "filterGroupsWithSelectedNoneOption");
+			List<string> collapsedFilterGroups = readAsListOfStrings(node, optionsPrefix + "collapsedFilterGroups");
 			string filterText = "";
 
-			foreach (string tag in node.GetValues(optionsPrefix + "filterTag")) {
-				selectedTags.Add(tag);
-			}
-			foreach (string groupName in node.GetValues(optionsPrefix + "filterGroupsWithSelectedNoneOption")) {
-				filterGroupsWithSelectedNoneOption.Add(groupName);
-			}
 			filterText = node.GetValue(optionsPrefix + "filterText");
 			if (filterText == null) {
 				filterText = "";
@@ -239,7 +235,16 @@ namespace KspCraftOrganizer
 			dto.selectedFilterTags = selectedTags.ToArray();
 			dto.selectedTextFilter = filterText;
 			dto.filterGroupsWithSelectedNoneOption = filterGroupsWithSelectedNoneOption;
+			dto.collapsedFilterGroups = collapsedFilterGroups;
 		}
+
+		public List<string> readAsListOfStrings(ConfigNode node, string name) {
+			List<string> toRet = new List<string>();
+			foreach (string v in node.GetValues(name)) {
+				toRet.Add(v);
+			}
+			return toRet;
+		}	
 
 		public void writeProfileSettings(string fileName, ProfileSettingsDto toWrite) {
 			COLogger.logDebug("Writing profile settings to '" + fileName);
@@ -263,14 +268,18 @@ namespace KspCraftOrganizer
 		}
 
 		private void writeFilterSettingsFromDto(ProfileFilterSettingsDto dto, ConfigNode node, string optionsPrefix) {
-			foreach (string filterTag in dto.selectedFilterTags) {
-				node.AddValue(optionsPrefix + "filterTag", filterTag);
-			}
-			foreach (string groupName in dto.filterGroupsWithSelectedNoneOption) {
-				node.AddValue(optionsPrefix + "filterGroupsWithSelectedNoneOption", groupName);
-			}
+			writeAsListOfStrings(node, optionsPrefix + "filterTag", dto.selectedFilterTags);
+			writeAsListOfStrings(node, optionsPrefix + "filterGroupsWithSelectedNoneOption", dto.filterGroupsWithSelectedNoneOption);
+			writeAsListOfStrings(node, optionsPrefix + "collapsedFilterGroups", dto.collapsedFilterGroups);
+
 			node.AddValue(optionsPrefix + "filterText", dto.selectedTextFilter);
 
+		}
+
+		void writeAsListOfStrings(ConfigNode node, string name, IEnumerable<string> list) {
+			foreach (string v in list) {
+				node.AddValue(name, v);
+			}
 		}
 
 		private void saveNode(ConfigNode node, string file) {
@@ -351,7 +360,11 @@ namespace KspCraftOrganizer
 		public void lockEditor (){
 			EditorLogic.fetch.toolsUI.enabled = false;
 			EditorLogic.fetch.enabled = false;
-			EditorLogic.fetch.Lock (true, true, true, LOCK_NAME);
+			bool lockExit = true;
+#if DEBUG
+			lockExit = false;
+#endif
+			EditorLogic.fetch.Lock (true, lockExit, true, LOCK_NAME);
 		}
 
 		public void unlockEditor (){

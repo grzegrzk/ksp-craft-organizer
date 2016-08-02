@@ -6,16 +6,17 @@ namespace KspCraftOrganizer {
 	public class OrganizerServiceFilterGroupsOfTagModel {
 
 		private OrganizerService parent;
-		private TagsGrouper<OrganizerTagModel> tagsGrouper;
+		private FilterTagsGrouper tagsGrouper = new FilterTagsGrouper();
 		private Dictionary<string, string> groupsWithSelectedNone = new Dictionary<string, string>();
 
 		public OrganizerServiceFilterGroupsOfTagModel(OrganizerService parent) {
 			this.parent = parent;
 		}
 
+
 		public void update() {
 			ICollection<OrganizerTagModel> usedTags = parent.usedTags;
-			this.tagsGrouper = new TagsGrouper<OrganizerTagModel>(usedTags, t => t.name);
+			this.tagsGrouper.update(usedTags);
 
 			List<string> groupsToRemove = new List<string>();
 			foreach (string g in groupsWithSelectedNone.Keys) {
@@ -28,7 +29,7 @@ namespace KspCraftOrganizer {
 			}
 		}
 
-		public ICollection<TagGroup<OrganizerTagModel>> groups {
+		public ICollection<FilterTagGroup> groups {
 			get {
 				return this.tagsGrouper.groups;
 			}
@@ -40,12 +41,30 @@ namespace KspCraftOrganizer {
 			}
 		}
 
+		public ICollection<string> collapsedFilterGroups {
+			get {
+				List<string> toRet = new List<string>();
+				foreach (FilterTagGroup tagGroup in tagsGrouper.groups) {
+					if (tagGroup.collapsedInFilterView) {
+						toRet.Add(tagGroup.name);
+					}
+				}
+				return toRet;
+			}
+		}
+
 		public void setInitialGroupsWithSelectedNone(ICollection<string> filterGroupsWithSelectedNoneOption) {
 			groupsWithSelectedNone.Clear();
 			foreach (string groupName in filterGroupsWithSelectedNoneOption) {
 				if (!groupsWithSelectedNone.ContainsKey(groupName)) {
 					groupsWithSelectedNone.Add(groupName, groupName);
 				}
+			}
+		}
+
+		public void setCollapsedGroups(ICollection<string> collapsedGroups) {
+			foreach (FilterTagGroup tagGroup in tagsGrouper.groups) {
+				tagGroup.collapsedInFilterView = collapsedGroups.Contains(tagGroup.name);
 			}
 		}
 

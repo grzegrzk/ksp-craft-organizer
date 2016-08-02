@@ -179,33 +179,44 @@ namespace KspCraftOrganizer {
 					using (GUILayout.ScrollViewScope tagScrollScope = new GUILayout.ScrollViewScope(tagScrollPosition, false, false, GUILayout.MaxWidth(FILTER_TOOLBAR_WIDTH - 10))) {
 						tagScrollPosition = tagScrollScope.scrollPosition;
 						using (new GUILayout.VerticalScope(GUILayout.ExpandWidth(false))) {
-							foreach (TagGroup<OrganizerTagModel> tagGroup in filterGroups.groups) {
-								GUILayout.Label(tagGroup.displayName + ":");
-								if (tagGroup.isYesNoGroup) {
-									OrganizerTagModel tag = tagGroup.firstTag.originalTag;
-									int thisYesNoTagState;
-									if (tag.selectedForFiltering) {
-										thisYesNoTagState = 0;
-									} else if (filterGroups.hasGroupSelectedNoneFilter(tagGroup.name)) {
-										thisYesNoTagState = 1;
+							foreach (FilterTagGroup tagGroup in filterGroups.groups) {
+								bool collapsed = tagGroup.collapsedInFilterView;
+								if (!collapsed) {
+									if (GUILayout.Button("- " + tagGroup.displayName + ":", this.skin.label)) {
+										tagGroup.collapsedInFilterView = !collapsed;
+										model.markProfileSettingsAsDirty("group collapsed state changed");
+									}
+									if (tagGroup.isYesNoGroup) {
+										OrganizerTagModel tag = tagGroup.firstTag.originalTag;
+										int thisYesNoTagState;
+										if (tag.selectedForFiltering) {
+											thisYesNoTagState = 0;
+										} else if (filterGroups.hasGroupSelectedNoneFilter(tagGroup.name)) {
+											thisYesNoTagState = 1;
+										} else {
+											thisYesNoTagState = 2;
+										}
+										thisYesNoTagState = guiLayout_Radio_OrigSkin(thisYesNoTagState, 0, " " + tagGroup.displayName);
+										thisYesNoTagState = guiLayout_Radio_OrigSkin(thisYesNoTagState, 1, " not " + tagGroup.displayName);
+										thisYesNoTagState = guiLayout_Radio_OrigSkin(thisYesNoTagState, 2, " all");
+										tag.selectedForFiltering = thisYesNoTagState == 0;
+										model.setGroupHasSelectedNoneFilter(tagGroup.name, thisYesNoTagState == 1);
 									} else {
-										thisYesNoTagState = 2;
-									}
-									thisYesNoTagState = guiLayout_Radio_OrigSkin(thisYesNoTagState, 0, " " + tagGroup.displayName);
-									thisYesNoTagState = guiLayout_Radio_OrigSkin(thisYesNoTagState, 1, " not " + tagGroup.displayName);
-									thisYesNoTagState = guiLayout_Radio_OrigSkin(thisYesNoTagState, 2, " all");
-									tag.selectedForFiltering = thisYesNoTagState == 0;
-									model.setGroupHasSelectedNoneFilter(tagGroup.name, thisYesNoTagState == 1);
-								} else {
-									foreach (TagInGroup<OrganizerTagModel> tagInGroup in tagGroup.tags) {
-										OrganizerTagModel tag = tagInGroup.originalTag;
-										tag.selectedForFiltering = guiLayout_Toggle_OrigSkin(tag.selectedForFiltering, " " + tagInGroup.tagDisplayName);
-										GUILayout.Space(5);
-									}
-									bool noneSelected = guiLayout_Toggle_OrigSkin(filterGroups.hasGroupSelectedNoneFilter(tagGroup.name), " <with no tag assigned>");
+										foreach (TagInGroup<OrganizerTagModel> tagInGroup in tagGroup.tags) {
+											OrganizerTagModel tag = tagInGroup.originalTag;
+											tag.selectedForFiltering = guiLayout_Toggle_OrigSkin(tag.selectedForFiltering, " " + tagInGroup.tagDisplayName);
+											GUILayout.Space(5);
+										}
+										bool noneSelected = guiLayout_Toggle_OrigSkin(filterGroups.hasGroupSelectedNoneFilter(tagGroup.name), " <with no tag assigned>");
 
-									model.setGroupHasSelectedNoneFilter(tagGroup.name, noneSelected);
-										
+										model.setGroupHasSelectedNoneFilter(tagGroup.name, noneSelected);
+
+									}
+								} else {
+									if(GUILayout.Button("+ " + tagGroup.displayName, this.skin.label)){
+										tagGroup.collapsedInFilterView = !collapsed;
+										model.markProfileSettingsAsDirty("group collapsed state changed");
+									}
 								}
 							}
 							if (filterGroups.restTags.Count > 0) {

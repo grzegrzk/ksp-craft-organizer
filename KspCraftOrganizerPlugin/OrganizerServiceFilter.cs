@@ -14,6 +14,7 @@ namespace KspCraftOrganizer {
 		public OrganizerServiceFilterGroupsOfTagModel groupsModel { get; private set; }
 		private OrganizerService parent;
 		private ProfileAllFilterSettingsDto allFiltersDto;
+		private bool afterSettingsChanged = true;
 
 
 		public OrganizerServiceFilter(OrganizerService parent, ProfileSettingsDto profileSettigngs) {
@@ -40,7 +41,7 @@ namespace KspCraftOrganizer {
 		}
 
 
-		void applyFilterSettings(ProfileFilterSettingsDto dto) {
+		private void applyFilterSettings(ProfileFilterSettingsDto dto) {
 			foreach (OrganizerTagModel tag in _availableTags.Values) {
 				tag.selectedForFiltering = false;
 			}
@@ -56,16 +57,19 @@ namespace KspCraftOrganizer {
 			if (craftNameFilter == null) {
 				craftNameFilter = "";
 			}
+			groupsModel.setCollapsedGroups(dto.collapsedFilterGroups);
 
 
-			COLogger.logDebug("applyFilterSettings, selected tags: " + Globals.join(dto.selectedFilterTags, s => s, ", "));
-			COLogger.logDebug("applyFilterSettings, groupsWithSelectedNoneOption: " + Globals.join(dto.filterGroupsWithSelectedNoneOption, s => s, ", "));
+			COLogger.logDebug("applyFilterSettings, selected tags: " + Globals.join(dto.selectedFilterTags, ", "));
+			COLogger.logDebug("applyFilterSettings, groupsWithSelectedNoneOption: " + Globals.join(dto.filterGroupsWithSelectedNoneOption, ", "));
+			COLogger.logDebug("applyFilterSettings, collapsed groups: " + Globals.join(dto.collapsedFilterGroups, ", "));
 		}
 
 		public void onCraftTypeChanged(CraftType oldCraftType, CraftType newCraftType) {
 			COLogger.logDebug("filter.onCraftTypeChanged, old: " + oldCraftType + ", new : " + newCraftType);
 			assignCurrentFilterSettingsToDto(getFilterDtoFor(oldCraftType));
 			applyFilterSettings(getFilterDtoFor(newCraftType));
+			afterSettingsChanged = true;
 			COLogger.logDebug("filter.onCraftTypeChanged -- end");
 		}
 
@@ -98,8 +102,10 @@ namespace KspCraftOrganizer {
 			if (dto.selectedTextFilter == null) {
 				dto.selectedTextFilter = "";
 			}
-			COLogger.logDebug("assignCurrentFilterSettingsToDto, selected tags: " + Globals.join(selectedTags, s => s, ", "));
-			COLogger.logDebug("assignCurrentFilterSettingsToDto, groupsWithSelectedNoneOption: " + Globals.join(dto.filterGroupsWithSelectedNoneOption, s => s, ", "));
+			dto.collapsedFilterGroups = new List<string>(groupsModel.collapsedFilterGroups);
+			COLogger.logDebug("assignCurrentFilterSettingsToDto, selected tags: " + Globals.join(selectedTags, ", "));
+			COLogger.logDebug("assignCurrentFilterSettingsToDto, groupsWithSelectedNoneOption: " + Globals.join(dto.filterGroupsWithSelectedNoneOption, ", "));
+			COLogger.logDebug("assignCurrentFilterSettingsToDto, collapsed groups: " + Globals.join(dto.collapsedFilterGroups, ", "));
 		}
 
 		public ICollection<string> groupsWithSelectedNoneOption {
@@ -194,6 +200,10 @@ namespace KspCraftOrganizer {
 			}
 			updateUsedTags();
 			groupsModel.update();
+			if (afterSettingsChanged) {
+				applyFilterSettings(getFilterDtoFor(parent.craftType));
+				afterSettingsChanged = false;
+			}
 		}
 
 		public ICollection<OrganizerTagModel> usedTags {

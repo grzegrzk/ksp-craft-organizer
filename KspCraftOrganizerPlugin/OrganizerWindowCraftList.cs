@@ -6,16 +6,6 @@ namespace KspCraftOrganizer {
 
 		private readonly float DOUBLE_CLICK_THRESHOLD = 0.5f;
 
-		//static List<Vector2> scaledOffsetStack = new List<Vector2>();
-		//public static float debugLeft;
-		//public static float debugTop;
-		//public static int debugScaleIndex = 3;
-		//public static float[] debugScales = new float[] { 0.5f, 0.75f, 1, 1.5f, 2, 2.25f};
-		//public static float debugScale = 1.5f;
-		//public static int windowPosIndex;
-		//public static float[] windowPoses = new float[] { 0f, 0.25f, 0.5f };
-		//public static float windowPos = 0;
-
 		private readonly OrganizerWindow parent;
 		private Vector2 shipsScrollPosition;
 		private Rect shipsRect;
@@ -35,14 +25,7 @@ namespace KspCraftOrganizer {
 
 			int manageTagsWidth = parent.showManageTagsToolbar ? OrganizerWindow.MANAGE_TAGS_TOOLBAR_WIDTH : OrganizerWindow.NO_MANAGE_TAGS_TOOLBAR_WIDTH;
 			using (new GUILayout.VerticalScope(GUILayout.Width(parent.windowWidth - manageTagsWidth - 30 - OrganizerWindow.FILTER_TOOLBAR_WIDTH))) {
-
-				//debugLeft = GUILayout.HorizontalSlider(debugLeft, -1000, 1000.0f);
-				//debugTop = GUILayout.HorizontalSlider(debugTop, -1000, 1000.0f);
-				//debugScaleIndex = GUILayout.Toolbar(debugScaleIndex, new string[]{ "0.5", "0.75", "1", "1.5", "2", "3"});
-				//debugScale = debugScales[debugScaleIndex];
-				//windowPosIndex = GUILayout.Toolbar(windowPosIndex, new string[] { "0", "1/4", "1/2" });
-				//windowPos = Screen.width * windowPoses[windowPosIndex];
-
+				
 				using (LayoutScrollScope shipsScroll = new LayoutScrollScope(shipsRect, shipsScrollPosition)) {
 					shipsScrollPosition = shipsScroll.scroll;
 					using (new GUILayout.VerticalScope(GUILayout.ExpandWidth(false))) {
@@ -90,7 +73,7 @@ namespace KspCraftOrganizer {
 				}
 				using (new GUILayout.VerticalScope(GUILayout.ExpandWidth(true))) {
 					GUIStyle thisCraftButtonStyle = craft.isSelectedPrimary ? parent.toggleButtonStyleTrue : parent.toggleButtonStyleFalse;
-					TagsGrouper<string> tagsGrouper = new TagsGrouper<string>(craft.tags, t => t);
+					CraftTagsGrouper tagsGrouper = new CraftTagsGrouper(craft.tags);
 
 					using (new GUI.ClipScope(Globals.ZERO_RECT)) {
 						GUILayout.Button("", thisCraftButtonStyle, GUILayout.Height(0));
@@ -123,7 +106,7 @@ namespace KspCraftOrganizer {
 
 						craft.tagsHeight = 0;
 						tagValuesWidth = tagsWidth - craft.tagGroupNameWidth - 10;
-						foreach (TagGroup<string> tagGroup in tagsGrouper.groups) {
+						foreach (CraftTagGroup tagGroup in tagsGrouper.groups) {
 							tagGroup.guiHeight = calcMultilineLabelHeight(tagValuesWidth, tagGroup.tagsAsString) - (parent.isKspSkin() ? 7 : 2);
 							craft.tagsHeight += tagGroup.guiHeight;
 						}
@@ -164,7 +147,7 @@ namespace KspCraftOrganizer {
 					}
 					Rect thisShipRect = GUILayoutUtility.GetLastRect();
 					Color tagsColor = parent.originalSkin.label.normal.textColor;
-					//using (new GUI.GroupScope(thisShipRect)) {
+
 					int leftOffset = (int)thisShipRect.x + 10;
 					int firstRowsLeftOffset = leftOffset;
 					int nextTop = (int)thisShipRect.y + 10;
@@ -192,7 +175,7 @@ namespace KspCraftOrganizer {
 						nextTop += 20;
 					}
 
-					foreach (TagGroup<string> tagGroup in tagsGrouper.groups) {
+					foreach (CraftTagGroup tagGroup in tagsGrouper.groups) {
 						drawLabel(tagsColor, leftOffset, nextTop, tagGroup.displayName + ":");
 						drawMultilineLabel(tagsColor,
 										   tagValuesWidth,
@@ -210,9 +193,7 @@ namespace KspCraftOrganizer {
 										   tagsGrouper.restTagsAsString);
 						nextTop += (int)tagsGrouper.restTagsGuiHeight;
 					}
-					GUI.DrawTexture(new Rect(thumbPosX, thumbPosY, thumbSize, thumbSize), craft.thumbTexture);
-
-					//}
+					GUI.Label(new Rect(thumbPosX, thumbPosY, thumbSize, thumbSize), new GUIContent(craft.thumbTexture, "!!craft" + index));
 				}
 			}
 		}

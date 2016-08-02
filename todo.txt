@@ -1,7 +1,7 @@
 TODO:
- - Add mouse over image
- - Allow to collapse tags on the filter list
- - Allow to search tags on the "manage tags" list
+ 
+ - Add possibility to read crafts from different save
+ - Allow to collapse tags on the "manage tags" list
  - Create a list of non-default selected tags with possibility to clear them (show it above the craft list), like:
  	Bodies: [Eve x] [Duna x] BuildingStage: [Final x] [Clear All] [>>]
  - Create *categories
@@ -10,6 +10,8 @@ TODO:
  - Add button "+" inside craft that will add tag in any category
  - Add button "x" next to each tag in craft that will remove it
  - Add dropdown box for each tag that will allow it to be changed to different one in the same category
+ - Add button "move to SPH"/"move to VAB"
+ - Add non-category|hierarchical|tags
  
 Cancelled or far future:
  - Cache cost/part count/etc in separate file so loading is much faster
@@ -21,6 +23,9 @@ Cancelled or far future:
  
  
 Done:
+ - Change icons to the ones provided by cy4n
+ - Add mouse over image
+ - Allow to collapse tags on the filter list
  - Fix: list of crafts is not refreshed when craft is deleted
  - Fix "unsaved changes" dialog displayed when user has unmodified new craft
  - Fix bug with wrongly displayed tags in scenario: got to VAB -> open craft -> rename -> save -> assign new tags -> launch -> recover vessel -> go to VAB -> click "tags"

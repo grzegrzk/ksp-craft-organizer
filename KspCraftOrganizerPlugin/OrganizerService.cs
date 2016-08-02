@@ -131,6 +131,15 @@ namespace KspCraftOrganizer
 		}
 
 		public void update(bool selectAll) {
+			//
+			//Filter & crafts affect each other:
+			//
+			// - The only tags that affect filtering are those assigned to the crafts currently on list
+			// - The only displayed crafts are those that pass filter
+			//
+			//
+			//So at first we need to update filter and then update craft list.
+			//
 			filter.update();
 			craftList.update(selectAll, filter.filterChanged);
 		}

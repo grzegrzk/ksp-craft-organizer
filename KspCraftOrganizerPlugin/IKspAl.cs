@@ -48,6 +48,7 @@ namespace KspCraftOrganizer {
 			this.selectedTextFilter = "";
 			this.selectedFilterTags = new string[0];
 			this.filterGroupsWithSelectedNoneOption = new List<string>();
+			this.collapsedFilterGroups = new List<string>();
 		}
 
 		public string selectedTextFilter { get; set; }
@@ -55,6 +56,8 @@ namespace KspCraftOrganizer {
 		public string[] selectedFilterTags { get; set; }
 
 		public ICollection<string> filterGroupsWithSelectedNoneOption { get; set; }
+
+		public ICollection<string> collapsedFilterGroups { get; set; }
 
 	}
 
