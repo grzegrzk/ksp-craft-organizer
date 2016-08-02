@@ -410,23 +410,32 @@ namespace KspCraftOrganizer {
 				float thumbMargin = 10;
 				Vector2 tooltipPos = Event.current.mousePosition + new Vector2(10, 10);
 				Vector2 tooltipSize = new Vector2(tooltipTextWidth + thumbSize + thumbMargin*2, Math.Max(drawer.contentSize.y, thumbSize + thumbMargin*2));
-				if (tooltipPos.y + tooltipSize.y > windowHeight) {
-					tooltipPos.y = windowHeight - tooltipSize.y - 10;
-					if (tooltipPos.y < 10) {
-						tooltipPos.y = 10;
-					}
-				}
-				if (tooltipPos.x + tooltipSize.x > windowWidth) {
-					tooltipPos.x = windowWidth - tooltipSize.x - 10;
-					if (tooltipPos.x < 10) {
-						tooltipPos.x = 10;
-					}
+				clampTooltipPosToWindow(ref tooltipPos, tooltipSize);
+
+				if (new Rect(tooltipPos, tooltipSize).Contains(Event.current.mousePosition)) {
+					tooltipPos = Event.current.mousePosition - tooltipSize - new Vector2(10, 10);
+					clampTooltipPosToWindow(ref tooltipPos, tooltipSize);
 				}
 
 				GUI.Box(new Rect(tooltipPos, tooltipSize), "", tooltipBackgroundStyle);
 				drawer.drawAt(tooltipPos);
 
 				GUI.DrawTexture(new Rect(tooltipPos.x + tooltipTextWidth + thumbMargin, tooltipPos.y + thumbMargin, thumbSize, thumbSize), tooltipCraft.thumbTexture);
+			}
+		}
+
+		private void clampTooltipPosToWindow(ref Vector2 tooltipPos, Vector2 tooltipSize) {
+			if (tooltipPos.y + tooltipSize.y > windowHeight) {
+				tooltipPos.y = windowHeight - tooltipSize.y - 10;
+				if (tooltipPos.y < 10) {
+					tooltipPos.y = 10;
+				}
+			}
+			if (tooltipPos.x + tooltipSize.x > windowWidth) {
+				tooltipPos.x = windowWidth - tooltipSize.x - 10;
+				if (tooltipPos.x < 10) {
+					tooltipPos.x = 10;
+				}
 			}
 		}
 
