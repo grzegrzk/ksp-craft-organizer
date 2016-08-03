@@ -233,7 +233,7 @@ namespace KspCraftOrganizer {
 			}
 			using (new ScaledGuiScope(scale, x, y + size.y / 2)) {
 				Rect position = new Rect();
-				position.x = x;//text.Contains("37.800") ? 0 : x;
+				position.x = x;
 				position.y = y;
 				position.width = size.x;
 				position.height = size.y;

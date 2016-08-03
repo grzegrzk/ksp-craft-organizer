@@ -8,8 +8,21 @@ namespace KspCraftOrganizer
 	public class KspAlImpl: IKspAl {
 
 		private static readonly String LOCK_NAME = "KspAlImpl";
-		private static readonly String SETTINGS_VER_1 = "1";
-		private static readonly String SETTINGS_VER_2 = "2";
+		private static readonly int SETTINGS_VER_1 = 1;
+		/**
+		 * In profile settings: introduced separated settings for VABinSPH, SPHinSPH, etc
+		 * In plugin settings: no changes
+		 */
+		private static readonly int SETTINGS_VER_2 = 2;
+		/**
+		 * In profile settings: Introduced new default tags
+		 * In plugin settings: Introduced new default tags
+		 */
+		private static readonly int SETTINGS_VER_3 = 3;
+
+		private List<string> NEW_TAGS_IN_VER3 = new List<string>(new string[] { "MasterpieceAmongCrafts"});
+
+		private static readonly int SETTINGS_VER_NOW = SETTINGS_VER_3;
 
 		private Dictionary<string, AvailablePart> _availablePartCache;
 		private EditorFacility editorFacility;
@@ -180,10 +193,7 @@ namespace KspCraftOrganizer
 			if (File.Exists(fileName)) {
 				ConfigNode node = ConfigNode.Load(fileName);
 				if (node != null) {
-					string settingsVersion = node.GetValue("version");
-					if (settingsVersion == null || settingsVersion == "") {
-						settingsVersion = SETTINGS_VER_1;
-					}
+					int settingsVersion = readSettingsVersion(node);
 
 					if (settingsVersion == SETTINGS_VER_1) {
 						readFilterSettingsToDto(allFilterSettings.filterSphInSph, node, "");
@@ -199,6 +209,11 @@ namespace KspCraftOrganizer
 
 					foreach (string tag in node.GetValues("availableTag")) {
 						tags.Add(tag);
+					}
+
+					if (settingsVersion <= SETTINGS_VER_2) {
+						COLogger.logDebug("Profile settings were in version " + settingsVersion + ", adding new default tags");
+						tags.AddRange(NEW_TAGS_IN_VER3);
 					}
 
 					string styleId = node.GetValue("guiStyle");
@@ -220,11 +235,29 @@ namespace KspCraftOrganizer
 			return settings;
 		}
 
+		static int readSettingsVersion(ConfigNode node) {
+			int settingsVersion;
+			string settingsVersionString = node.GetValue("version");
+			if (settingsVersionString == null || settingsVersionString == "") {
+				settingsVersion = SETTINGS_VER_1;
+			} else {
+				settingsVersion = int.Parse(settingsVersionString);
+			}
+
+			return settingsVersion;
+		}
+
 		private void readFilterSettingsToDto(ProfileFilterSettingsDto dto, ConfigNode node, string optionsPrefix) {
 
 			List<string> selectedTags = readAsListOfStrings(node, optionsPrefix + "filterTag");
 			List<string> filterGroupsWithSelectedNoneOption = readAsListOfStrings(node, optionsPrefix + "filterGroupsWithSelectedNoneOption");
-			List<string> collapsedFilterGroups = readAsListOfStrings(node, optionsPrefix + "collapsedFilterGroups");
+
+			List<string> collapsedFilterGroups = readAsListOfStrings(node, optionsPrefix + "collapsedFilterTagGroups");
+			dto.restFilterTagsCollapsed = readBoolFromSettings(node, optionsPrefix + "isRestFilterTagsCollapsed", false);
+
+			List<string> collapsedManagementGroups = readAsListOfStrings(node, optionsPrefix + "collapsedManagementTagGroups");
+			dto.restManagementTagsCollapsed = readBoolFromSettings(node, optionsPrefix + "isRestManagementTagsCollapsed", false);
+
 			string filterText = "";
 
 			filterText = node.GetValue(optionsPrefix + "filterText");
@@ -236,6 +269,16 @@ namespace KspCraftOrganizer
 			dto.selectedTextFilter = filterText;
 			dto.filterGroupsWithSelectedNoneOption = filterGroupsWithSelectedNoneOption;
 			dto.collapsedFilterGroups = collapsedFilterGroups;
+			dto.collapsedManagementGroups = collapsedManagementGroups;
+		}
+
+		private bool readBoolFromSettings(ConfigNode node, string name, bool defaultValue) {
+			string valAsString = node.GetValue(name);
+			if (valAsString == null || valAsString == "") {
+				return defaultValue;
+			} else {
+				return valAsString.ToUpper().Equals("TRUE");
+			}
 		}
 
 		public List<string> readAsListOfStrings(ConfigNode node, string name) {
@@ -249,8 +292,7 @@ namespace KspCraftOrganizer
 		public void writeProfileSettings(string fileName, ProfileSettingsDto toWrite) {
 			COLogger.logDebug("Writing profile settings to '" + fileName);
 			ConfigNode node = new ConfigNode();
-
-			node.AddValue("version", SETTINGS_VER_2);
+			writeSettingsVersion(node);
 
 			foreach (string availableTag in toWrite.availableTags) {
 				node.AddValue("availableTag", availableTag);
@@ -267,10 +309,19 @@ namespace KspCraftOrganizer
 			saveNode(node, fileName);
 		}
 
+		static void writeSettingsVersion(ConfigNode node) {
+			node.AddValue("version", SETTINGS_VER_NOW);
+		}
+
 		private void writeFilterSettingsFromDto(ProfileFilterSettingsDto dto, ConfigNode node, string optionsPrefix) {
 			writeAsListOfStrings(node, optionsPrefix + "filterTag", dto.selectedFilterTags);
 			writeAsListOfStrings(node, optionsPrefix + "filterGroupsWithSelectedNoneOption", dto.filterGroupsWithSelectedNoneOption);
-			writeAsListOfStrings(node, optionsPrefix + "collapsedFilterGroups", dto.collapsedFilterGroups);
+
+			writeAsListOfStrings(node, optionsPrefix + "collapsedFilterTagGroups", dto.collapsedFilterGroups);
+			node.AddValue(optionsPrefix + "isRestFilterTagsCollapsed", dto.restFilterTagsCollapsed);
+
+			writeAsListOfStrings(node, optionsPrefix + "collapsedManagementTagGroups", dto.collapsedManagementGroups);
+			node.AddValue(optionsPrefix + "isRestManagementTagsCollapsed", dto.restManagementTagsCollapsed);
 
 			node.AddValue(optionsPrefix + "filterText", dto.selectedTextFilter);
 
@@ -398,10 +449,18 @@ namespace KspCraftOrganizer
 
 		public PluginSettings getPluginSettings(string fileName) {
 			COLogger.logDebug("Reading plugin settings from " + fileName);
+
 			PluginSettings toRet = new PluginSettings();
 			toRet.debug = false;
-			toRet.defaultAvailableTags = new List<string>();
+
+			List<string> defaultAvailableTags = new List<string>();
+			toRet.defaultAvailableTags = defaultAvailableTags;
+
+			bool settingsChanged = false;
+
 			if (!File.Exists(fileName)){
+				
+				settingsChanged = true;
 				COLogger.logDebug("Plugin settings do not exist, creating default file in " + fileName);
 
 				List<string> tags = new List<string>();
@@ -440,21 +499,41 @@ namespace KspCraftOrganizer
 				tags.Add(@"Status\Prototype");
 				tags.Add(@"Status\Final");
 
-				ConfigNode settingsToWrite = new ConfigNode();
-				foreach (string tag in tags) {
-					settingsToWrite.AddValue("defaultAvailableTag", tag);
-				}
-				settingsToWrite.AddValue("debug", "false");
-				settingsToWrite.Save(fileName);
+				tags.AddRange(NEW_TAGS_IN_VER3);
 			}
 			ConfigNode settings = ConfigNode.Load(fileName);
 			if (settings != null) {
+				int settingsVersion = readSettingsVersion(settings);
 				foreach (string tag in settings.GetValues("defaultAvailableTag")) {
-					toRet.defaultAvailableTags.Add(tag);
+					defaultAvailableTags.Add(tag);
 				}
-				toRet.debug = "true" == settings.GetValue("debug");
+				if (settingsVersion < SETTINGS_VER_3) {
+					COLogger.logDebug("Plugin settings were in version " + settingsVersion + ", adding new default tags");
+					defaultAvailableTags.AddRange(NEW_TAGS_IN_VER3);
+					settingsChanged = true;
+				}
+				toRet.debug = readBoolFromSettings(settings, "debug", false);
 			}
+
+			if (settingsChanged) {
+				writePluginSettings(toRet, fileName);
+			}
+
 			return toRet;
+		}
+
+		private void writePluginSettings(PluginSettings settings, string fileName) {
+			ConfigNode settingsToWrite = new ConfigNode();
+
+			writeSettingsVersion(settingsToWrite);
+
+			foreach (string tag in settings.defaultAvailableTags) {
+				settingsToWrite.AddValue("defaultAvailableTag", tag);
+			}
+
+			settingsToWrite.AddValue("debug", settings.debug);
+
+			settingsToWrite.Save(fileName);
 		}
 	}
 }

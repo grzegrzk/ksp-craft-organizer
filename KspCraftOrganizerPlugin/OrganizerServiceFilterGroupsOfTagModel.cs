@@ -6,10 +6,11 @@ namespace KspCraftOrganizer {
 	public class OrganizerServiceFilterGroupsOfTagModel {
 
 		private OrganizerService parent;
-		private FilterTagsGrouper tagsGrouper = new FilterTagsGrouper();
+		private FilterTagsGrouper tagsGrouper;
 		private Dictionary<string, string> groupsWithSelectedNone = new Dictionary<string, string>();
 
 		public OrganizerServiceFilterGroupsOfTagModel(OrganizerService parent) {
+			this.tagsGrouper = new FilterTagsGrouper(parent);
 			this.parent = parent;
 		}
 
@@ -40,6 +41,8 @@ namespace KspCraftOrganizer {
 				return this.tagsGrouper.restTags;
 			}
 		}
+
+		public bool restGroupCollapsed { get; set; }
 
 		public ICollection<string> collapsedFilterGroups {
 			get {
@@ -142,10 +145,6 @@ namespace KspCraftOrganizer {
 					}
 				}	
 			}
-
-			//if (craft.name.Contains("Station")) {
-			//	COLogger.logDebug("For craft " + craft.name + " pass = " + pass + "\n" + Globals.join(groupsWithSelectedNone, s=>s.Key, ", ") + "\n" + Globals.join(tagsGrouper.groups, g => g.name, ", "));
-			//}
 
 			return pass;
 		}

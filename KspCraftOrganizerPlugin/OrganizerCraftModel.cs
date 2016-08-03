@@ -103,12 +103,12 @@ namespace KspCraftOrganizer
 		public string costToDisplay { get { 
 				float cost = this.cost;
 				if (cost > 10000000000) {
-					return roundDiv (cost, 1000000) + "M";
+					return roundDivCost (cost, 1000000) + "M";
 				}
 				if (cost > 1000000) {
-					return roundDiv (cost, 1000) + "k";
+					return roundDivCost (cost, 1000) + "k";
 				}
-				return roundDiv(cost, 1);
+				return roundDivCost(cost, 1);
 			}}
 
 		public int partCount { get { return craftDto.partCount; } }
@@ -123,18 +123,15 @@ namespace KspCraftOrganizer
 			get {
 				float mass = this.mass;
 				if (mass > 1000000000) {
-					return roundDiv (mass, 1000000000) + "Gt";
+					return roundDivMass (mass, 1000000000) + "Gt";
 				}
 				if (mass > 1000000) {
-					return roundDiv (mass, 1000000) + "Mt";
+					return roundDivMass (mass, 1000000) + "Mt";
 				}
 				if (mass > 1000) {
-					return roundDiv (mass, 1000) + "kt";
+					return roundDivMass (mass, 1000) + "kt";
 				}
-				if (mass < 1) {
-					return roundDiv(mass*1000, 1) + "kg";
-				}
-				return roundDiv(mass, 1) + "t";
+				return roundDivMass(mass, 1) + "t";
 			}
 		}
 
@@ -142,8 +139,16 @@ namespace KspCraftOrganizer
 
 		public bool notEnoughScience { get { return craftDto.notEnoughScience; } }
 
-		private string roundDiv(float toDiv, int  divisor){
-			return (((double)toDiv) / divisor).ToString("#,##0");
+		private string roundDivMass(float toDiv, int divisor) {
+			return roundDiv(toDiv, divisor, "#,##0.000");
+		}
+		
+		private string roundDivCost(float toDiv, int divisor) {
+			return roundDiv(toDiv, divisor, "#,##0.00");
+		}
+
+		private string roundDiv(float toDiv, int  divisor, string format){
+			return (((double)toDiv) / divisor).ToString(format);
 		}
 
 		public void setSelectedPrimaryInternal(bool selectedPrimary){
@@ -255,6 +260,7 @@ namespace KspCraftOrganizer
 		}
 
 		public bool inDeleteState { get; set; }
+
 		public string description {
 			get {
 				return craftDto.description;

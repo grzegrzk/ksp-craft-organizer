@@ -15,10 +15,18 @@ namespace KspCraftOrganizer
 		private FileLocationService fileLocationService = FileLocationService.instance;
 		private OrganizerServiceCraftList craftList;
 		private OrganizerServiceFilter filter;
+		public ManagementTagsGrouper managementTagsGroups;
+		public bool restTagsInManagementCollapsed { get; set; }
+		private bool afterSettingsChanged = true;
+		private ProfileAllFilterSettingsDto allFiltersDto;
+
+		public bool restTagsInFilterCollapsed { get { return filter.restTagsCollapsed; } set { filter.restTagsCollapsed = value;}  }
 
 		public OrganizerService() {
+			this.managementTagsGroups = new ManagementTagsGrouper(this);
 			this.craftList = new OrganizerServiceCraftList(this);
 			ProfileSettingsDto profileSettings = settingsService.readProfileSettings();
+			this.allFiltersDto = profileSettings.allFilter;
 			this.filter = new OrganizerServiceFilter(this, profileSettings);
 			_selectedGuiStyle = profileSettings.selectedGuiStyle;
 			if (_selectedGuiStyle == null) {
@@ -28,6 +36,11 @@ namespace KspCraftOrganizer
 
 			this.filter.init();
 		}
+
+		private ProfileFilterSettingsDto getFilterDtoFor(CraftType craftType) {
+			return allFiltersDto.getFilterDtoFor(ksp.getCurrentEditorFacilityType(), craftType);
+		}
+
 
 		public bool selectAllFiltered {
 			get {
@@ -134,14 +147,25 @@ namespace KspCraftOrganizer
 			//
 			//Filter & crafts affect each other:
 			//
-			// - The only tags that affect filtering are those assigned to the crafts currently on list
+			// - The only tags that affect filtering are those assigned to the crafts currently on the list
 			// - The only displayed crafts are those that pass filter
 			//
 			//
 			//So at first we need to update filter and then update craft list.
 			//
 			filter.update();
+			ProfileFilterSettingsDto filterDto = getFilterDtoFor(craftType);
+			if (afterSettingsChanged) {
+				filter.applyFilterSettings(filterDto);
+			}
 			craftList.update(selectAll, filter.filterChanged);
+			managementTagsGroups.update(availableTags);
+			if (afterSettingsChanged) {
+				managementTagsGroups.applyFilterSettings(filterDto);
+				restTagsInManagementCollapsed = filterDto.restManagementTagsCollapsed;
+			}
+
+			afterSettingsChanged = false;
 		}
 
 		public OrganizerServiceCraftList.CraftFilterPredicate craftFilterPredicate {
@@ -226,10 +250,20 @@ namespace KspCraftOrganizer
 			}
 			set {
 				if (craftList.craftType != value) {
-					filter.onCraftTypeChanged(craftList.craftType, value);
+					assignStateToFiltersDto();
+
+					afterSettingsChanged = true;
+
 					craftList.craftType = value;
 				}
 			}
+		}
+
+		private void assignStateToFiltersDto() {
+			ProfileFilterSettingsDto filterDto = getFilterDtoFor(craftList.craftType);
+			filter.assignCurrentFilterSettingsToDto(filterDto);
+			managementTagsGroups.assignCurrentFilterSettingsToDto(filterDto);
+			filterDto.restManagementTagsCollapsed = this.restTagsInManagementCollapsed;
 		}
 
 		public bool isCraftAlreadyLoadedInWorkspace(){
@@ -252,7 +286,9 @@ namespace KspCraftOrganizer
 					dto.availableTags = filter.availableTagsNames;
 				}
 
-				dto.allFilter = filter.getFilterDto();
+				assignStateToFiltersDto();
+
+				dto.allFilter = allFiltersDto;
 				dto.selectedGuiStyle = _selectedGuiStyle;
 				settingsService.writeProfileSettings(dto);
 

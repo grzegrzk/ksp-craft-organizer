@@ -132,11 +132,49 @@ namespace KspCraftOrganizer {
 
 	public class FilterTagGroup : TagGroup<OrganizerTagModel> {
 
-		public FilterTagGroup(string name) : base(name) {
-			//
+		private bool _collapsedInFilterView;
+		private OrganizerService parent;
+
+		public FilterTagGroup(OrganizerService parent, string name) : base(name) {
+			this.parent = parent;
 		}
 
-		public bool collapsedInFilterView { get; set; }
+
+		public bool collapsedInFilterView {
+			get {
+				return _collapsedInFilterView;
+			}
+			set {
+				if (_collapsedInFilterView != value) {
+					_collapsedInFilterView = value;
+					parent.markProfileSettingsAsDirty("Filter tag group collapsed state changed");
+				}
+			}
+		}
+
+	}
+
+
+	public class ManagementTagGroup : TagGroup<OrganizerTagModel> {
+
+		private bool _collapsedInManagementView;
+		private OrganizerService parent;
+
+		public ManagementTagGroup(OrganizerService parent, string name) : base(name) {
+			this.parent = parent;
+		}
+
+		public bool collapsedInManagementView { 
+			get {
+				return _collapsedInManagementView;
+			} 
+			set {
+				if (_collapsedInManagementView != value) {
+					_collapsedInManagementView = value;
+					parent.markProfileSettingsAsDirty("Management tag group collapsed state changed");
+				}
+			} 
+		}
 
 	}
 
@@ -246,8 +284,36 @@ namespace KspCraftOrganizer {
 		}
 	}
 
+
+	public class ManagementTagsGrouper : TagsGrouper<OrganizerTagModel, ManagementTagGroup> {
+		
+		public ManagementTagsGrouper(OrganizerService parent) : base(t => t.name, s => new ManagementTagGroup(parent, s)) {
+			
+		}
+
+		public void assignCurrentFilterSettingsToDto(ProfileFilterSettingsDto filterDto) {
+			List<string> collapsedGroups = new List<string>();
+			foreach (ManagementTagGroup tagGroup in groups) {
+				if (tagGroup.collapsedInManagementView) {
+					collapsedGroups.Add(tagGroup.displayName);
+				}
+			}
+			filterDto.collapsedManagementGroups = collapsedGroups;
+		}
+
+		public void applyFilterSettings(ProfileFilterSettingsDto filterDto) {
+			foreach (ManagementTagGroup tagGroup in groups) {
+				tagGroup.collapsedInManagementView = filterDto.collapsedManagementGroups.Contains(tagGroup.displayName);
+			}
+		}
+
+}
+
+
 	public class FilterTagsGrouper : TagsGrouper<OrganizerTagModel, FilterTagGroup> {
-		public FilterTagsGrouper(): base(t=>t.name,s=>new FilterTagGroup(s)) {
+		
+
+		public FilterTagsGrouper(OrganizerService parent): base(t=>t.name,s=> new FilterTagGroup(parent, s)) {
 			
 		}
 

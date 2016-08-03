@@ -6,20 +6,16 @@ using UnityEngine;
 namespace KspCraftOrganizer {
 
 	public class OrganizerServiceFilter {
-
-		private IKspAl ksp = IKspAlProvider.instance;
+		
 		private SortedList<string, OrganizerTagModel> _availableTags;
 		private string _craftNameFilter;
 		private SortedList<string, OrganizerTagModel> _usedTags = new SortedList<string, OrganizerTagModel>();
 		public OrganizerServiceFilterGroupsOfTagModel groupsModel { get; private set; }
 		private OrganizerService parent;
-		private ProfileAllFilterSettingsDto allFiltersDto;
-		private bool afterSettingsChanged = true;
 
 
 		public OrganizerServiceFilter(OrganizerService parent, ProfileSettingsDto profileSettigngs) {
 			this.parent = parent;
-			this.allFiltersDto = profileSettigngs.allFilter;
 
 			groupsModel = new OrganizerServiceFilterGroupsOfTagModel(parent);
 
@@ -31,17 +27,13 @@ namespace KspCraftOrganizer {
 			craftNameFilter = "";
 		}
 
-		public ProfileAllFilterSettingsDto getFilterDto(){
-			assignCurrentFilterSettingsToDto(getFilterDtoFor(parent.craftType));
-			return allFiltersDto;
-		}
 
 		public void init() {
-			applyFilterSettings(getFilterDtoFor(parent.craftType));
+			//
 		}
 
 
-		private void applyFilterSettings(ProfileFilterSettingsDto dto) {
+		public void applyFilterSettings(ProfileFilterSettingsDto dto) {
 			foreach (OrganizerTagModel tag in _availableTags.Values) {
 				tag.selectedForFiltering = false;
 			}
@@ -58,38 +50,19 @@ namespace KspCraftOrganizer {
 				craftNameFilter = "";
 			}
 			groupsModel.setCollapsedGroups(dto.collapsedFilterGroups);
+			groupsModel.restGroupCollapsed = dto.restFilterTagsCollapsed;
 
 
 			COLogger.logDebug("applyFilterSettings, selected tags: " + Globals.join(dto.selectedFilterTags, ", "));
 			COLogger.logDebug("applyFilterSettings, groupsWithSelectedNoneOption: " + Globals.join(dto.filterGroupsWithSelectedNoneOption, ", "));
 			COLogger.logDebug("applyFilterSettings, collapsed groups: " + Globals.join(dto.collapsedFilterGroups, ", "));
+			COLogger.logDebug("applyFilterSettings, rest tags collapsed: " + dto.restFilterTagsCollapsed);
 		}
 
-		public void onCraftTypeChanged(CraftType oldCraftType, CraftType newCraftType) {
-			COLogger.logDebug("filter.onCraftTypeChanged, old: " + oldCraftType + ", new : " + newCraftType);
-			assignCurrentFilterSettingsToDto(getFilterDtoFor(oldCraftType));
-			applyFilterSettings(getFilterDtoFor(newCraftType));
-			afterSettingsChanged = true;
-			COLogger.logDebug("filter.onCraftTypeChanged -- end");
-		}
 
-		private ProfileFilterSettingsDto getFilterDtoFor(CraftType craftType) {
-			if (ksp.getCurrentEditorFacilityType() == CraftType.VAB) {
-				if (craftType == CraftType.VAB) {
-					return allFiltersDto.filterVabInVab;
-				} else {
-					return allFiltersDto.filterSphInVab;
-				}
-			} else {
-				if (craftType == CraftType.VAB) {
-					return allFiltersDto.filterVabInSph;
-				} else {
-					return allFiltersDto.filterSphInSph;
-				}
-			}
-		}
+		public bool restTagsCollapsed { get { return groupsModel.restGroupCollapsed; } set { groupsModel.restGroupCollapsed = value; } }
 
-		private void assignCurrentFilterSettingsToDto(ProfileFilterSettingsDto dto) {
+		public void assignCurrentFilterSettingsToDto(ProfileFilterSettingsDto dto) {
 			List<string> selectedTags = new List<string>();
 			foreach (OrganizerTagModel tag in availableTags) {
 				if (tag.selectedForFiltering) {
@@ -103,9 +76,11 @@ namespace KspCraftOrganizer {
 				dto.selectedTextFilter = "";
 			}
 			dto.collapsedFilterGroups = new List<string>(groupsModel.collapsedFilterGroups);
+			dto.restFilterTagsCollapsed = groupsModel.restGroupCollapsed;
 			COLogger.logDebug("assignCurrentFilterSettingsToDto, selected tags: " + Globals.join(selectedTags, ", "));
 			COLogger.logDebug("assignCurrentFilterSettingsToDto, groupsWithSelectedNoneOption: " + Globals.join(dto.filterGroupsWithSelectedNoneOption, ", "));
 			COLogger.logDebug("assignCurrentFilterSettingsToDto, collapsed groups: " + Globals.join(dto.collapsedFilterGroups, ", "));
+			COLogger.logDebug("assignCurrentFilterSettingsToDto, rest group collapsed: " + dto.restFilterTagsCollapsed);
 		}
 
 		public ICollection<string> groupsWithSelectedNoneOption {
@@ -200,10 +175,6 @@ namespace KspCraftOrganizer {
 			}
 			updateUsedTags();
 			groupsModel.update();
-			if (afterSettingsChanged) {
-				applyFilterSettings(getFilterDtoFor(parent.craftType));
-				afterSettingsChanged = false;
-			}
 		}
 
 		public ICollection<OrganizerTagModel> usedTags {

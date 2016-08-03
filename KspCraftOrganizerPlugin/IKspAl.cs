@@ -49,6 +49,7 @@ namespace KspCraftOrganizer {
 			this.selectedFilterTags = new string[0];
 			this.filterGroupsWithSelectedNoneOption = new List<string>();
 			this.collapsedFilterGroups = new List<string>();
+			this.collapsedManagementGroups = new List<string>();
 		}
 
 		public string selectedTextFilter { get; set; }
@@ -59,6 +60,11 @@ namespace KspCraftOrganizer {
 
 		public ICollection<string> collapsedFilterGroups { get; set; }
 
+		public bool restFilterTagsCollapsed { get; set; }
+
+		public ICollection<string> collapsedManagementGroups { get; set; }
+
+		public bool restManagementTagsCollapsed { get; set; }
 	}
 
 
@@ -67,6 +73,22 @@ namespace KspCraftOrganizer {
 		public ProfileFilterSettingsDto filterVabInSph = new ProfileFilterSettingsDto();
 		public ProfileFilterSettingsDto filterSphInVab = new ProfileFilterSettingsDto();
 		public ProfileFilterSettingsDto filterSphInSph = new ProfileFilterSettingsDto();
+
+		public ProfileFilterSettingsDto getFilterDtoFor(CraftType currentFacility, CraftType selectedCraftType) {
+			if (currentFacility == CraftType.VAB) {
+				if (selectedCraftType == CraftType.VAB) {
+					return this.filterVabInVab;
+				} else {
+					return this.filterSphInVab;
+				}
+			} else {
+				if (selectedCraftType == CraftType.VAB) {
+					return this.filterVabInSph;
+				} else {
+					return this.filterSphInSph;
+				}
+			}
+		}
 	}
 
 	public class ProfileSettingsDto {

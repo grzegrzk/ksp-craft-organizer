@@ -33,11 +33,44 @@ namespace KspCraftOrganizer {
 				}
 				assingTagsScrollPosition = GUILayout.BeginScrollView(assingTagsScrollPosition);
 				if (model.availableTags.Count > 0) {
-					foreach (OrganizerTagModel tag in model.availableTags) {
 
-						drawSingleTag(tag);
+					foreach (ManagementTagGroup tagGroup in model.managementTagsGroups.groups) {
+						bool collapsed = tagGroup.collapsedInManagementView;
+						if (collapsed) {
+							if (GUILayout.Button("+ " + tagGroup.displayName, parent.skin.label)) {
+								tagGroup.collapsedInManagementView = !collapsed;
+							}
+						} else {
+							if (GUILayout.Button("- " + tagGroup.displayName + ":", parent.skin.label)) {
+								tagGroup.collapsedInManagementView = !collapsed;
+							}
+							foreach (TagInGroup<OrganizerTagModel> tag in tagGroup.tags) {
+								drawSingleTag(tag.originalTag);
 
-						GUILayout.Space(5);
+								GUILayout.Space(5);
+							}
+						}
+					}
+
+					if (model.managementTagsGroups.groups.Count > 0) {
+						if (model.restTagsInManagementCollapsed) {
+							if (GUILayout.Button("+ Rest tags", parent.skin.label)) {
+								model.restTagsInManagementCollapsed = !model.restTagsInManagementCollapsed;
+							}
+						} else {
+							if (GUILayout.Button("- Rest tags:", parent.skin.label)) {
+								model.restTagsInManagementCollapsed = !model.restTagsInManagementCollapsed;
+							}
+						}
+					} else {
+						model.restTagsInManagementCollapsed = false;
+					}
+					if (!model.restTagsInManagementCollapsed) {
+						foreach (OrganizerTagModel tag in model.managementTagsGroups.restTags) {
+							drawSingleTag(tag);
+
+							GUILayout.Space(5);
+						}
 					}
 				} else {
 					GUILayout.Label("<No tags exist yet>");

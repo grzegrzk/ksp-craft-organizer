@@ -101,7 +101,8 @@ namespace KspCraftOrganizer {
 			toggleButtonStyleTrue.hover = toggleButtonStyleTrue.active;
 
 			_warningLabelStyle = new GUIStyle(skin.label);
-			_warningLabelStyle.normal.textColor = Color.red;
+			_warningLabelStyle.normal.textColor = new Color(1, 0.2f, 0.2f);
+
 
 			using (new GUILayout.VerticalScope()) {
 
@@ -113,7 +114,6 @@ namespace KspCraftOrganizer {
 
 					drawFilterColumn();
 
-
 					craftList.drawCraftsList();
 
 					GUILayout.Space(10);
@@ -122,9 +122,7 @@ namespace KspCraftOrganizer {
 						tagsManagementBar.drawManageTagsColumn();
 					}
 				}
-				//			if (!showManageTagsToolbar) {
 				GUILayout.Space(10);
-				//			}
 
 				drawBottomBar();
 			}
@@ -138,6 +136,13 @@ namespace KspCraftOrganizer {
 			using (new GUILayout.HorizontalScope()) {
 				int sphOrVab = GUILayout.Toolbar(Array.IndexOf(SPH_VAB_STATES, model.craftType), SPH_VAB, GUILayout.Width(150), GUILayout.ExpandWidth(false));
 				model.craftType = SPH_VAB_STATES[sphOrVab];
+				GUILayout.Space(10);
+				//if (GUILayout.Button(">>", GUILayout.ExpandWidth(false))) {
+				//}
+				//	if (GUILayout.Button("Change save folder", GUILayout.ExpandWidth(false))) {
+				//}
+				//if (GUILayout.Button("<<", GUILayout.ExpandWidth(false))) {
+				//}
 
 				bool displayCraftsFilteredWarning = model.craftsAreFiltered;
 				if (!displayCraftsFilteredWarning) {
@@ -154,6 +159,7 @@ namespace KspCraftOrganizer {
 				}
 
 				GUILayout.FlexibleSpace();
+
 				string toggleManageTagsButtonLabel = showManageTagsToolbar ? "Manage Tags->" : "<-Manage Tags";
 				if (GUILayout.Button(toggleManageTagsButtonLabel, GUILayout.ExpandWidth(false))) {
 					showManageTagsToolbar = !showManageTagsToolbar;
@@ -184,7 +190,6 @@ namespace KspCraftOrganizer {
 								if (!collapsed) {
 									if (GUILayout.Button("- " + tagGroup.displayName + ":", this.skin.label)) {
 										tagGroup.collapsedInFilterView = !collapsed;
-										model.markProfileSettingsAsDirty("group collapsed state changed");
 									}
 									if (tagGroup.isYesNoGroup) {
 										OrganizerTagModel tag = tagGroup.firstTag.originalTag;
@@ -215,19 +220,31 @@ namespace KspCraftOrganizer {
 								} else {
 									if(GUILayout.Button("+ " + tagGroup.displayName, this.skin.label)){
 										tagGroup.collapsedInFilterView = !collapsed;
-										model.markProfileSettingsAsDirty("group collapsed state changed");
 									}
 								}
 							}
 							if (filterGroups.restTags.Count > 0) {
+								bool collapsed = model.restTagsInFilterCollapsed;
+								string labelString;
 								if (filterGroups.groups.Count > 0) {
-									GUILayout.Label("Rest tags:");
+									labelString = "Rest tags";
 								} else {
-									GUILayout.Label("Tags:");
+									labelString = "Tags";
 								}
-								foreach (OrganizerTagModel tag in filterGroups.restTags) {
-									tag.selectedForFiltering = guiLayout_Toggle_OrigSkin(tag.selectedForFiltering, " " + tag.name);
-									GUILayout.Space(5);
+								if (collapsed) {
+									if (GUILayout.Button("+ " + labelString, this.skin.label)) {
+										model.restTagsInFilterCollapsed = !collapsed;
+										model.markProfileSettingsAsDirty("rest tags group collapsed state changed");
+									}
+								} else {
+									if (GUILayout.Button("- " + labelString + ":", this.skin.label)) {
+										model.restTagsInFilterCollapsed = !collapsed;
+										model.markProfileSettingsAsDirty("rest tags group collapsed state changed");
+									}
+									foreach (OrganizerTagModel tag in filterGroups.restTags) {
+										tag.selectedForFiltering = guiLayout_Toggle_OrigSkin(tag.selectedForFiltering, " " + tag.name);
+										GUILayout.Space(5);
+									}
 								}
 							}
 						}
@@ -300,6 +317,7 @@ namespace KspCraftOrganizer {
 									model.primaryCraft.inDeleteState = true;
 									selectedCraftName = model.primaryCraft.name;
 								}
+
 							}
 						}
 						GUILayout.FlexibleSpace();

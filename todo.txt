@@ -1,19 +1,21 @@
 TODO:
  
+ - Highlights categories that do filter crafts
+ - Add option to collapse/uncollapse all tags groups
  - Add possibility to read crafts from different save
- - Allow to collapse tags on the "manage tags" list
- - Create a list of non-default selected tags with possibility to clear them (show it above the craft list), like:
- 	Bodies: [Eve x] [Duna x] BuildingStage: [Final x] [Clear All] [>>]
- - Create *categories
  - Add help button to "manage tags"
  - Add button "+" inside craft that will add tag in a given category
  - Add button "+" inside craft that will add tag in any category
  - Add button "x" next to each tag in craft that will remove it
  - Add dropdown box for each tag that will allow it to be changed to different one in the same category
- - Add button "move to SPH"/"move to VAB"
- - Add non-category|hierarchical|tags
+ - Add "hide" button next to each tag group + "hidden tags" in craft list
  
 Cancelled or far future:
+ - Create a list of non-default selected tags with possibility to clear them (show it above the craft list), like:
+ 	Bodies: [Eve x] [Duna x] BuildingStage: [Final x] [Clear All] [>>]
+ - Add button "move to SPH"/"move to VAB"
+ - Add non-category|hierarchical|tags
+ - Create *categories
  - Cache cost/part count/etc in separate file so loading is much faster
  - Add toolbar next to category in filters: [All | Any | Single]
  - Show "Cancel & discard changes" only if some tags were actually modified
@@ -23,6 +25,7 @@ Cancelled or far future:
  
  
 Done:
+ - Allow to collapse tags on the "manage tags" list
  - Change icons to the ones provided by cy4n
  - Add mouse over image
  - Allow to collapse tags on the filter list
