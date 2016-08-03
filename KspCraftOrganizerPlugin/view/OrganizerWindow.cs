@@ -30,11 +30,11 @@ namespace KspCraftOrganizer {
 		private GUIStyle _toggleButtonStyleTrue;
 		private GUIStyle _warningLabelStyle;
 		private GUIStyle tooltipBackgroundStyle;
-		private OrganizerService _modelLazy;
+		private OrganizerController _modelLazy;
 
-		public OrganizerService model { get {
+		public OrganizerController model { get {
 				if (_modelLazy == null) { 
-					_modelLazy = new OrganizerService();
+					_modelLazy = new OrganizerController();
 				} 
 				return _modelLazy; 
 			} }
@@ -179,24 +179,24 @@ namespace KspCraftOrganizer {
 				}
 
 				if (model.usedTags.Count > 0) {
-					OrganizerServiceFilterGroupsOfTagModel filterGroups = model.filterGroups;
+					FilterTagsGrouper filterTagsGrouper = model.filterTagsGrouper;
 					GUILayout.Space(15);
 					GUILayout.Label("Filter crafts by tag:");
 					using (GUILayout.ScrollViewScope tagScrollScope = new GUILayout.ScrollViewScope(tagScrollPosition, false, false, GUILayout.MaxWidth(FILTER_TOOLBAR_WIDTH - 10))) {
 						tagScrollPosition = tagScrollScope.scrollPosition;
 						using (new GUILayout.VerticalScope(GUILayout.ExpandWidth(false))) {
-							foreach (FilterTagGroup tagGroup in filterGroups.groups) {
+							foreach (FilterTagGroup tagGroup in filterTagsGrouper.groups) {
 								bool collapsed = tagGroup.collapsedInFilterView;
 								if (!collapsed) {
 									if (GUILayout.Button("- " + tagGroup.displayName + ":", this.skin.label)) {
 										tagGroup.collapsedInFilterView = !collapsed;
 									}
 									if (tagGroup.isYesNoGroup) {
-										OrganizerTagModel tag = tagGroup.firstTag.originalTag;
+										OrganizerTagEntity tag = tagGroup.firstTag.originalTag;
 										int thisYesNoTagState;
 										if (tag.selectedForFiltering) {
 											thisYesNoTagState = 0;
-										} else if (filterGroups.hasGroupSelectedNoneFilter(tagGroup.name)) {
+										} else if (filterTagsGrouper.hasGroupSelectedNoneFilter(tagGroup.name)) {
 											thisYesNoTagState = 1;
 										} else {
 											thisYesNoTagState = 2;
@@ -207,12 +207,12 @@ namespace KspCraftOrganizer {
 										tag.selectedForFiltering = thisYesNoTagState == 0;
 										model.setGroupHasSelectedNoneFilter(tagGroup.name, thisYesNoTagState == 1);
 									} else {
-										foreach (TagInGroup<OrganizerTagModel> tagInGroup in tagGroup.tags) {
-											OrganizerTagModel tag = tagInGroup.originalTag;
+										foreach (TagInGroup<OrganizerTagEntity> tagInGroup in tagGroup.tags) {
+											OrganizerTagEntity tag = tagInGroup.originalTag;
 											tag.selectedForFiltering = guiLayout_Toggle_OrigSkin(tag.selectedForFiltering, " " + tagInGroup.tagDisplayName);
 											GUILayout.Space(5);
 										}
-										bool noneSelected = guiLayout_Toggle_OrigSkin(filterGroups.hasGroupSelectedNoneFilter(tagGroup.name), " <with no tag assigned>");
+										bool noneSelected = guiLayout_Toggle_OrigSkin(filterTagsGrouper.hasGroupSelectedNoneFilter(tagGroup.name), " <with no tag assigned>");
 
 										model.setGroupHasSelectedNoneFilter(tagGroup.name, noneSelected);
 
@@ -223,10 +223,10 @@ namespace KspCraftOrganizer {
 									}
 								}
 							}
-							if (filterGroups.restTags.Count > 0) {
+							if (filterTagsGrouper.restTags.Count > 0) {
 								bool collapsed = model.restTagsInFilterCollapsed;
 								string labelString;
-								if (filterGroups.groups.Count > 0) {
+								if (filterTagsGrouper.groups.Count > 0) {
 									labelString = "Rest tags";
 								} else {
 									labelString = "Tags";
@@ -241,7 +241,7 @@ namespace KspCraftOrganizer {
 										model.restTagsInFilterCollapsed = !collapsed;
 										model.markProfileSettingsAsDirty("rest tags group collapsed state changed");
 									}
-									foreach (OrganizerTagModel tag in filterGroups.restTags) {
+									foreach (OrganizerTagEntity tag in filterTagsGrouper.restTags) {
 										tag.selectedForFiltering = guiLayout_Toggle_OrigSkin(tag.selectedForFiltering, " " + tag.name);
 										GUILayout.Space(5);
 									}
@@ -403,7 +403,7 @@ namespace KspCraftOrganizer {
 		private void drawCraftTooltip() {
 			if (GUI.tooltip != null && GUI.tooltip != "" && GUI.tooltip.StartsWith("!!craft")) {
 				int craftIndex = int.Parse(GUI.tooltip.Substring("!!craft".Length));
-				OrganizerCraftModel tooltipCraft = model.filteredCrafts[craftIndex];
+				OrganizerCraftEntity tooltipCraft = model.filteredCrafts[craftIndex];
 
 				GUIStyle nameStyle = new GUIStyle(skin.label);
 				GUIStyle descStyle = new GUIStyle(skin.label);

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace KspCraftOrganizer
 {
-	public class CurrentCraftTagModel
+	public class CurrentCraftTagEntity
 	{
 
 		public string name { get; set; }
@@ -17,18 +17,18 @@ namespace KspCraftOrganizer
 
 	}
 
-	public class CurrentCraftSettingsService
+	public class CurrentCraftTagsController
 	{
-		public static CurrentCraftSettingsService instance = new CurrentCraftSettingsService();
+		public static CurrentCraftTagsController instance = new CurrentCraftTagsController();
 		
 		private SettingsService settingsService = SettingsService.instance;
 		private EditorListenerService craftListenerService = EditorListenerService.instance;
 		private FileLocationService fileLocationService = FileLocationService.instance;
 		private IKspAl ksp = IKspAlProvider.instance;
 
-		private SortedDictionary<string, CurrentCraftTagModel> _availableTagsCache;
+		private SortedDictionary<string, CurrentCraftTagEntity> _availableTagsCache;
 
-		public CurrentCraftSettingsService() {
+		public CurrentCraftTagsController() {
 			craftListenerService.onEditorStarted += delegate () {
 				_availableTagsCache = null;
 			};
@@ -39,7 +39,7 @@ namespace KspCraftOrganizer
 		}
 
 		public void resetToLastlyEditied() {
-			foreach (CurrentCraftTagModel tagModel in availableTags) {
+			foreach (CurrentCraftTagEntity tagModel in availableTags) {
 				tagModel.selected = tagModel.selectedDuringLastEdit;
 			}
 			refreshExistingTags();
@@ -49,7 +49,7 @@ namespace KspCraftOrganizer
 			if (craftListenerService.canAutoSaveSomethingToDisk()) {
 				saveTagsToCraftIfNeeded(craftListenerService.currentShipFile, false);
 			}
-			foreach (CurrentCraftTagModel tag in availableTags) {
+			foreach (CurrentCraftTagEntity tag in availableTags) {
 				tag.selectedDuringLastEdit = tag.selected;
 			}
 		}
@@ -69,7 +69,7 @@ namespace KspCraftOrganizer
 				CraftSettingsDto dto = new CraftSettingsDto();
 
 				List<string> selectedTags = new List<string>();
-				foreach (CurrentCraftTagModel tag in availableTags) {
+				foreach (CurrentCraftTagEntity tag in availableTags) {
 					if (tag.selected) {
 						selectedTags.Add(tag.name);
 					}
@@ -85,7 +85,7 @@ namespace KspCraftOrganizer
 
 		private bool isDirty() {
 			if (_availableTagsCache != null) {
-				foreach (CurrentCraftTagModel tag in availableTags) {
+				foreach (CurrentCraftTagEntity tag in availableTags) {
 					if (tag.selected != tag.selectedOriginally) {
 						return true;
 					}
@@ -94,7 +94,7 @@ namespace KspCraftOrganizer
 			return false;
 		}
 
-		public ICollection<CurrentCraftTagModel> availableTags
+		public ICollection<CurrentCraftTagEntity> availableTags
 		{
 			get {
 				ensureTagsCacheLoaded();
@@ -104,7 +104,7 @@ namespace KspCraftOrganizer
 
 		private void ensureTagsCacheLoaded() {
 			if (_availableTagsCache == null) {
-				_availableTagsCache = new SortedDictionary<string, CurrentCraftTagModel>();
+				_availableTagsCache = new SortedDictionary<string, CurrentCraftTagEntity>();
 				foreach (string tag in settingsService.readProfileSettings().availableTags) {
 					addTagIfNeeded(tag);
 				}
@@ -149,7 +149,7 @@ namespace KspCraftOrganizer
 
 		private void addTagIfNeeded(string tag) {
 			if (!_availableTagsCache.ContainsKey(tag)) {
-				CurrentCraftTagModel newTag = new CurrentCraftTagModel();
+				CurrentCraftTagEntity newTag = new CurrentCraftTagEntity();
 				newTag.name = tag;
 				_availableTagsCache.Add(tag, newTag);
 			}

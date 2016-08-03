@@ -30,13 +30,13 @@ namespace KspCraftOrganizer
 
 
 
-	public class OrganizerCraftModel{
+	public class OrganizerCraftEntity{
 		
 		private bool _selectedPrimary;
 		private bool _selected;
 		private string _craftFile;
 		private SortedList<string, string> _tags = new SortedList<string, string>();
-		private readonly OrganizerService service;
+		private readonly OrganizerController service;
 		private Texture2D thumbTextureCache;
 		private bool duringCreation;
 		private CraftDaoDto craftDtoLazy;
@@ -56,7 +56,7 @@ namespace KspCraftOrganizer
 				return craftDtoLazy;
 			}}
 
-		public OrganizerCraftModel(OrganizerService service, string craftFile){
+		public OrganizerCraftEntity(OrganizerController service, string craftFile){
 			this.service = service;
 			this._craftFile = craftFile;
 			this.duringCreation = true;

@@ -12,7 +12,7 @@ namespace KspCraftOrganizer {
 		private List<BaseWindow> windows = new List<BaseWindow>();
 
 		private OrganizerWindow craftOrganizerWindow;
-		private CurrentCraftSettingsWindow manageThisCraftWindow;
+		private CurrentCraftTagsWindow manageThisCraftWindow;
 
 		private FileLocationService locationService = FileLocationService.instance;
 
@@ -24,7 +24,7 @@ namespace KspCraftOrganizer {
 
 			ShouldCurrentCraftBeSavedQuestionWindow shouldCraftBeSavedQuestionWindow = addWindow(new ShouldCurrentCraftBeSavedQuestionWindow());
 			craftOrganizerWindow = addWindow(new OrganizerWindow(shouldCraftBeSavedQuestionWindow));
-			manageThisCraftWindow = addWindow(new CurrentCraftSettingsWindow());
+			manageThisCraftWindow = addWindow(new CurrentCraftTagsWindow());
 
 			addLauncherButtonInAllEditors(craftOrganizerWindow.displayWindow, "manage.png");
 			addLauncherButtonInAllEditors(manageThisCraftWindow.displayWindow, "tags.png");

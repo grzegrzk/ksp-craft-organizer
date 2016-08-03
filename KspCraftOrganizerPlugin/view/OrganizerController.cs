@@ -6,15 +6,15 @@ using UnityEngine;
 namespace KspCraftOrganizer
 {
 
-	public class OrganizerService {
+	public class OrganizerController {
 		private IKspAl ksp = IKspAlProvider.instance;
 		private bool _profileSettingsFileIsDirtyDoNotEditDirectly;
 		private GuiStyleOption _selectedGuiStyle;
 
 		private SettingsService settingsService = SettingsService.instance;
 		private FileLocationService fileLocationService = FileLocationService.instance;
-		private OrganizerServiceCraftList craftList;
-		private OrganizerServiceFilter filter;
+		private OrganizerControllerCraftList craftList;
+		private OrganizerControllerFilter filter;
 		public ManagementTagsGrouper managementTagsGroups;
 		public bool restTagsInManagementCollapsed { get; set; }
 		private bool afterSettingsChanged = true;
@@ -22,12 +22,12 @@ namespace KspCraftOrganizer
 
 		public bool restTagsInFilterCollapsed { get { return filter.restTagsCollapsed; } set { filter.restTagsCollapsed = value;}  }
 
-		public OrganizerService() {
+		public OrganizerController() {
 			this.managementTagsGroups = new ManagementTagsGrouper(this);
-			this.craftList = new OrganizerServiceCraftList(this);
+			this.craftList = new OrganizerControllerCraftList(this);
 			ProfileSettingsDto profileSettings = settingsService.readProfileSettings();
 			this.allFiltersDto = profileSettings.allFilter;
-			this.filter = new OrganizerServiceFilter(this, profileSettings);
+			this.filter = new OrganizerControllerFilter(this, profileSettings);
 			_selectedGuiStyle = profileSettings.selectedGuiStyle;
 			if (_selectedGuiStyle == null) {
 				_selectedGuiStyle = GuiStyleOption.Ksp;
@@ -48,7 +48,7 @@ namespace KspCraftOrganizer
 			}
 		}
 
-		public ICollection<OrganizerTagModel> availableTags {
+		public ICollection<OrganizerTagEntity> availableTags {
 			get {
 				return filter.availableTags;
 			}
@@ -73,7 +73,7 @@ namespace KspCraftOrganizer
 			filter.markFilterAsUpToDate();
 		}
 
-		public List<OrganizerCraftModel> getCraftsOfType(CraftType type) {
+		public List<OrganizerCraftEntity> getCraftsOfType(CraftType type) {
 			return craftList.getCraftsOfType(type);
 		}
 
@@ -91,7 +91,7 @@ namespace KspCraftOrganizer
 
 		public bool craftsAreFiltered { get { return craftList.craftsAreFiltered; } }
 
-		public OrganizerCraftModel[] filteredCrafts {
+		public OrganizerCraftEntity[] filteredCrafts {
 			get {
 				return craftList.filteredCrafts;
 			}
@@ -109,7 +109,7 @@ namespace KspCraftOrganizer
 			}
 		}
 
-		public List<OrganizerCraftModel> availableCrafts {
+		public List<OrganizerCraftEntity> availableCrafts {
 			get {
 				return craftList.availableCrafts;
 			}
@@ -133,9 +133,9 @@ namespace KspCraftOrganizer
 			filter.setGroupHasSelectedNoneFilter(groupName, selectedNone);
 		}
 
-		public OrganizerServiceFilterGroupsOfTagModel filterGroups{
+		public FilterTagsGrouper filterTagsGrouper {
 			get {
-				return filter.groupsModel;
+				return filter.tagsGrouper;
 			}
 		}
 
@@ -168,14 +168,14 @@ namespace KspCraftOrganizer
 			afterSettingsChanged = false;
 		}
 
-		public OrganizerServiceCraftList.CraftFilterPredicate craftFilterPredicate {
+		public OrganizerControllerCraftList.CraftFilterPredicate craftFilterPredicate {
 			get {
 				return filter.createCraftFilterPredicate();
 			}
 		}
 
 
-		public ICollection<OrganizerTagModel> usedTags {
+		public ICollection<OrganizerTagEntity> usedTags {
 			get {
 				return filter.usedTags;
 			}
@@ -191,20 +191,20 @@ namespace KspCraftOrganizer
 			} 
 		}
 
-		public OrganizerTagModel getTag(string tag) {
+		public OrganizerTagEntity getTag(string tag) {
 			return filter.getTag(tag);
 		}
 
-		public void setTagToAllSelectedCrafts(OrganizerTagModel tag){
-			foreach (OrganizerCraftModel craft in filteredCrafts) {
+		public void setTagToAllSelectedCrafts(OrganizerTagEntity tag){
+			foreach (OrganizerCraftEntity craft in filteredCrafts) {
 				if (craft.isSelected) {
 					craft.addTag (tag.name);
 				}
 			}
 		}
 
-		public void removeTagFromAllSelectedCrafts(OrganizerTagModel tag){
-			foreach (OrganizerCraftModel craft in filteredCrafts) {
+		public void removeTagFromAllSelectedCrafts(OrganizerTagEntity tag){
+			foreach (OrganizerCraftEntity craft in filteredCrafts) {
 				if (craft.isSelected) {
 					craft.removeTag (tag.name);
 				}
@@ -215,7 +215,7 @@ namespace KspCraftOrganizer
 			return filter.doesTagExist(tag);
 		}
 
-		public OrganizerTagModel addAvailableTag(string newTag) {
+		public OrganizerTagEntity addAvailableTag(string newTag) {
 			return filter.addAvailableTag(newTag);
 		}
 
@@ -227,7 +227,7 @@ namespace KspCraftOrganizer
 			filter.renameTag(oldName, newName);
 		}
 
-		public OrganizerCraftModel primaryCraft {
+		public OrganizerCraftEntity primaryCraft {
 			get {
 				return craftList.primaryCraft;
 			}
@@ -236,11 +236,11 @@ namespace KspCraftOrganizer
 			}
 		}
 
-		public void renameCraft(OrganizerCraftModel craft, string newName) {
+		public void renameCraft(OrganizerCraftEntity craft, string newName) {
 			craftList.renameCraft(craft, newName);
 		}
 
-		public void deleteCraft(OrganizerCraftModel craft) {
+		public void deleteCraft(OrganizerCraftEntity craft) {
 			craftList.deleteCraft(craft);
 		}
 
@@ -270,10 +270,11 @@ namespace KspCraftOrganizer
 			return ksp.isCraftAlreadyLoadedInWorkspace ();
 		}
 
-		public void mergeCraftToWorkspace(OrganizerCraftModel craft){
+		public void mergeCraftToWorkspace(OrganizerCraftEntity craft){
 			ksp.mergeCraftToWorkspace (craft.craftFile);
 		}
-		public void loadCraftToWorkspace(OrganizerCraftModel craft){
+
+		public void loadCraftToWorkspace(OrganizerCraftEntity craft){
 			ksp.loadCraftToWorkspace (craft.craftFile);
 		}
 
@@ -295,8 +296,8 @@ namespace KspCraftOrganizer
 				markProfileSettingsAsNotDirty("Settings were just written to the disk");
 			}
 			if (!doNotWriteTagSettingsToDisk) {
-				foreach (List<OrganizerCraftModel> crafts in craftList.alreadyLoadedCrafts) {
-					foreach (OrganizerCraftModel craft in crafts) {
+				foreach (List<OrganizerCraftEntity> crafts in craftList.alreadyLoadedCrafts) {
+					foreach (OrganizerCraftEntity craft in crafts) {
 						if (craft.craftSettingsFileIsDirty) {
 							CraftSettingsDto dto = new CraftSettingsDto();
 							dto.tags = craft.tags;

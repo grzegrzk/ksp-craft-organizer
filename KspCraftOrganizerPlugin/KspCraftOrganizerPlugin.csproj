@@ -60,34 +60,43 @@
   <ItemGroup Condition=" '$(Configuration)' == 'Release' ">
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MainRelease.cs" />
-    <Compile Include="MainDebug.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="OrganizerService.cs" />
-    <Compile Include="OrganizerTagModel.cs" />
-    <Compile Include="OrganizerCraftModel.cs" />
-    <Compile Include="IKspAl.cs" />
-    <Compile Include="KspAlImpl.cs" />
-    <Compile Include="KspALMock.cs" />
-    <Compile Include="COLogger.cs" />
-    <Compile Include="OrganizerWindow.cs" />
-    <Compile Include="CurrentCraftSettingsWindow.cs" />
-    <Compile Include="Globals.cs" />
-    <Compile Include="CurrentCraftSettingsService.cs" />
-    <Compile Include="SettingsService.cs" />
-    <Compile Include="BaseWindow.cs" />
-    <Compile Include="FileLocationService.cs" />
-    <Compile Include="EditorListenerService.cs" />
-    <Compile Include="OrganizerWindowTagsManagementBar.cs" />
-    <Compile Include="OrganizerWindowCraftList.cs" />
-    <Compile Include="ShouldCurrentCraftBeSavedQuestionWindow.cs" />
-    <Compile Include="MainImpl.cs" />
-    <Compile Include="TagsGrouper.cs" />
-    <Compile Include="ScaledGuiScope.cs" />
-    <Compile Include="ParagraphBoxDrawer.cs" />
-    <Compile Include="OrganizerServiceCraftList.cs" />
-    <Compile Include="OrganizerServiceFilter.cs" />
-    <Compile Include="OrganizerServiceFilterGroupsOfTagModel.cs" />
+    <Compile Include="Services\EditorListenerService.cs" />
+    <Compile Include="Services\FileLocationService.cs" />
+    <Compile Include="Services\IKspAl.cs" />
+    <Compile Include="Services\KspAlImpl.cs" />
+    <Compile Include="Services\KspALMock.cs" />
+    <Compile Include="Services\SettingsService.cs" />
+    <Compile Include="TagsGrouper\CraftTagsGrouper.cs" />
+    <Compile Include="TagsGrouper\FilterTagsGrouper.cs" />
+    <Compile Include="TagsGrouper\ManagementTagsGrouper.cs" />
+    <Compile Include="TagsGrouper\TagsGrouper.cs" />
+    <Compile Include="UiUtils\BaseWindow.cs" />
+    <Compile Include="UiUtils\ParagraphBoxDrawer.cs" />
+    <Compile Include="UiUtils\ScaledGuiScope.cs" />
+    <Compile Include="Utils\COLogger.cs" />
+    <Compile Include="Utils\Globals.cs" />
+    <Compile Include="Utils\MainDebug.cs" />
+    <Compile Include="Utils\MainImpl.cs" />
+    <Compile Include="Utils\MainRelease.cs" />
+    <Compile Include="View\CurrentCraftTagsController.cs" />
+    <Compile Include="View\CurrentCraftTagsWindow.cs" />
+    <Compile Include="View\OrganizerController.cs" />
+    <Compile Include="View\OrganizerControllerCraftList.cs" />
+    <Compile Include="View\OrganizerControllerFilter.cs" />
+    <Compile Include="View\OrganizerCraftEntity.cs" />
+    <Compile Include="View\OrganizerTagEntity.cs" />
+    <Compile Include="View\OrganizerWindow.cs" />
+    <Compile Include="View\OrganizerWindowCraftList.cs" />
+    <Compile Include="View\OrganizerWindowTagsManagementBar.cs" />
+    <Compile Include="View\ShouldCurrentCraftBeSavedQuestionWindow.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Services\" />
+    <Folder Include="TagsGrouper\" />
+    <Folder Include="UiUtils\" />
+    <Folder Include="Utils\" />
+    <Folder Include="View\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

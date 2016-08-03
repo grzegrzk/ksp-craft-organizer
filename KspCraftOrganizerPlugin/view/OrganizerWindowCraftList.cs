@@ -10,7 +10,7 @@ namespace KspCraftOrganizer {
 		private Vector2 shipsScrollPosition;
 		private Rect shipsRect;
 
-		private OrganizerCraftModel lastSelectedCraft;
+		private OrganizerCraftEntity lastSelectedCraft;
 		private float lastClickTime;
 
 
@@ -19,7 +19,7 @@ namespace KspCraftOrganizer {
 			this.parent = parent;
 		}
 
-		private OrganizerService model { get { return parent.model; } }
+		private OrganizerController model { get { return parent.model; } }
 
 		public void drawCraftsList() {
 
@@ -37,7 +37,7 @@ namespace KspCraftOrganizer {
 							}
 						}
 						int index = 0;
-						foreach (OrganizerCraftModel craft in model.filteredCrafts) {
+						foreach (OrganizerCraftEntity craft in model.filteredCrafts) {
 							drawSingleCraft(index, craft);
 							if (!parent.isKspSkin()) {
 								GUILayout.Space(5);
@@ -62,7 +62,7 @@ namespace KspCraftOrganizer {
 			}
 		}
 
-		private void drawSingleCraft(int index, OrganizerCraftModel craft) {
+		private void drawSingleCraft(int index, OrganizerCraftEntity craft) {
 			using (new GUILayout.HorizontalScope()) {
 				if (parent.showManageTagsToolbar) {
 					using (new GUILayout.VerticalScope(GUILayout.ExpandWidth(false), GUILayout.MaxWidth(20), GUILayout.Height(60))) {

@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System;
 
 namespace KspCraftOrganizer {
-	public class CurrentCraftSettingsWindow : BaseWindow {
+	public class CurrentCraftTagsWindow : BaseWindow {
 		private static readonly int WINDOW_WIDTH = 500;
 
 		private Vector2 tagScrollPos;
 
-		private CurrentCraftSettingsService model = new CurrentCraftSettingsService();
+		private CurrentCraftTagsController model = new CurrentCraftTagsController();
 		private string newTagText = "";
 
-		public CurrentCraftSettingsWindow() : base("Current Craft Settings") {
+		public CurrentCraftTagsWindow() : base("Current Craft Settings") {
 
 		}
 
@@ -37,7 +37,7 @@ namespace KspCraftOrganizer {
 				GUILayout.Label("Select tags for this craft:");
 				tagScrollPos = GUILayout.BeginScrollView(tagScrollPos);
 				using (new GUILayout.VerticalScope()) {
-					foreach (CurrentCraftTagModel tag in model.availableTags) {
+					foreach (CurrentCraftTagEntity tag in model.availableTags) {
 						tag.selected = GUILayout.Toggle(tag.selected, tag.name, originalSkin.toggle);
 					}
 				}

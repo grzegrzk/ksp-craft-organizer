@@ -17,7 +17,7 @@ namespace KspCraftOrganizer {
 			this.parent = parent;
 		}
 
-		private OrganizerService model { get { return parent.model; } }
+		private OrganizerController model { get { return parent.model; } }
 
 		public void drawManageTagsColumn() {
 			using (new GUILayout.VerticalScope(GUILayout.Width(OrganizerWindow.MANAGE_TAGS_TOOLBAR_WIDTH))) {
@@ -44,7 +44,7 @@ namespace KspCraftOrganizer {
 							if (GUILayout.Button("- " + tagGroup.displayName + ":", parent.skin.label)) {
 								tagGroup.collapsedInManagementView = !collapsed;
 							}
-							foreach (TagInGroup<OrganizerTagModel> tag in tagGroup.tags) {
+							foreach (TagInGroup<OrganizerTagEntity> tag in tagGroup.tags) {
 								drawSingleTag(tag.originalTag);
 
 								GUILayout.Space(5);
@@ -66,7 +66,7 @@ namespace KspCraftOrganizer {
 						model.restTagsInManagementCollapsed = false;
 					}
 					if (!model.restTagsInManagementCollapsed) {
-						foreach (OrganizerTagModel tag in model.managementTagsGroups.restTags) {
+						foreach (OrganizerTagEntity tag in model.managementTagsGroups.restTags) {
 							drawSingleTag(tag);
 
 							GUILayout.Space(5);
@@ -98,7 +98,7 @@ namespace KspCraftOrganizer {
 			}
 		}
 
-		private void drawSingleTag(OrganizerTagModel tag) {
+		private void drawSingleTag(OrganizerTagEntity tag) {
 			using (new GUILayout.HorizontalScope()) {
 				if (tag.inRenameMode) {
 					tag.inNameEditMode = GUILayout.TextField(tag.inNameEditMode, GUILayout.ExpandWidth(false), GUILayout.Width(OrganizerWindow.MANAGE_TAGS_TOOLBAR_WIDTH - (parent.isKspSkin() ? 20 : 10) - 20));

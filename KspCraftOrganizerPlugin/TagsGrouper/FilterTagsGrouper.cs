@@ -1,44 +1,53 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace KspCraftOrganizer {
 
-	public class OrganizerServiceFilterGroupsOfTagModel {
+	public class FilterTagGroup : TagGroup<OrganizerTagEntity> {
 
-		private OrganizerService parent;
-		private FilterTagsGrouper tagsGrouper;
-		private Dictionary<string, string> groupsWithSelectedNone = new Dictionary<string, string>();
+		private bool _collapsedInFilterView;
+		private OrganizerController parent;
 
-		public OrganizerServiceFilterGroupsOfTagModel(OrganizerService parent) {
-			this.tagsGrouper = new FilterTagsGrouper(parent);
+		public FilterTagGroup(OrganizerController parent, string name) : base(name) {
 			this.parent = parent;
 		}
 
 
-		public void update() {
-			ICollection<OrganizerTagModel> usedTags = parent.usedTags;
-			this.tagsGrouper.update(usedTags);
+		public bool collapsedInFilterView {
+			get {
+				return _collapsedInFilterView;
+			}
+			set {
+				if (_collapsedInFilterView != value) {
+					_collapsedInFilterView = value;
+					parent.markProfileSettingsAsDirty("Filter tag group collapsed state changed");
+				}
+			}
+		}
+
+	}
+
+	public class FilterTagsGrouper : TagsGrouper<OrganizerTagEntity, FilterTagGroup> {
+
+		private Dictionary<string, string> groupsWithSelectedNone = new Dictionary<string, string>();
+		private OrganizerController parent;
+
+		public FilterTagsGrouper(OrganizerController parent) : base(t => t.name, s => new FilterTagGroup(parent, s)) {
+			this.parent = parent;
+		}
+
+
+		public override void update(ICollection<OrganizerTagEntity> currentTags) {
+			base.update(currentTags);
 
 			List<string> groupsToRemove = new List<string>();
 			foreach (string g in groupsWithSelectedNone.Keys) {
-				if (!tagsGrouper.groupExists(g)) {
+				if (!this.groupExists(g)) {
 					groupsToRemove.Add(g);
 				}
 			}
+
 			foreach (string g in groupsToRemove) {
 				groupsWithSelectedNone.Remove(g);
-			}
-		}
-
-		public ICollection<FilterTagGroup> groups {
-			get {
-				return this.tagsGrouper.groups;
-			}
-		}
-
-		public ICollection<OrganizerTagModel> restTags {
-			get {
-				return this.tagsGrouper.restTags;
 			}
 		}
 
@@ -47,7 +56,7 @@ namespace KspCraftOrganizer {
 		public ICollection<string> collapsedFilterGroups {
 			get {
 				List<string> toRet = new List<string>();
-				foreach (FilterTagGroup tagGroup in tagsGrouper.groups) {
+				foreach (FilterTagGroup tagGroup in this.groups) {
 					if (tagGroup.collapsedInFilterView) {
 						toRet.Add(tagGroup.name);
 					}
@@ -66,7 +75,7 @@ namespace KspCraftOrganizer {
 		}
 
 		public void setCollapsedGroups(ICollection<string> collapsedGroups) {
-			foreach (FilterTagGroup tagGroup in tagsGrouper.groups) {
+			foreach (FilterTagGroup tagGroup in this.groups) {
 				tagGroup.collapsedInFilterView = collapsedGroups.Contains(tagGroup.name);
 			}
 		}
@@ -99,19 +108,14 @@ namespace KspCraftOrganizer {
 			return groupsWithSelectedNone.ContainsKey(groupName);
 		}
 
-		public bool doesCraftPassFilter(OrganizerCraftModel craft, out bool shouldBeVisibleByDefault) {
-			if (tagsGrouper == null) {
-				COLogger.logError("tagsGrouper == null!");
-				shouldBeVisibleByDefault = false;
-				return false;
-			}
+		public bool doesCraftPassFilter(OrganizerCraftEntity craft, out bool shouldBeVisibleByDefault) {
 			bool pass = true;
 			shouldBeVisibleByDefault = true;
-			foreach (TagGroup<OrganizerTagModel> tagGroup in tagsGrouper.groups) {
+			foreach (TagGroup<OrganizerTagEntity> tagGroup in this.groups) {
 				bool anythingSelectedInThisGroup = false;
 				bool craftPassesAnythingInThisGroup = false;
 				bool craftContainsAnyTagFromThisGroup = false;
-				foreach (TagInGroup<OrganizerTagModel> tag in tagGroup.tags) {
+				foreach (TagInGroup<OrganizerTagEntity> tag in tagGroup.tags) {
 					bool craftHasThisTag = craft.containsTag(tag.originalTag.name);
 					craftContainsAnyTagFromThisGroup = craftContainsAnyTagFromThisGroup || craftHasThisTag;
 					if (tag.originalTag.selectedForFiltering) {
@@ -138,16 +142,17 @@ namespace KspCraftOrganizer {
 
 			}
 
-			foreach (OrganizerTagModel tag in tagsGrouper.restTags) {
+			foreach (OrganizerTagEntity tag in this.restTags) {
 				if (tag.selectedForFiltering) {
 					if (!craft.containsTag(tag.name)) {
 						pass = false;
 					}
-				}	
+				}
 			}
 
 			return pass;
 		}
+
 	}
 }
 
