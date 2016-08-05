@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System;
 
 namespace KspCraftOrganizer {
-	public class OrganizerWindow : BaseWindow {
+	public class OrganizerWindow : BaseWindow, IGuiOverlayContainer {
 
 		private static readonly string[] SPH_VAB = { "VAB", "SPH" };
 		private static readonly CraftType[] SPH_VAB_STATES = { CraftType.VAB, CraftType.SPH };
@@ -31,6 +31,7 @@ namespace KspCraftOrganizer {
 		private GUIStyle _warningLabelStyle;
 		private GUIStyle tooltipBackgroundStyle;
 		private OrganizerController _modelLazy;
+		private List<DrawOverlay> overlaysToDraw = new List<DrawOverlay>();
 
 		public OrganizerController model { get {
 				if (_modelLazy == null) { 
@@ -90,6 +91,8 @@ namespace KspCraftOrganizer {
 		}
 
 		override protected void windowGUI(int WindowID) {
+			overlaysToDraw.Clear();
+
 			GUIStyle buttonStyle = skin.button;
 
 			_toggleButtonStyleFalse = new GUIStyle(buttonStyle);
@@ -129,8 +132,22 @@ namespace KspCraftOrganizer {
 
 			drawCraftTooltip();
 
+			drawOverlays();
+
 			GUI.DragWindow();
 		}
+
+		public void addOverlay(DrawOverlay drawOverlay){
+			overlaysToDraw.Add(drawOverlay);
+		}
+
+		private void drawOverlays() {
+			foreach(DrawOverlay overlay in overlaysToDraw){
+				overlay();
+			}
+		}
+
+		private DropDownList<string> chooseSaveName = new DropDownList<string>(new string[] { "default", "science" , "something something darkness" }, t => t);
 
 		private void drawTopToolbar() {
 			using (new GUILayout.HorizontalScope()) {
@@ -139,8 +156,12 @@ namespace KspCraftOrganizer {
 				GUILayout.Space(10);
 				//if (GUILayout.Button(">>", GUILayout.ExpandWidth(false))) {
 				//}
+
 				//	if (GUILayout.Button("Change save folder", GUILayout.ExpandWidth(false))) {
 				//}
+
+				chooseSaveName.onGui(this);
+
 				//if (GUILayout.Button("<<", GUILayout.ExpandWidth(false))) {
 				//}
 

@@ -49,6 +49,25 @@ namespace KspCraftOrganizer
 			//
 			this.editorFacility = EditorDriver.editorFacility;
 			COLogger.logDebug("Setting editor facility to " + this.editorFacility);
+			createKspSkin();
+		}
+
+		private GUISkin _kspSkin;
+
+		private void createKspSkin() {
+			this._kspSkin = MonoBehaviour.Instantiate(HighLogic.Skin);
+			//
+			//It will eliminate ugly rounded buttons:
+			//
+			_kspSkin.button.fixedHeight = 0;
+			_kspSkin.button.padding.top = 6;
+			_kspSkin.button.border.top = _kspSkin.button.border.bottom = 0;
+
+			//
+			//It will add default left/right padding:
+			//
+			_kspSkin.button.padding.left = _kspSkin.button.padding.right = 12;
+
 		}
 
 		public string getBaseCraftDirectory(){
@@ -401,7 +420,7 @@ namespace KspCraftOrganizer
 		}
 
 		public GUISkin kspSkin(){
-			return HighLogic.Skin;
+			return _kspSkin;
 		}
 
 		public GUISkin editorSkin(){

@@ -41,12 +41,7 @@ namespace KspCraftOrganizer {
 		private void addLauncherButtonInAllEditors(Globals.Procedure callback, string textureFile) {
 			ApplicationLauncherButton button = null;
 
-			Texture2D texture;
-			if(textureFile == null){
-				texture = Texture2D.blackTexture;
-			}else{
-				texture = loadTextureFrom(Globals.combinePaths(locationService.getThisPluginDirectory(), "icons", textureFile));
-			}
+			Texture2D texture = UiUtils.loadIcon(textureFile);
 
 			button = ApplicationLauncher.Instance.AddModApplication(
 				delegate () {
@@ -63,22 +58,7 @@ namespace KspCraftOrganizer {
 			return newWindow;
 		}
 
-		Texture2D loadTextureFrom(string file) {
 
-			Texture2D tex = null;
-			byte[] fileData;
-
-			if (File.Exists(file)) {
-				fileData = File.ReadAllBytes(file);
-				tex = new Texture2D(2, 2);
-				tex.LoadImage(fileData);
-			} else {
-				COLogger.logError("Cannot find " + file);
-				tex = Texture2D.blackTexture;
-			}
-
-			return tex;
-		}
 
 		private void CleanUp() {
 			COLogger.logDebug("Craft organizer plugin - CleanUp in " + EditorDriver.editorFacility);

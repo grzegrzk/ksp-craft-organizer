@@ -90,6 +90,8 @@
     <Compile Include="View\OrganizerWindowCraftList.cs" />
     <Compile Include="View\OrganizerWindowTagsManagementBar.cs" />
     <Compile Include="View\ShouldCurrentCraftBeSavedQuestionWindow.cs" />
+    <Compile Include="UiUtils\DropDownList.cs" />
+    <Compile Include="UiUtils\UIUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Services\" />
