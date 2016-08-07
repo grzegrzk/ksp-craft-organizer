@@ -22,12 +22,19 @@ namespace KspCraftOrganizer
 
 		public bool restTagsInFilterCollapsed { get { return filter.restTagsCollapsed; } set { filter.restTagsCollapsed = value;}  }
 
+		public Dictionary<string, bool> defaultTagsToAdd { get; private set; }
+		public List<string> defaultTagsNotToAdd { get; private set; }
+
+
 		public OrganizerController() {
 			this.managementTagsGroups = new ManagementTagsGrouper(this);
 			this.craftList = new OrganizerControllerCraftList(this);
 			ProfileSettingsDto profileSettings = settingsService.readProfileSettings();
 			this.allFiltersDto = profileSettings.allFilter;
 			this.filter = new OrganizerControllerFilter(this, profileSettings);
+			this.defaultTagsToAdd = new Dictionary<string, bool>();
+			refreshDefaultTagsToAdd();
+
 			_selectedGuiStyle = profileSettings.selectedGuiStyle;
 			if (_selectedGuiStyle == null) {
 				_selectedGuiStyle = GuiStyleOption.Ksp;
@@ -35,6 +42,30 @@ namespace KspCraftOrganizer
 			markProfileSettingsAsNotDirty("Constructor - fresh settings were just read");
 
 			this.filter.init();
+		}
+
+		private void refreshDefaultTagsToAdd() {
+			defaultTagsNotToAdd = new List<string>();
+			foreach (string tag in settingsService.getPluginSettings().defaultAvailableTags) {
+				if (!filter.doesTagExist(tag)) {
+					if (!this.defaultTagsToAdd.ContainsKey(tag)) {
+						this.defaultTagsToAdd.Add(tag, true);
+					}
+				} else {
+					if (this.defaultTagsToAdd.ContainsKey(tag)) {
+						this.defaultTagsToAdd.Remove(tag);
+					}
+					defaultTagsNotToAdd.Add(tag);
+				}
+			}
+		}
+
+		internal void addSelectedDefaultTags() {
+			foreach (KeyValuePair<string, bool> tag in new Dictionary<string, bool>(defaultTagsToAdd)) {
+				if (tag.Value) {
+					addAvailableTag(tag.Key);
+				}
+			}
 		}
 
 		private ProfileFilterSettingsDto getFilterDtoFor(CraftType craftType) {
@@ -124,6 +155,7 @@ namespace KspCraftOrganizer
 		public CraftDaoDto getCraftInfo(string craftFilePath) {
 			return ksp.getCraftInfo(craftFilePath);
 		}
+
 
 		public void clearFilters() {
 			filter.clearFilters();
@@ -216,15 +248,19 @@ namespace KspCraftOrganizer
 		}
 
 		public OrganizerTagEntity addAvailableTag(string newTag) {
-			return filter.addAvailableTag(newTag);
+			OrganizerTagEntity toRet = filter.addAvailableTag(newTag);
+			refreshDefaultTagsToAdd();
+			return toRet;
 		}
 
 		public void removeTag(string tag) {
 			filter.removeTag(tag);
+			refreshDefaultTagsToAdd();
 		}
 
 		public void renameTag(string oldName, string newName) {
 			filter.renameTag(oldName, newName);
+			refreshDefaultTagsToAdd();
 		}
 
 		public OrganizerCraftEntity primaryCraft {
