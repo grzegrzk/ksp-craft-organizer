@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Collections.Generic;
 
 namespace KspCraftOrganizer {
 	
@@ -54,6 +55,20 @@ namespace KspCraftOrganizer {
 			return Path.Combine(saveFolder, Path.GetFileNameWithoutExtension(craftFile)) + ".crmgr";
 		}
 
+
+		public ICollection<string> getAvailableSaveNames() {
+			string savesFolder = Globals.combinePaths(ksp.getApplicationRootPath(), "saves");
+			string[] directories = Directory.GetDirectories(savesFolder);
+			List<string> toRet = new List<string>();
+			foreach (string dir in directories) {
+				if (Directory.Exists(Globals.combinePaths(dir, "ships"))) {
+					toRet.Add(Path.GetFileName(dir));
+				}
+			}
+			return toRet;
+		}
+
+
 		public string getCraftDirectoryForCraftType(CraftType type) {
 			return Path.Combine(ksp.getBaseCraftDirectory(), type.directoryName);
 		}
@@ -106,7 +121,6 @@ namespace KspCraftOrganizer {
 				File.Delete(thumbPath);
 			}
 		}
-
 
 		public string getThumbPath(string filePath) {
 			string thumbUrl = getThumbUrl(filePath);

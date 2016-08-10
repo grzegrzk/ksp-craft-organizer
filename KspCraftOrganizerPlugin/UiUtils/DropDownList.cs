@@ -1,90 +1,187 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 namespace KspCraftOrganizer {
 
 	public delegate void DrawOverlay();
 
 	public interface IGuiOverlayContainer {
-		void addOverlay(DrawOverlay drawOverlay);
-	}
+
+		void addOverlayAtStart(DrawOverlay drawOverlay);
+
+		void addOverlayAtEnd(DrawOverlay drawOverlay);
+}
 
 	public class DropDownList<T> {
 
 		public delegate string Stringizer(T value);
-		Texture2D texture;
-		private ICollection<T> items;
+
+		private Texture2D downArrowImage;
+		private List<T> items;
 		private Stringizer stringizer;
-		private Texture2D texBack = UiUtils.createSingleColorTexture(new Color(207, 207, 207));
+		private Texture2D hoverBackgroundTexture = UiUtils.createSingleColorTexture(new Color(200, 200, 200));
+		private float openedListMaxItemWidth;
+		private float openedListItemHeight;
+		private Vector2 openedListScrollPosition = new Vector2(0, 0);
+		private Rect openedListRect = new Rect(0, 0, 0, 0);
+		private Rect openedListViewRect = new Rect(0, 0, 0, 0);
+		private Rect dropDownRect = new Rect(0, 0, 0, 0);
 
 		public DropDownList(ICollection<T> items, Stringizer stringizer) {
-			this.items = items;
+			this.items = new List<T>(items);
 			this.stringizer = stringizer;
+			this.maxOpenedListVisibleItemsCount = 6;
 		}
 
-		Vector2 openedListScrollPosition = new Vector2(0, 0);
-
-		public void onGui(IGuiOverlayContainer overlayContainer) {
-			if (texture == null) {
-				texture = UiUtils.loadIcon("dropdown-list.png");
+		public void onGui(IGuiOverlayContainer overlayContainer, int width) {
+			if (downArrowImage == null) {
+				downArrowImage = UiUtils.loadIcon("dropdown-list.png");
 			}
 			GUIStyle style = new GUIStyle(GUI.skin.button);
-			//style.padding.left += (int)5;
-			//style.padding.left = style.padding.right = 0;
-			//style.border.left = style.border.right = 0;
-			string label = "drop down list";// + " " + style.lineHeight;
 
+			string label;
+			if (someItemSelected) {
+				label = stringizer(selectedItem);
+			} else {
+				label = "<none>";
+			}
 			GUIContent content = new GUIContent(label);
 
-			float height = style.CalcSize(content).y;
-			//style.margin.right = (int)style.fixedHeight;
-			//style.isHeightDependantOnWidth;
-			style.padding.right = (int)height;
+			float dropDownArrowSize = style.CalcSize(content).y;
+
+			style.padding.right = (int)dropDownArrowSize;
 			style.alignment = TextAnchor.MiddleLeft;
-			Rect rect = GUILayoutUtility.GetRect(content, style);
-			//GUI.Label(new Rect(rect.position, new Vector2(rect.width + rect.height, rect.height)), label, style);
-			if (GUI.Button(rect, label, style)) {
+
+			Rect dropDownRectTemp = GUILayoutUtility.GetRect(content, style, GUILayout.Width(width));
+			if (Event.current.type == EventType.Repaint) {
+				dropDownRect = dropDownRectTemp;
+				Vector2 perfectSize = style.CalcSize(content);
+
+				if (perfectSize.x > dropDownRect.width) {
+					while (perfectSize.x > dropDownRect.width || content.text.Length < 5) {
+						content.text = content.text.Substring(0, content.text.Length - 1);
+						perfectSize = style.CalcSize(content);
+					}
+				}
+			}
+
+			if (GUI.Button(dropDownRect, content, style)) {
 				this.opened = !this.opened;
 			}
-			float margin = rect.height/3;
-			GUI.DrawTexture(new Rect(rect.x + rect.width - rect.height + margin, rect.y + margin, rect.height - margin*2, rect.height - margin*2), texture);
+
+			float dropDownArrorMargin = dropDownRect.height/3;
+			Rect dropDownArrowRect = new Rect(dropDownRect.x + dropDownRect.width - dropDownRect.height + dropDownArrorMargin, dropDownRect.y + dropDownArrorMargin, dropDownRect.height - dropDownArrorMargin * 2, dropDownRect.height - dropDownArrorMargin * 2);
+			GUI.DrawTexture(dropDownArrowRect, downArrowImage);
 
 			if (opened) {
-				overlayContainer.addOverlay(delegate () {
-					Rect openedListPosition = new Rect(rect.x, rect.y + rect.height, rect.width, rect.height*4);
-					float scrollbarWidth = GUI.skin.verticalScrollbar.CalcSize(new GUIContent("")).x;
-					Rect openedListViewRect = new Rect(0, 0, openedListPosition.width - scrollbarWidth - 4, rect.height * 9);
-					using (var scrollViewScrope = new GUI.ScrollViewScope(openedListPosition, openedListScrollPosition, openedListViewRect)) {
-						openedListScrollPosition = scrollViewScrope.scrollPosition;
+				GUIStyle scrollbarStyle = GUI.skin.verticalScrollbar;
+				float scrollbarWidth = scrollbarStyle.CalcSize(new GUIContent("")).x + scrollbarStyle.margin.left;
+				if (Event.current.type == EventType.Repaint) {
+					int displayedCount = this.maxOpenedListVisibleItemsCount;
+					if (displayedCount > items.Count) {
+						displayedCount = items.Count;
+					}
+					bool scrollbarVisible = displayedCount < items.Count;
+					float optionalScrollbarWidth = scrollbarVisible ? scrollbarWidth : 0;
+					openedListRect = new Rect(dropDownRect.x, dropDownRect.y + dropDownRect.height, openedListMaxItemWidth + optionalScrollbarWidth, openedListItemHeight * displayedCount);
+					if (openedListRect.width < dropDownRect.width) {
+						openedListRect.width = dropDownRect.width;
+					}
+					openedListViewRect = new Rect(0, 0, openedListRect.width - optionalScrollbarWidth, openedListItemHeight*items.Count);
+				}
 
-						float itemX = 0;//openedListPosition.x;
-						float itemY = 0;//openedListPosition.y;
-						float itemWidth = openedListViewRect.width;
-						foreach (T item in items) {
-							GUIContent itemContent = new GUIContent(stringizer(item));
-							//GUIStyle itemStyle = GUI.skin.button;
-
-							GUIStyle itemStyle = new GUIStyle();
-							itemStyle.normal.textColor = new Color(207, 207, 207);
-							itemStyle.hover.background = texBack;
-							itemStyle.onHover.background = texBack;
-							itemStyle.hover.textColor = Color.black;
-							itemStyle.onHover.textColor = Color.black;
-							itemStyle.padding = new RectOffset(4, 4, 3, 4);
-
-							float itemHeight = itemStyle.CalcSize(itemContent).y;
-							GUI.Button(new Rect(itemX, itemY, itemWidth, itemHeight), itemContent, itemStyle);
-							itemY += itemHeight;
+				overlayContainer.addOverlayAtStart(delegate () {
+					if (Event.current.type != EventType.Repaint) {
+						drawOpenedList();
+						if (Event.current.type == EventType.MouseDown) {
+							if (!openedListRect.Contains(Event.current.mousePosition)) {
+								this.opened = false;
+							}
 						}
 					}
+
+				});
+				overlayContainer.addOverlayAtEnd(delegate () {
+					//
+					//this is to prevent tooltips-through-list:
+					//
+					if (openedListRect.Contains(Event.current.mousePosition)) {
+						GUI.tooltip = "";
+					}
+
+					if (Event.current.type == EventType.Repaint) {
+						drawOpenedList();
+					}
+
 				});
 			}
-			//GUI.Label(new Rect(rect.position +  new Vector2(rect.width-1, 0), new Vector2(rect.height, rect.height)), "\\/", style);
 		}
+
+		private void drawOpenedList() {
+			GUIStyle listStyle = GUI.skin.window;
+
+			GUI.Box(openedListRect, "", listStyle);
+			using (var scrollViewScrope = new GUI.ScrollViewScope(openedListRect, openedListScrollPosition, openedListViewRect)) {
+
+				openedListScrollPosition = scrollViewScrope.scrollPosition;
+
+				float itemX = 0;
+				float itemY = 0;
+				float itemWidth = openedListViewRect.width;
+				int currentIndex = 0;
+				this.openedListMaxItemWidth = 0;
+				foreach (T item in items) {
+					GUIContent itemContent = new GUIContent(stringizer(item));
+
+					GUIStyle itemStyle = new GUIStyle();
+					itemStyle.normal.textColor = new Color(200, 200, 200);
+					if (currentIndex == selectedItemIndex) {
+						itemStyle.hover.textColor = Color.black;
+						itemStyle.normal.background = hoverBackgroundTexture;
+					}
+
+					itemStyle.hover.background = hoverBackgroundTexture;
+					itemStyle.onHover.background = hoverBackgroundTexture;
+					itemStyle.hover.textColor = Color.black;
+					itemStyle.onHover.textColor = Color.black;
+
+					itemStyle.padding = new RectOffset(4, 4, 4, 4);
+					Vector2 itemSize = itemStyle.CalcSize(itemContent);
+					float itemHeight = itemStyle.CalcSize(itemContent).y;
+					this.openedListItemHeight = itemHeight;
+					this.openedListMaxItemWidth = Math.Max(itemSize.x, openedListMaxItemWidth);
+					if (GUI.Button(new Rect(itemX, itemY, itemWidth, itemHeight), itemContent, itemStyle)) {
+						this.selectedItemIndex = currentIndex;
+						this.opened = false;
+					}
+					itemY += itemHeight;
+					++currentIndex;
+				}
+			}
+		}
+
+		public int maxOpenedListVisibleItemsCount { get; set;}
 
 		public bool opened { get; private set;}
 
-		public T selectedItem { get; private set; }
+		public int selectedItemIndex { get; set; }
+
+		public bool someItemSelected {
+			get {
+				return selectedItemIndex < items.Count && selectedItemIndex >= 0;
+			}
+		}
+
+		public T selectedItem {
+			get {
+				if (someItemSelected) {
+					return items[selectedItemIndex];
+				} else {
+					return default(T);
+				}
+			}
+		}
 	}
 
 }

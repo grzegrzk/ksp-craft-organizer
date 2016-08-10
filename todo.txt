@@ -1,5 +1,5 @@
 TODO:
- 
+ - Add possibility to edit default tags
  - Highlights categories that do filter crafts
  - Add option to collapse/uncollapse all tags groups
  - Add possibility to read crafts from different save

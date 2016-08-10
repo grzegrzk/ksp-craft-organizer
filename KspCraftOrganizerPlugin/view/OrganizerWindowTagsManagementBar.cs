@@ -78,7 +78,7 @@ namespace KspCraftOrganizer {
 				GUILayout.Label("Add new tag:");
 				using (new GUILayout.HorizontalScope(GUILayout.ExpandWidth(false))) {
 					GUI.SetNextControlName(GUI_ID_ADD_NEW_TAG_TEXT);
-					newTagText = GUILayout.TextField(newTagText, GUILayout.Width(160));
+					newTagText = GUILayout.TextField(newTagText, GUILayout.Width(150));
 
 					focusNewTagTextFieldIfNeeded();
 

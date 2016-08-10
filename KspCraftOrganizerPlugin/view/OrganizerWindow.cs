@@ -31,7 +31,10 @@ namespace KspCraftOrganizer {
 		private GUIStyle _warningLabelStyle;
 		private GUIStyle tooltipBackgroundStyle;
 		private OrganizerController _modelLazy;
-		private List<DrawOverlay> overlaysToDraw = new List<DrawOverlay>();
+		private List<DrawOverlay> endOverlaysToDraw = new List<DrawOverlay>();
+		private List<DrawOverlay> startOverlaysToDraw = new List<DrawOverlay>();
+
+		private DropDownList<string> chooseSaveName;// = new DropDownList<string>(new string[] { "default", "science", "something something darkness", "ab", "cd", "ef", "gh", "ij" }, t => t);
 
 		public OrganizerController model { get {
 				if (_modelLazy == null) { 
@@ -55,6 +58,7 @@ namespace KspCraftOrganizer {
 			tagsManagementBar = new OrganizerWindowTagsManagementBar(this);
 			craftList = new OrganizerWindowCraftList(this);
 			this.shouldCurrentCraftBeSavedWindow = shouldCurrentCraftBeSavedWindow;
+			this.chooseSaveName = new DropDownList<string>(model.availableSaveNames, t => t);
 		}
 
 		protected override float getWindowWidthOnScreen(Rect pos) {
@@ -91,7 +95,6 @@ namespace KspCraftOrganizer {
 		}
 
 		override protected void windowGUI(int WindowID) {
-			overlaysToDraw.Clear();
 
 			GUIStyle buttonStyle = skin.button;
 
@@ -106,6 +109,8 @@ namespace KspCraftOrganizer {
 			_warningLabelStyle = new GUIStyle(skin.label);
 			_warningLabelStyle.normal.textColor = new Color(1, 0.2f, 0.2f);
 
+
+			drawStartOverlays();
 
 			using (new GUILayout.VerticalScope()) {
 
@@ -130,24 +135,34 @@ namespace KspCraftOrganizer {
 				drawBottomBar();
 			}
 
-			drawCraftTooltip();
+			drawEndOverlays();
 
-			drawOverlays();
+			drawCraftTooltip();
 
 			GUI.DragWindow();
 		}
 
-		public void addOverlay(DrawOverlay drawOverlay){
-			overlaysToDraw.Add(drawOverlay);
-		}
-
-		private void drawOverlays() {
-			foreach(DrawOverlay overlay in overlaysToDraw){
+		void drawStartOverlays() {
+			foreach (DrawOverlay overlay in startOverlaysToDraw) {
 				overlay();
 			}
+			startOverlaysToDraw.Clear();
 		}
 
-		private DropDownList<string> chooseSaveName = new DropDownList<string>(new string[] { "default", "science" , "something something darkness" }, t => t);
+		public void addOverlayAtStart(DrawOverlay drawOverlay) {
+			startOverlaysToDraw.Add(drawOverlay);
+		}
+
+		public void addOverlayAtEnd(DrawOverlay drawOverlay) {
+			endOverlaysToDraw.Add(drawOverlay);
+		}
+
+		private void drawEndOverlays() {
+			foreach(DrawOverlay overlay in endOverlaysToDraw){
+				overlay();
+			}
+			endOverlaysToDraw.Clear();
+		}
 
 		private void drawTopToolbar() {
 			using (new GUILayout.HorizontalScope()) {
@@ -160,7 +175,7 @@ namespace KspCraftOrganizer {
 				//	if (GUILayout.Button("Change save folder", GUILayout.ExpandWidth(false))) {
 				//}
 
-				chooseSaveName.onGui(this);
+				chooseSaveName.onGui(this, 200);
 
 				//if (GUILayout.Button("<<", GUILayout.ExpandWidth(false))) {
 				//}

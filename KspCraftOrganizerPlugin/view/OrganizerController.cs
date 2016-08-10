@@ -97,6 +97,12 @@ namespace KspCraftOrganizer
 			}
 		}
 
+		public ICollection<string> availableSaveNames {
+			get {
+				return fileLocationService.getAvailableSaveNames();
+			}
+		}
+
 		internal GuiStyleOption selectedGuiStyle {
 			get {
 				return _selectedGuiStyle;
