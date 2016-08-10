@@ -19,10 +19,15 @@ namespace KspCraftOrganizer
 		 * In plugin settings: Introduced new default tags
 		 */
 		private static readonly int SETTINGS_VER_3 = 3;
+		/**
+		 * In profile settings: no changes
+		 * In plugin settings: Eliminated bug that default tags may not be created
+		 */
+		private static readonly int SETTINGS_VER_4 = 4;
 
 		private List<string> NEW_TAGS_IN_VER3 = new List<string>(new string[] { "MasterpieceAmongCrafts"});
 
-		private static readonly int SETTINGS_VER_NOW = SETTINGS_VER_3;
+		private static readonly int SETTINGS_VER_NOW = SETTINGS_VER_4;
 
 		private Dictionary<string, AvailablePart> _availablePartCache;
 		private EditorFacility editorFacility;
@@ -234,6 +239,12 @@ namespace KspCraftOrganizer
 						COLogger.logDebug("Profile settings were in version " + settingsVersion + ", adding new default tags");
 						tags.AddRange(NEW_TAGS_IN_VER3);
 					}
+
+
+					//if (settingsVersion == SETTINGS_VER_3) {
+					//	COLogger.logDebug("Profile settings were in version " + settingsVersion + " which had bug that default tags were not created. Adding them now.");
+					//	tags.AddRange(createDefaultTags());
+					//}
 
 					string styleId = node.GetValue("guiStyle");
 					foreach (GuiStyleOption candidateStyle in GuiStyleOption.SKIN_STATES) {
@@ -477,58 +488,28 @@ namespace KspCraftOrganizer
 
 			bool settingsChanged = false;
 
-			if (!File.Exists(fileName)){
+			if (!File.Exists(fileName)) {
 				
-				settingsChanged = true;
 				COLogger.logDebug("Plugin settings do not exist, creating default file in " + fileName);
+				toRet.defaultAvailableTags = getDefaultTags();
 
-				List<string> tags = new List<string>();
-				//			tags.Add (@"Bodies\Moho");
-				//			tags.Add (@"Bodies\Eve");
-				//			tags.Add (@"Bodies\Eve\Gilly");
-				tags.Add(@"-Archived?");
-				tags.Add(@"Bodies\Kerbin");
-				tags.Add(@"Bodies\Kerbin\Mun");
-				tags.Add(@"Bodies\Kerbin\Minmus");
-				tags.Add(@"Bodies\Duna");
-				//			tags.Add (@"Bodies\Duna\Ike");
-				//			tags.Add (@"Bodies\Dres");
-				//			tags.Add (@"Bodies\Jool");
-				//			tags.Add (@"Bodies\Jool\Laythe");
-				//			tags.Add (@"Bodies\Jool\Vall");
-				//			tags.Add (@"Bodies\Jool\Tylo");
-				//			tags.Add (@"Bodies\Jool\Bop");
-				//			tags.Add (@"Bodies\Jool\Pol");
-				//			tags.Add (@"Bodies\Eeloo");
-				//			tags.Add (@"Type\Lander\Crew");
-				//			tags.Add (@"Type\Lander\Unmanned");
-				//			tags.Add (@"Type\Orbit\Crew");
-				//			tags.Add (@"Type\Orbit\Unmanned");
-				//			tags.Add (@"Type\SpaceStation");
-				//			tags.Add (@"Type\Rover\Crew");
-				//			tags.Add (@"Type\Rover\Unmanned");
-				//			tags.Add (@"Type\Satellite");
-
-				tags.Add(@"Type\Lander");
-				tags.Add(@"Type\Orbit");
-				tags.Add(@"Type\SpaceStation");
-				tags.Add(@"Type\Rover");
-				tags.Add(@"Type\Satellite");
-
-				tags.Add(@"Status\Prototype");
-				tags.Add(@"Status\Final");
-
-				tags.AddRange(NEW_TAGS_IN_VER3);
+				writePluginSettings(toRet, fileName);
 			}
+
 			ConfigNode settings = ConfigNode.Load(fileName);
 			if (settings != null) {
 				int settingsVersion = readSettingsVersion(settings);
 				foreach (string tag in settings.GetValues("defaultAvailableTag")) {
 					defaultAvailableTags.Add(tag);
 				}
-				if (settingsVersion < SETTINGS_VER_3) {
+				if (settingsVersion <= SETTINGS_VER_2) {
 					COLogger.logDebug("Plugin settings were in version " + settingsVersion + ", adding new default tags");
 					defaultAvailableTags.AddRange(NEW_TAGS_IN_VER3);
+					settingsChanged = true;
+				}
+				if (settingsVersion == SETTINGS_VER_3) {
+					COLogger.logDebug("Plugin settings were in version " + settingsVersion + " which had bug that default tags may not be created. Creating them now.");
+					defaultAvailableTags.AddUniqueRange(getDefaultTags());
 					settingsChanged = true;
 				}
 				toRet.debug = readBoolFromSettings(settings, "debug", false);
@@ -539,6 +520,48 @@ namespace KspCraftOrganizer
 			}
 
 			return toRet;
+		}
+
+		private ICollection<string> getDefaultTags() {
+			List<string> tags = new List<string>();
+			//			tags.Add (@"Bodies\Moho");
+			//			tags.Add (@"Bodies\Eve");
+			//			tags.Add (@"Bodies\Eve\Gilly");
+			tags.Add(@"-Archived?");
+			tags.Add(@"Bodies\Kerbin");
+			tags.Add(@"Bodies\Kerbin\Mun");
+			tags.Add(@"Bodies\Kerbin\Minmus");
+			tags.Add(@"Bodies\Duna");
+			//			tags.Add (@"Bodies\Duna\Ike");
+			//			tags.Add (@"Bodies\Dres");
+			//			tags.Add (@"Bodies\Jool");
+			//			tags.Add (@"Bodies\Jool\Laythe");
+			//			tags.Add (@"Bodies\Jool\Vall");
+			//			tags.Add (@"Bodies\Jool\Tylo");
+			//			tags.Add (@"Bodies\Jool\Bop");
+			//			tags.Add (@"Bodies\Jool\Pol");
+			//			tags.Add (@"Bodies\Eeloo");
+			//			tags.Add (@"Type\Lander\Crew");
+			//			tags.Add (@"Type\Lander\Unmanned");
+			//			tags.Add (@"Type\Orbit\Crew");
+			//			tags.Add (@"Type\Orbit\Unmanned");
+			//			tags.Add (@"Type\SpaceStation");
+			//			tags.Add (@"Type\Rover\Crew");
+			//			tags.Add (@"Type\Rover\Unmanned");
+			//			tags.Add (@"Type\Satellite");
+
+			tags.Add(@"Type\Lander");
+			tags.Add(@"Type\Orbit");
+			tags.Add(@"Type\SpaceStation");
+			tags.Add(@"Type\Rover");
+			tags.Add(@"Type\Satellite");
+
+			tags.Add(@"Status\Prototype");
+			tags.Add(@"Status\Final");
+
+			tags.AddRange(NEW_TAGS_IN_VER3);
+
+			return tags;
 		}
 
 		private void writePluginSettings(PluginSettings settings, string fileName) {

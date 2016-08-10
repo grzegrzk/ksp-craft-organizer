@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 
 namespace KspCraftOrganizer {
 	
@@ -12,6 +13,7 @@ namespace KspCraftOrganizer {
 		private string newTagText = "";
 		private bool newTagWasJustAdded;
 		private bool needsToUpdateSelectionInNewTag;
+		private bool showDefaultTagsToAdd;
 
 		public OrganizerWindowTagsManagementBar(OrganizerWindow parent) {
 			this.parent = parent;
@@ -92,6 +94,28 @@ namespace KspCraftOrganizer {
 					if ((addButtonClicked || enterPressedOnInput) && newTagText.Trim() != "") {
 						model.addAvailableTag(newTagText.Trim());
 						newTagWasJustAdded = true;
+					}
+				}
+				GUILayout.Space(10);
+
+				if (GUILayout.Button("Default tags " + (showDefaultTagsToAdd ? "<<" : ">>"))) {
+					showDefaultTagsToAdd = !showDefaultTagsToAdd;
+				}
+				if (showDefaultTagsToAdd) {
+					GUILayout.Label("Select default tags to add:");
+					if (model.defaultTagsToAdd.Count == 0) {
+						GUILayout.Label("<You have all of them>", parent.originalSkin.label);
+					} else {
+						foreach (KeyValuePair<string, bool> tag in new Dictionary<string, bool>(model.defaultTagsToAdd)) {
+							model.defaultTagsToAdd[tag.Key] = parent.guiLayout_Toggle_OrigSkin(tag.Value, tag.Key);
+						}
+						if (GUILayout.Button("Add selected default tags")) {
+							model.addSelectedDefaultTags();
+						}
+					}
+					GUILayout.Label("Default tags that you already have:");
+					foreach (string tag in model.defaultTagsNotToAdd) {
+						GUILayout.Label(tag, parent.originalSkin.label);
 					}
 				}
 				GUILayout.EndScrollView();
