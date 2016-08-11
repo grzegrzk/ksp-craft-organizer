@@ -181,6 +181,15 @@ namespace KspCraftOrganizer {
 					return default(T);
 				}
 			}
+			set {
+				int index = 0;
+				foreach (T item in items) {
+					if (EqualityComparer<T>.Default.Equals(item, value)) {
+						selectedItemIndex = index;
+					}
+					++index;					
+				}
+			}
 		}
 	}
 

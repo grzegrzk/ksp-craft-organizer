@@ -59,6 +59,7 @@ namespace KspCraftOrganizer {
 			craftList = new OrganizerWindowCraftList(this);
 			this.shouldCurrentCraftBeSavedWindow = shouldCurrentCraftBeSavedWindow;
 			this.chooseSaveName = new DropDownList<string>(model.availableSaveNames, t => t);
+			chooseSaveName.selectedItem = model.currentSave;
 		}
 
 		protected override float getWindowWidthOnScreen(Rect pos) {
@@ -75,12 +76,14 @@ namespace KspCraftOrganizer {
 			EditorListenerService.instance.fireEventIfShipHasBeenSaved();
 			selectedGuiSkin = Array.IndexOf(GuiStyleOption.SKIN_STATES, model.selectedGuiStyle);
 			_modelLazy = null;
+			COLogger.logDebug("Current save: " + model.currentSave);
+			chooseSaveName.selectedItem = model.currentSave;
 		}
 
 		override public void update() {
 			base.update();
 			if (windowDisplayed) {
-				model.update(selectAllFiltered);
+				model.update(chooseSaveName.selectedItem, selectAllFiltered);
 				this.selectAllFiltered = model.selectAllFiltered;
 
 				//model.updateFilteredCrafts();

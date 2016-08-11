@@ -61,7 +61,7 @@ namespace KspCraftOrganizer {
 			string[] directories = Directory.GetDirectories(savesFolder);
 			List<string> toRet = new List<string>();
 			foreach (string dir in directories) {
-				if (Directory.Exists(Globals.combinePaths(dir, "ships"))) {
+				if (Directory.Exists(Globals.combinePaths(dir, "Ships"))) {
 					toRet.Add(Path.GetFileName(dir));
 				}
 			}
@@ -69,8 +69,8 @@ namespace KspCraftOrganizer {
 		}
 
 
-		public string getCraftDirectoryForCraftType(CraftType type) {
-			return Path.Combine(ksp.getBaseCraftDirectory(), type.directoryName);
+		public string getCraftDirectoryForCraftType(string saveName, CraftType type) {
+			return Globals.combinePaths(ksp.getApplicationRootPath(), "saves", saveName, "Ships", type.directoryName);
 		}
 
 
@@ -139,14 +139,25 @@ namespace KspCraftOrganizer {
 			if (filePath.StartsWith(getStockCraftDirectoryForCraftType(CraftType.VAB))) {
 				return "/Ships/@thumbs/VAB/" + Path.GetFileNameWithoutExtension(filePath);
 			}
-			if (filePath.StartsWith(getCraftDirectoryForCraftType(CraftType.SPH))) {
-				return "/thumbs/" + ksp.getNameOfSaveFolder() + "_SPH_" + Path.GetFileNameWithoutExtension(filePath);
+			string saveName = extractSaveName(filePath);
+			if (filePath.StartsWith(getCraftDirectoryForCraftType(saveName, CraftType.SPH))) {
+				return "/thumbs/" + saveName + "_SPH_" + Path.GetFileNameWithoutExtension(filePath);
 			}
-			if (filePath.StartsWith(getCraftDirectoryForCraftType(CraftType.VAB))) {
-				return "/thumbs/" + ksp.getNameOfSaveFolder() + "_VAB_" + Path.GetFileNameWithoutExtension(filePath);
+			if (filePath.StartsWith(getCraftDirectoryForCraftType(saveName, CraftType.VAB))) {
+				return "/thumbs/" + saveName + "_VAB_" + Path.GetFileNameWithoutExtension(filePath);
 			}
 			return "";
 
+		}
+
+		string extractSaveName(string filePath) {
+			string[] pathElements = 
+				filePath.Split(new char[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
+			if (pathElements.Length >= 4) {
+				return pathElements[pathElements.Length - 4];
+			} else {
+				return "";
+			}
 		}
 
 		public string getAutoSaveShipPath() {

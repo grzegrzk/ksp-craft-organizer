@@ -60,6 +60,12 @@ namespace KspCraftOrganizer
 			}
 		}
 
+		public string currentSave { 
+			get {
+				return craftList.currentSave;
+			} 
+		}
+
 		internal void addSelectedDefaultTags() {
 			foreach (KeyValuePair<string, bool> tag in new Dictionary<string, bool>(defaultTagsToAdd)) {
 				if (tag.Value) {
@@ -181,7 +187,7 @@ namespace KspCraftOrganizer
 			craftList.unselectAllCrafts();
 		}
 
-		public void update(bool selectAll) {
+		public void update(string selectedSave, bool selectAll) {
 			//
 			//Filter & crafts affect each other:
 			//
@@ -196,7 +202,7 @@ namespace KspCraftOrganizer
 			if (afterSettingsChanged) {
 				filter.applyFilterSettings(filterDto);
 			}
-			craftList.update(selectAll, filter.filterChanged);
+			craftList.update(selectedSave, selectAll, filter.filterChanged);
 			managementTagsGroups.update(availableTags);
 			if (afterSettingsChanged) {
 				managementTagsGroups.applyFilterSettings(filterDto);
