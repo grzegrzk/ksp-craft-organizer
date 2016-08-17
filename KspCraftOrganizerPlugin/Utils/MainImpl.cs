@@ -14,8 +14,6 @@ namespace KspCraftOrganizer {
 		private OrganizerWindow craftOrganizerWindow;
 		private CurrentCraftTagsWindow manageThisCraftWindow;
 
-		//private FileLocationService locationService = FileLocationService.instance;
-
 		private List<ApplicationLauncherButton> appLauncherButtons = new List<ApplicationLauncherButton>();
 
 		public void Start() {
@@ -28,7 +26,6 @@ namespace KspCraftOrganizer {
 
 			addLauncherButtonInAllEditors(craftOrganizerWindow.displayWindow, "manage.png");
 			addLauncherButtonInAllEditors(manageThisCraftWindow.displayWindow, "tags.png");
-			//addLauncherButtonInAllEditors(CleanUp, null);
 
 			foreach (BaseWindow window in windows) {
 				window.start();

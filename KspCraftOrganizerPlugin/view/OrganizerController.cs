@@ -8,15 +8,12 @@ namespace KspCraftOrganizer
 
 	public class OrganizerController {
 		private IKspAl ksp = IKspAlProvider.instance;
-		//private bool _profileSettingsFileIsDirtyDoNotEditDirectly;
 
 		private SettingsService settingsService = SettingsService.instance;
 		private FileLocationService fileLocationService = FileLocationService.instance;
 		private OrganizerControllerCraftList craftList;
 		private OrganizerControllerFilter filter;
 		public ManagementTagsGrouper managementTagsGroups;
-		//private bool afterSettingsChanged = true;
-		//private ProfileAllFilterSettingsDto allFiltersDto;
 		public OrganizerControllerStateManager stateManager { get; private set; }
 
 		public bool restTagsInFilterCollapsed { get { return filter.restTagsCollapsed; } set { filter.restTagsCollapsed = value;}  }
@@ -37,13 +34,6 @@ namespace KspCraftOrganizer
 			this.filter = new OrganizerControllerFilter(this);
 			this.defaultTagsToAdd = new Dictionary<string, bool>();
 			refreshDefaultTagsToAdd();
-
-			//_selectedGuiStyle = profileSettings.selectedGuiStyle;
-			//if (_selectedGuiStyle == null) {
-			//	_selectedGuiStyle = GuiStyleOption.Ksp;
-			//}
-
-			//markProfileSettingsAsNotDirty("Constructor - fresh settings were just read");
 
 			this.filter.init();
 		}
@@ -71,12 +61,6 @@ namespace KspCraftOrganizer
 				}
 			}
 		}
-
-		//private ProfileFilterSettingsDto getFilterDtoFor(CraftType craftType) {
-		//	return allFiltersDto.getFilterDtoFor(ksp.getCurrentEditorFacilityType(), craftType);
-		//}
-
-
 		public bool selectAllFiltered {
 			get {
 				return craftList.selectAllFiltered;
@@ -112,18 +96,6 @@ namespace KspCraftOrganizer
 			return craftList.getCraftsOfType(type);
 		}
 
-		//private bool profileSettingsFileIsDirty { get { return _profileSettingsFileIsDirtyDoNotEditDirectly; } }
-
-		//private void markProfileSettingsAsNotDirty(string reason) {
-		//	COLogger.logTrace("marking profile settings as NOT dirty, reason: " + reason);
-		//	_profileSettingsFileIsDirtyDoNotEditDirectly = false;
-		//}
-
-		//public void markProfileSettingsAsDirty(string reason) {
-		//	COLogger.logTrace("marking profile settings as dirty, reason: " + reason);
-		//	_profileSettingsFileIsDirtyDoNotEditDirectly = true;
-		//}
-
 		public bool craftsAreFiltered { get { return craftList.craftsAreFiltered; } }
 
 		public OrganizerCraftEntity[] filteredCrafts {
@@ -140,10 +112,10 @@ namespace KspCraftOrganizer
 
 		internal GuiStyleOption selectedGuiStyle {
 			get {
-				return stateManager.getSelectedGuiStyle();
+				return stateManager.selectedGuiStyle;
 			}
 			set {
-				stateManager.setSelectedGuiStyle(value);
+				stateManager.selectedGuiStyle = value;
 			}
 		}
 
@@ -199,18 +171,8 @@ namespace KspCraftOrganizer
 			}
 
 			filter.update();
-			//ProfileFilterSettingsDto filterDto = getFilterDtoFor(craftType);
-			//if (afterSettingsChanged) {
-			//	filter.applyFilterSettings(filterDto);
-			//}
-			craftList.update(selectedSave, selectAll, filter.filterChanged);
+			craftList.update(selectAll, filter.filterChanged);
 			managementTagsGroups.update(availableTags);
-			//if (afterSettingsChanged) {
-			//	managementTagsGroups.applyFilterSettings(filterDto);
-			//	restTagsInManagementCollapsed = filterDto.restManagementTagsCollapsed;
-			//}
-
-			//afterSettingsChanged = false;
 
 		}
 
@@ -300,22 +262,8 @@ namespace KspCraftOrganizer
 			}
 			set {
 				craftList.craftType = value;
-				//if (craftList.craftType != value) {
-				//	persistFiltersState();
-
-				//	afterSettingsChanged = true;
-
-				//	craftList.craftType = value;
-				//}
 			}
 		}
-
-		//private void persistFiltersState() {
-		//	ProfileFilterSettingsDto filterDto = getFilterDtoFor(craftList.craftType);
-		//	filter.assignCurrentFilterSettingsToDto(filterDto);
-		//	managementTagsGroups.assignCurrentFilterSettingsToDto(filterDto);
-		//	filterDto.restManagementTagsCollapsed = this.restTagsInManagementCollapsed;
-		//}
 
 		public bool isCraftAlreadyLoadedInWorkspace(){
 			return ksp.isCraftAlreadyLoadedInWorkspace ();
@@ -338,39 +286,6 @@ namespace KspCraftOrganizer
 				return craftList.alreadyLoadedCrafts;
 			}
 		}
-		//public void writeAllDirtySettings(){
-		//	if (profileSettingsFileIsDirty) {
-		//		ProfileSettingsDto dto = new ProfileSettingsDto ();
-		//		if (doNotWriteTagSettingsToDisk) {
-		//			dto.availableTags = settingsService.readProfileSettings().availableTags;
-		//		} else {
-		//			dto.availableTags = filter.availableTagsNames;
-		//		}
-
-		//		persistFiltersState();
-
-		//		dto.allFilter = allFiltersDto;
-		//		dto.selectedGuiStyle = _selectedGuiStyle;
-		//		settingsService.writeProfileSettings(dto);
-
-		//		markProfileSettingsAsNotDirty("Settings were just written to the disk");
-		//	}
-		//	if (!doNotWriteTagSettingsToDisk) {
-		//		foreach (List<OrganizerCraftEntity> crafts in craftList.alreadyLoadedCrafts) {
-		//			foreach (OrganizerCraftEntity craft in crafts) {
-		//				if (craft.craftSettingsFileIsDirty) {
-		//					CraftSettingsDto dto = new CraftSettingsDto();
-		//					dto.tags = craft.tags;
-		//					dto.craftName = craft.name;
-		//					settingsService.writeCraftSettingsForCraftFile(craft.craftFile, dto);
-
-		//					craft.craftSettingsFileIsDirty = false;
-		//				}
-		//			}
-		//		}
-			
-		//	}
-		//}
 
 	}
 }

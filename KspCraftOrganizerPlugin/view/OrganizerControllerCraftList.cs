@@ -68,7 +68,6 @@ namespace KspCraftOrganizer {
 
 				CraftSettingsDto craftSettings = settingsService.readCraftSettingsForCraftFile(toRet[i].craftFile);
 				foreach (string craftTag in craftSettings.tags) {
-					//parent.addAvailableTag(craftTag);
 					toRet[i].addTag(craftTag);
 				}
 				toRet[i].nameFromSettingsFile = craftSettings.craftName;
@@ -93,17 +92,14 @@ namespace KspCraftOrganizer {
 
 		public delegate bool CraftFilterPredicate(OrganizerCraftEntity craft, out bool shouldBeVisibleByDefault);
 
-		//private List<OrganizerCraftEntity> cachedAvailableCrafts;
 		private OrganizerCraftEntity[] cachedFilteredCrafts;
 		private OrganizerCraftEntity _primaryCraft;
 		private int cachedSelectedCraftsCount;
 		private CraftType _craftType;
-		//private Dictionary<CraftType, List<OrganizerCraftEntity>> craftTypeToAvailableCraftsLazy = new Dictionary<CraftType, List<OrganizerCraftEntity>>();
 		private Dictionary<string, ListOfCraftsInSave> saveToListOfCrafts = new Dictionary<string, ListOfCraftsInSave>();
 			
 		private IKspAl ksp = IKspAlProvider.instance;
 		private FileLocationService fileLocationService = FileLocationService.instance;
-		//private SettingsService settingsService = SettingsService.instance;
 		private OrganizerController parent;
 
 		private string currentSave { get { return parent.currentSave; } }
@@ -125,10 +121,7 @@ namespace KspCraftOrganizer {
 			set; 
 		}
 
-		public void update(string selectedSave, bool selectAll, bool filterChanged) {
-			//if (this.currentSave != selectedSave) {
-			//	clearCaches("save folder changed");
-			//}
+		public void update(bool selectAll, bool filterChanged) {
 			if (this.cachedFilteredCrafts == null || filterChanged) {
 				this.cachedFilteredCrafts = createFilteredCrafts(parent.craftFilterPredicate);
 				parent.markFilterAsUpToDate();
@@ -287,7 +280,6 @@ namespace KspCraftOrganizer {
 
 		public void clearCaches(string reason) {
 			COLogger.logDebug("Clearing caches in OrganizerServiceCraftList, reason: " + reason);
-			//this.cachedAvailableCrafts = null;
 			this.cachedFilteredCrafts = null;
 			this.cachedSelectedCraftsCount = 0;
 		}

@@ -27,22 +27,6 @@ namespace KspCraftOrganizer {
 
 		}
 
-		//public void assignCurrentFilterSettingsToDto(ProfileFilterSettingsDto filterDto) {
-		//	List<string> collapsedGroups = new List<string>();
-		//	foreach (ManagementTagGroup tagGroup in groups) {
-		//		if (tagGroup.collapsedInManagementView) {
-		//			collapsedGroups.Add(tagGroup.displayName);
-		//		}
-		//	}
-		//	filterDto.collapsedManagementGroups = collapsedGroups;
-		//}
-
-		//public void applyFilterSettings(ProfileFilterSettingsDto filterDto) {
-		//	foreach (ManagementTagGroup tagGroup in groups) {
-		//		tagGroup.collapsedInManagementView = filterDto.collapsedManagementGroups.Contains(tagGroup.displayName);
-		//	}
-		//}
-
 	}
 }
 

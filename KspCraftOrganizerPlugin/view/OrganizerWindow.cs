@@ -86,13 +86,10 @@ namespace KspCraftOrganizer {
 				model.update(chooseSaveName.selectedItem, selectAllFiltered);
 				this.selectAllFiltered = model.selectAllFiltered;
 
-				//model.updateFilteredCrafts();
 				if (model.primaryCraft == null) {
 					this.selectedCraftName = "";
 				}
 				model.selectedGuiStyle = GuiStyleOption.SKIN_STATES[selectedGuiSkin];
-				//selectAllFiltered = model.updateSelectedCrafts(selectAllFiltered);
-				//model.updateUsedTags();
 				guiStyleOption = GuiStyleOption.SKIN_STATES[selectedGuiSkin];
 			}
 		}

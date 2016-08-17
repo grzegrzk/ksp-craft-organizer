@@ -125,13 +125,13 @@ namespace KspCraftOrganizer {
 
 		private bool primarySettingsChanged;
 		
-		private SortedList<string, OrganizerControllerPrimaryTagState> primaryTagsSettings = new SortedList<string, OrganizerControllerPrimaryTagState>();
-		private SortedList<string, OrganizerControllerPrimaryTagGroupState> primaryGroupsSettings = new SortedList<string, OrganizerControllerPrimaryTagGroupState>();
+		private SortedList<string, OrganizerControllerPrimaryTagState> primaryTagsState = new SortedList<string, OrganizerControllerPrimaryTagState>();
+		private SortedList<string, OrganizerControllerPrimaryTagGroupState> primaryGroupsState = new SortedList<string, OrganizerControllerPrimaryTagGroupState>();
 		private CraftTypeDependendSetting<bool> restTagsCollapsedInFilter;
 		private CraftTypeDependendSetting<bool> restTagsCollapsedInManagement;
 		private CraftTypeDependendSetting<string> craftNameFilter;
 
-		public GuiStyleOption selectedGuiStyle;
+		private ListenableSetting<GuiStyleOption> _selectedGuiStyle;
 
 		private SortedList<string, OrganizerControllerPerSaveSettings> perSaveSettings = new SortedList<string, OrganizerControllerPerSaveSettings>();
 
@@ -140,6 +140,7 @@ namespace KspCraftOrganizer {
 
 		public OrganizerControllerStateManager(OrganizerController parent) {
 			this.parent = parent;
+			_selectedGuiStyle = new ListenableSetting<GuiStyleOption>(() => markPrimaryProfileDirty("Gui style changed"));
 			restTagsCollapsedInFilter = new CraftTypeDependendSetting<bool>(this, ()=>markPrimaryProfileDirty("rest tags collapsed state changed in filters"));
 			restTagsCollapsedInManagement = new CraftTypeDependendSetting<bool>(this, ()=>markPrimaryProfileDirty("rest tags collapsed state changed in management"));
 			craftNameFilter = new CraftTypeDependendSetting<string>(this, ()=>markPrimaryProfileDirty("craft name filter changed"));
@@ -150,6 +151,15 @@ namespace KspCraftOrganizer {
 		public List<string> availableTagsForCurrentSave {
 			get {
 				return perSaveSettingsFor(parent.currentSave).availableTags;
+			}
+		}
+
+		public GuiStyleOption selectedGuiStyle {
+			get {
+				return _selectedGuiStyle.v;
+			}
+			set {
+				_selectedGuiStyle.v = value;
 			}
 		}
 
@@ -165,49 +175,49 @@ namespace KspCraftOrganizer {
 		}
 
 		public void setTagSelectedForFiltering(string tagName, bool selected) {
-			getTag(tagName).selectedForFiltering.current = selected;
+			getPrimaryTagState(tagName).selectedForFiltering.current = selected;
 		}
 
 		public bool isTagSelectedForFiltering(string tagName) {
-			return getTag(tagName).selectedForFiltering.current;
+			return getPrimaryTagState(tagName).selectedForFiltering.current;
 		}
 
-		private OrganizerControllerPrimaryTagState getTag(string tagName) {
-			if (!primaryTagsSettings.ContainsKey(tagName)) {
-				primaryTagsSettings.Add(tagName, new OrganizerControllerPrimaryTagState(this));
+		private OrganizerControllerPrimaryTagState getPrimaryTagState(string tagName) {
+			if (!primaryTagsState.ContainsKey(tagName)) {
+				primaryTagsState.Add(tagName, new OrganizerControllerPrimaryTagState(this));
 			}
-			return primaryTagsSettings[tagName];
+			return primaryTagsState[tagName];
 		}
 
 		public void setGroupCollapsedInFilters(string groupName, bool collapsed) {
-			getGroup(groupName).collapsedInFilters.current = collapsed;
+			getPrimaryGroupState(groupName).collapsedInFilters.current = collapsed;
 		}
 
 		public bool isGroupCollapsedInFilters(string groupName) {
-			return getGroup(groupName).collapsedInFilters.current;
+			return getPrimaryGroupState(groupName).collapsedInFilters.current;
 		}
 
 		public void setGroupHasSelectedNoneFilter(string groupName, bool collapsed) {
-			getGroup(groupName).hasSelectedNoneInFilter.current = collapsed;
+			getPrimaryGroupState(groupName).hasSelectedNoneInFilter.current = collapsed;
 		}
 
 		public bool isGroupHasSelectedNoneFilter(string groupName) {
-			return getGroup(groupName).hasSelectedNoneInFilter.current;
+			return getPrimaryGroupState(groupName).hasSelectedNoneInFilter.current;
 		}
 
 		public void setGroupCollapsedInManagement(string groupName, bool collapsed) {
-			getGroup(groupName).collapsedInManagement.current = collapsed;
+			getPrimaryGroupState(groupName).collapsedInManagement.current = collapsed;
 		}
 
 		public bool isGroupCollapsedInManagement(string groupName) {
-			return getGroup(groupName).collapsedInManagement.current;
+			return getPrimaryGroupState(groupName).collapsedInManagement.current;
 		}
 
-		private OrganizerControllerPrimaryTagGroupState getGroup(string groupName) {
-			if (!primaryGroupsSettings.ContainsKey(groupName)) {
-				primaryGroupsSettings.Add(groupName, new OrganizerControllerPrimaryTagGroupState(this));
+		private OrganizerControllerPrimaryTagGroupState getPrimaryGroupState(string groupName) {
+			if (!primaryGroupsState.ContainsKey(groupName)) {
+				primaryGroupsState.Add(groupName, new OrganizerControllerPrimaryTagGroupState(this));
 			}
-			return primaryGroupsSettings[groupName];
+			return primaryGroupsState[groupName];
 		}
 
 		public bool isRestTagsCollapsedInFilter() {
@@ -217,7 +227,6 @@ namespace KspCraftOrganizer {
 		public void setRestTagsCollapsedInFilter(bool collapsed) {
 			restTagsCollapsedInFilter.current = collapsed;
 		}
-
 
 		public bool isRestTagsCollapsedInManagement() {
 			return restTagsCollapsedInManagement.current;
@@ -236,29 +245,14 @@ namespace KspCraftOrganizer {
 			this.craftNameFilter.current = craftNameFilter;
 		}
 
-		public GuiStyleOption getSelectedGuiStyle() {
-			return selectedGuiStyle;
-		}
-
-		public void setSelectedGuiStyle(GuiStyleOption selectedGuiStyle) {
-			this.selectedGuiStyle = selectedGuiStyle;
-		}
-
 		public CraftType currentFacility { get { return ksp.getCurrentEditorFacilityType(); } }
 
 
 		public CraftType selectedCraftType { get { return parent.craftType; } }
 
 
-		//private void persistFiltersState() {
-		//	ProfileFilterSettingsDto filterDto = getFilterDtoFor(craftList.craftType);
-		//	filter.assignCurrentFilterSettingsToDto(filterDto);
-		//	managementTagsGroups.assignCurrentFilterSettingsToDto(filterDto);
-		//	filterDto.restManagementTagsCollapsed = this.restTagsInManagementCollapsed;
-		//}
-
 		void readPrimarySaveSettings() {
-			ProfileSettingsDto dto = settingsService.readProfileSettings(ksp.getNameOfSaveFolder());//new ProfileSettingsDto ();
+			ProfileSettingsDto dto = settingsService.readProfileSettings(ksp.getNameOfSaveFolder());
 
 			ProfileAllFilterSettingsDto allFilter = dto.allFilter;
 			readFilterSettings(allFilter, CraftType.SPH, CraftType.VAB);
@@ -277,28 +271,28 @@ namespace KspCraftOrganizer {
 			craftNameFilter.setForFacilityAndCraftType(facility, craftType, filterDto.selectedTextFilter);
 
 
-			foreach (KeyValuePair<string, OrganizerControllerPrimaryTagState> tagState in primaryTagsSettings) {
+			foreach (KeyValuePair<string, OrganizerControllerPrimaryTagState> tagState in primaryTagsState) {
 				tagState.Value.selectedForFiltering.setForFacilityAndCraftType(facility, craftType, false);
 			}
 			foreach (string selectedTag in filterDto.selectedFilterTags) {
-				getTag(selectedTag).selectedForFiltering.setForFacilityAndCraftType(facility, craftType, true);
+				getPrimaryTagState(selectedTag).selectedForFiltering.setForFacilityAndCraftType(facility, craftType, true);
 			}
 
 
-			foreach (KeyValuePair<string, OrganizerControllerPrimaryTagGroupState> groupState in primaryGroupsSettings) {
+			foreach (KeyValuePair<string, OrganizerControllerPrimaryTagGroupState> groupState in primaryGroupsState) {
 				groupState.Value.collapsedInFilters.setForFacilityAndCraftType(facility, craftType, false);
 				groupState.Value.collapsedInManagement.setForFacilityAndCraftType(facility, craftType, false);
 				groupState.Value.hasSelectedNoneInFilter.setForFacilityAndCraftType(facility, craftType, false);
 			}
 
 			foreach (string groupName in filterDto.filterGroupsWithSelectedNoneOption) {
-				getGroup(groupName).hasSelectedNoneInFilter.setForFacilityAndCraftType(facility, craftType, true);
+				getPrimaryGroupState(groupName).hasSelectedNoneInFilter.setForFacilityAndCraftType(facility, craftType, true);
 			}
 			foreach (string groupName in filterDto.collapsedFilterGroups) {
-				getGroup(groupName).collapsedInFilters.setForFacilityAndCraftType(facility, craftType, true);
+				getPrimaryGroupState(groupName).collapsedInFilters.setForFacilityAndCraftType(facility, craftType, true);
 			}
 			foreach (string groupName in filterDto.collapsedManagementGroups) {
-				getGroup(groupName).collapsedInManagement.setForFacilityAndCraftType(facility, craftType, true);
+				getPrimaryGroupState(groupName).collapsedInManagement.setForFacilityAndCraftType(facility, craftType, true);
 			}
 
 			restTagsCollapsedInFilter.setForFacilityAndCraftType(facility, craftType, filterDto.restFilterTagsCollapsed);
@@ -309,8 +303,6 @@ namespace KspCraftOrganizer {
 			if (primarySettingsChanged) {
 				ProfileSettingsDto dto = settingsService.readProfileSettings(ksp.getNameOfSaveFolder());//new ProfileSettingsDto ();
 
-				//persistFiltersState();
-
 				ProfileAllFilterSettingsDto allFilter = new ProfileAllFilterSettingsDto();
 				saveFilterSettings(allFilter, CraftType.SPH, CraftType.VAB);
 				saveFilterSettings(allFilter, CraftType.SPH, CraftType.SPH);
@@ -320,12 +312,7 @@ namespace KspCraftOrganizer {
 				dto.allFilter = allFilter;
 				dto.selectedGuiStyle = this.selectedGuiStyle;
 
-				//dto.allFilter = allFiltersDto;
-				//dto.selectedGuiStyle = _selectedGuiStyle;
-
 				settingsService.writeProfileSettings(ksp.getNameOfSaveFolder(), dto);
-
-				//markProfileSettingsAsNotDirty("Settings were just written to the disk");
 			}
 
 			if (!doNotWriteTagSettingsToDisk) {
@@ -357,7 +344,7 @@ namespace KspCraftOrganizer {
 			filterDto.selectedTextFilter = craftNameFilter.getForFacilityAndCraftType(facility, craftType);
 
 			List<string> selectedFilterTags = new List<string>();
-			foreach (KeyValuePair<string, OrganizerControllerPrimaryTagState> tagState in primaryTagsSettings) {
+			foreach (KeyValuePair<string, OrganizerControllerPrimaryTagState> tagState in primaryTagsState) {
 				if (tagState.Value.selectedForFiltering.getForFacilityAndCraftType(facility, craftType)) {
 					selectedFilterTags.Add(tagState.Key);
 				}
@@ -367,7 +354,7 @@ namespace KspCraftOrganizer {
 			List<string> filterGroupsWithSelectedNoneOption = new List<string>();
 			List<string> collapsedFilterGroups = new List<string>();
 			List<string> collapsedManagementGroups = new List<string>();
-			foreach (KeyValuePair<string, OrganizerControllerPrimaryTagGroupState> groupState in primaryGroupsSettings) {
+			foreach (KeyValuePair<string, OrganizerControllerPrimaryTagGroupState> groupState in primaryGroupsState) {
 				if (groupState.Value.hasSelectedNoneInFilter.getForFacilityAndCraftType(facility, craftType)) {
 					filterGroupsWithSelectedNoneOption.Add(groupState.Key);
 				}
@@ -390,6 +377,7 @@ namespace KspCraftOrganizer {
 			COLogger.logDebug("Marking primary profile settings as dirty, reason: " + reason);
 			this.primarySettingsChanged = true;
 		}
+
 		public void markCurrentSaveSettingsAsDirty(string reason) {
 			string currentSave = parent.currentSave;
 			COLogger.logDebug("Marking settings in '" + currentSave + "' as dirty, reason: " + reason);
@@ -409,11 +397,11 @@ namespace KspCraftOrganizer {
 		}
 
 		public void renameTag(string oldName, string newName) {
-			if (primaryTagsSettings.ContainsKey(oldName)) {
-				if (primaryTagsSettings.ContainsKey(newName)) {
-					primaryTagsSettings.Remove(newName);
+			if (primaryTagsState.ContainsKey(oldName)) {
+				if (primaryTagsState.ContainsKey(newName)) {
+					primaryTagsState.Remove(newName);
 				}
-				primaryTagsSettings.Add(newName, primaryTagsSettings[oldName]);
+				primaryTagsState.Add(newName, primaryTagsState[oldName]);
 			}
 
 			availableTagsForCurrentSave.Remove(oldName);

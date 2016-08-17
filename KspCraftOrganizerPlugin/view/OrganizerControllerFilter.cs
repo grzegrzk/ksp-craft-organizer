@@ -8,12 +8,9 @@ namespace KspCraftOrganizer {
 	public class OrganizerControllerFilter {
 		
 		private SortedList<string, OrganizerTagEntity> _availableTags;
-		//private string _craftNameFilter;
 		private SortedList<string, OrganizerTagEntity> _usedTags = new SortedList<string, OrganizerTagEntity>();
 		public FilterTagsGrouper tagsGrouper { get; private set; }
 		private OrganizerController parent;
-
-		//private SortedList<string, OrganizerTagEntity> _availableTags;
 
 		public OrganizerControllerFilter(OrganizerController parent) {
 			this.parent = parent;
@@ -42,55 +39,7 @@ namespace KspCraftOrganizer {
 			//
 		}
 
-		//public void applyFilterSettings(ProfileFilterSettingsDto dto) {
-		//	foreach (OrganizerTagEntity tag in _availableTags.Values) {
-		//		tag.selectedForFiltering = false;
-		//	}
-
-		//	foreach (string tagName in dto.selectedFilterTags) {
-		//		if (_availableTags.ContainsKey(tagName)) {
-		//			_availableTags[tagName].selectedForFiltering = true;
-		//		}
-		//	}
-
-		//	tagsGrouper.setInitialGroupsWithSelectedNone(dto.filterGroupsWithSelectedNoneOption);
-		//	craftNameFilter = dto.selectedTextFilter;
-		//	if (craftNameFilter == null) {
-		//		craftNameFilter = "";
-		//	}
-		//	tagsGrouper.setCollapsedGroups(dto.collapsedFilterGroups);
-		//	tagsGrouper.restGroupCollapsed = dto.restFilterTagsCollapsed;
-
-
-		//	COLogger.logDebug("applyFilterSettings, selected tags: " + Globals.join(dto.selectedFilterTags, ", "));
-		//	COLogger.logDebug("applyFilterSettings, groupsWithSelectedNoneOption: " + Globals.join(dto.filterGroupsWithSelectedNoneOption, ", "));
-		//	COLogger.logDebug("applyFilterSettings, collapsed groups: " + Globals.join(dto.collapsedFilterGroups, ", "));
-		//	COLogger.logDebug("applyFilterSettings, rest tags collapsed: " + dto.restFilterTagsCollapsed);
-		//}
-
-
 		public bool restTagsCollapsed { get { return tagsGrouper.restGroupCollapsed; } set { tagsGrouper.restGroupCollapsed = value; } }
-
-		//public void assignCurrentFilterSettingsToDto(ProfileFilterSettingsDto dto) {
-		//	List<string> selectedTags = new List<string>();
-		//	foreach (OrganizerTagEntity tag in availableTags) {
-		//		if (tag.selectedForFiltering) {
-		//			selectedTags.Add(tag.name);
-		//		}
-		//	}
-		//	dto.filterGroupsWithSelectedNoneOption = new List<string>(groupsWithSelectedNoneOption);
-		//	dto.selectedFilterTags = selectedTags.ToArray();
-		//	dto.selectedTextFilter = craftNameFilter;
-		//	if (dto.selectedTextFilter == null) {
-		//		dto.selectedTextFilter = "";
-		//	}
-		//	dto.collapsedFilterGroups = new List<string>(tagsGrouper.collapsedFilterGroups);
-		//	dto.restFilterTagsCollapsed = tagsGrouper.restGroupCollapsed;
-		//	COLogger.logDebug("assignCurrentFilterSettingsToDto, selected tags: " + Globals.join(selectedTags, ", "));
-		//	COLogger.logDebug("assignCurrentFilterSettingsToDto, groupsWithSelectedNoneOption: " + Globals.join(dto.filterGroupsWithSelectedNoneOption, ", "));
-		//	COLogger.logDebug("assignCurrentFilterSettingsToDto, collapsed groups: " + Globals.join(dto.collapsedFilterGroups, ", "));
-		//	COLogger.logDebug("assignCurrentFilterSettingsToDto, rest group collapsed: " + dto.restFilterTagsCollapsed);
-		//}
 
 		public ICollection<string> groupsWithSelectedNoneOption {
 			get {
@@ -126,7 +75,6 @@ namespace KspCraftOrganizer {
 
 		public void markFilterAsChanged() {
 			filterChanged = true;
-			//parent.markProfileSettingsAsDirty("Filter changed");
 		}
 
 
@@ -221,7 +169,6 @@ namespace KspCraftOrganizer {
 			if (!_availableTags.ContainsKey(newTag)) {
 				_availableTags.Add(newTag, new OrganizerTagEntity(parent, newTag));
 				parent.stateManager.addAvailableTag(newTag);
-				//parent.markProfileSettingsAsDirty("New available tag");
 			}
 			return _availableTags[newTag];
 		}
@@ -236,7 +183,6 @@ namespace KspCraftOrganizer {
 				}
 				_availableTags.Remove(tag);
 				parent.stateManager.removeTag(tag);
-				//parent.markProfileSettingsAsDirty("Tag removed");
 			}
 		}
 
@@ -263,7 +209,6 @@ namespace KspCraftOrganizer {
 				newTag.selectedForFiltering = selectForFilterAfterInsertion;
 				_availableTags.Add(newName, newTag);
 			}
-			//parent.markProfileSettingsAsDirty("Tag renamed");
 			parent.stateManager.renameTag(oldName, newName);
 		}
 
