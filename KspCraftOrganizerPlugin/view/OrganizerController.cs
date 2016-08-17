@@ -169,6 +169,7 @@ namespace KspCraftOrganizer
 				this.currentSave = selectedSave;
 				managementTagsGroups = new ManagementTagsGrouper(this);
 				craftList.clearCaches("save folder changed");
+				craftList.primaryCraft = null;
 				filter.recreateAvailableTags();
 				managementTagsGroups.update(availableTags);
 			}
