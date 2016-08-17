@@ -577,6 +577,14 @@ namespace KspCraftOrganizer
 
 			settingsToWrite.Save(fileName);
 		}
+
+		public double getAvailableFunds() {
+			if (HighLogic.CurrentGame.Mode == Game.Modes.CAREER) {
+				return Funding.Instance.Funds;
+			} else {
+				return -1;
+			}
+		}
 	}
 }
 

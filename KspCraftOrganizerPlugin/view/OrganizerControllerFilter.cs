@@ -17,12 +17,12 @@ namespace KspCraftOrganizer {
 			this.tagsGrouper = new FilterTagsGrouper(parent);
 
 			_availableTags = new SortedList<string, OrganizerTagEntity>();
-			recrateAvailableTags();
+			recreateAvailableTags();
 
-			craftNameFilter = "";
+			craftNameFilter = parent.stateManager.getCraftNameFilter();
 		}
 
-		public void recrateAvailableTags() {
+		public void recreateAvailableTags() {
 			_availableTags.Clear();
 			foreach (string tagName in parent.stateManager.availableTagsForCurrentSave) {
 				addAvailableTag(tagName);

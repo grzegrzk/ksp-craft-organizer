@@ -132,27 +132,27 @@ namespace KspCraftOrganizer {
 
 		}
 
-		public string getThumbUrl(string filePath) {
-			if (filePath.StartsWith(getStockCraftDirectoryForCraftType(CraftType.SPH))) {
-				return "/Ships/@thumbs/SPH/" + Path.GetFileNameWithoutExtension(filePath);
+		public string getThumbUrl(string craftPath) {
+			if (craftPath.StartsWith(getStockCraftDirectoryForCraftType(CraftType.SPH))) {
+				return "/Ships/@thumbs/SPH/" + Path.GetFileNameWithoutExtension(craftPath);
 			}
-			if (filePath.StartsWith(getStockCraftDirectoryForCraftType(CraftType.VAB))) {
-				return "/Ships/@thumbs/VAB/" + Path.GetFileNameWithoutExtension(filePath);
+			if (craftPath.StartsWith(getStockCraftDirectoryForCraftType(CraftType.VAB))) {
+				return "/Ships/@thumbs/VAB/" + Path.GetFileNameWithoutExtension(craftPath);
 			}
-			string saveName = extractSaveName(filePath);
-			if (filePath.StartsWith(getCraftDirectoryForCraftType(saveName, CraftType.SPH))) {
-				return "/thumbs/" + saveName + "_SPH_" + Path.GetFileNameWithoutExtension(filePath);
+			string saveName = extractSaveNameFromCraftPath(craftPath);
+			if (craftPath.StartsWith(getCraftDirectoryForCraftType(saveName, CraftType.SPH))) {
+				return "/thumbs/" + saveName + "_SPH_" + Path.GetFileNameWithoutExtension(craftPath);
 			}
-			if (filePath.StartsWith(getCraftDirectoryForCraftType(saveName, CraftType.VAB))) {
-				return "/thumbs/" + saveName + "_VAB_" + Path.GetFileNameWithoutExtension(filePath);
+			if (craftPath.StartsWith(getCraftDirectoryForCraftType(saveName, CraftType.VAB))) {
+				return "/thumbs/" + saveName + "_VAB_" + Path.GetFileNameWithoutExtension(craftPath);
 			}
 			return "";
 
 		}
 
-		string extractSaveName(string filePath) {
+		string extractSaveNameFromCraftPath(string craftPath) {
 			string[] pathElements = 
-				filePath.Split(new char[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
+				craftPath.Split(new char[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
 			if (pathElements.Length >= 4) {
 				return pathElements[pathElements.Length - 4];
 			} else {

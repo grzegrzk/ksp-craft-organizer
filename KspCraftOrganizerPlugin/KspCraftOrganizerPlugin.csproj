@@ -93,6 +93,7 @@
     <Compile Include="UiUtils\DropDownList.cs" />
     <Compile Include="UiUtils\UIUtils.cs" />
     <Compile Include="View\OrganizerControllerStateManager.cs" />
+    <Compile Include="CraftAlreadyExistsQuestionWindow.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Services\" />

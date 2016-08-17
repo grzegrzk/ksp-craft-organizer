@@ -17,6 +17,7 @@ namespace KspCraftOrganizer {
 
 		override public void displayWindow() {
 			base.displayWindow();
+			//model = new CurrentCraftTagsController();
 			model.resetToLastlyEditied();
 		}
 
@@ -48,7 +49,7 @@ namespace KspCraftOrganizer {
 					GUILayout.Label("Add new tag:");
 					newTagText = GUILayout.TextField(newTagText, GUILayout.Width(200));
 					if (GUILayout.Button("Add", GUILayout.Width(100), GUILayout.ExpandWidth(false))) {
-						model.addAvailableTag(newTagText);
+						model.userAddAvailableTag(newTagText);
 					}
 				}
 				GUILayout.Space(20);

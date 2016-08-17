@@ -13,8 +13,6 @@ namespace KspCraftOrganizer
 		private string _name;
 		private TagState _tagState = TagState.UNSET_IN_ALL;
 		private OrganizerController service;
-		//private OrganizerControllerTagsStateManager tagsStateManager;
-		//private bool _selectedForFiltering = false;
 
 		public OrganizerTagEntity(OrganizerController service, string name){
 			this._name = name;
@@ -27,7 +25,10 @@ namespace KspCraftOrganizer
 				return service.stateManager.isTagSelectedForFiltering(_name);
 			}
 			set{
-				service.stateManager.setTagSelectedForFiltering(_name, value);
+				if (service.stateManager.isTagSelectedForFiltering(_name) != value) {
+					service.stateManager.setTagSelectedForFiltering(_name, value);
+					service.markFilterAsChanged();
+				}
 			}
 		}
 

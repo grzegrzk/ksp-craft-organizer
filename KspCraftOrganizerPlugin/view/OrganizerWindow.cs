@@ -33,6 +33,7 @@ namespace KspCraftOrganizer {
 		private OrganizerController _modelLazy;
 		private List<DrawOverlay> endOverlaysToDraw = new List<DrawOverlay>();
 		private List<DrawOverlay> startOverlaysToDraw = new List<DrawOverlay>();
+		private bool showSaveFileChoice = false;
 
 		private DropDownList<string> chooseSaveName;// = new DropDownList<string>(new string[] { "default", "science", "something something darkness", "ab", "cd", "ef", "gh", "ij" }, t => t);
 
@@ -53,11 +54,13 @@ namespace KspCraftOrganizer {
 		private EditorListenerService editorListenerService = EditorListenerService.instance;
 
 		private ShouldCurrentCraftBeSavedQuestionWindow shouldCurrentCraftBeSavedWindow;
+		private CraftAlreadyExistsQuestionWindow craftAlreadyExistsQuestionWindow;
 
-		public OrganizerWindow(ShouldCurrentCraftBeSavedQuestionWindow shouldCurrentCraftBeSavedWindow) : base("Load craft"){			
+		public OrganizerWindow(ShouldCurrentCraftBeSavedQuestionWindow shouldCurrentCraftBeSavedWindow, CraftAlreadyExistsQuestionWindow craftAlreadyExistsQuestionWindow) : base("Load craft"){			
 			tagsManagementBar = new OrganizerWindowTagsManagementBar(this);
 			craftList = new OrganizerWindowCraftList(this);
 			this.shouldCurrentCraftBeSavedWindow = shouldCurrentCraftBeSavedWindow;
+			this.craftAlreadyExistsQuestionWindow = craftAlreadyExistsQuestionWindow;
 			this.chooseSaveName = new DropDownList<string>(model.availableSaveNames, t => t);
 			chooseSaveName.selectedItem = model.currentSave;
 		}
@@ -107,7 +110,9 @@ namespace KspCraftOrganizer {
 			toggleButtonStyleTrue.hover = toggleButtonStyleTrue.active;
 
 			_warningLabelStyle = new GUIStyle(skin.label);
-			_warningLabelStyle.normal.textColor = new Color(1, 0.2f, 0.2f);
+			//_warningLabelStyle.normal.textColor = new Color(1, 0.2f, 0.2f);
+			//_warningLabelStyle.normal.textColor = new Color(0.6f, 0.38f, 0.3f);
+			_warningLabelStyle.normal.textColor = new Color(0.99f, 0.57f, 0.6f, 1.0f);
 
 
 			drawStartOverlays();
@@ -122,7 +127,12 @@ namespace KspCraftOrganizer {
 
 					drawFilterColumn();
 
-					craftList.drawCraftsList();
+					using (new GUILayout.VerticalScope()) {
+						using (new GUILayout.HorizontalScope()) {
+							drawCraftsFilteredWarning();
+						}
+						craftList.drawCraftsList();
+					}
 
 					GUILayout.Space(10);
 
@@ -165,41 +175,48 @@ namespace KspCraftOrganizer {
 		}
 
 		private void drawTopToolbar() {
-			using (new GUILayout.HorizontalScope()) {
-				int sphOrVab = GUILayout.Toolbar(Array.IndexOf(SPH_VAB_STATES, model.craftType), SPH_VAB, GUILayout.Width(150), GUILayout.ExpandWidth(false));
-				model.craftType = SPH_VAB_STATES[sphOrVab];
-				GUILayout.Space(10);
-				//if (GUILayout.Button(">>", GUILayout.ExpandWidth(false))) {
-				//}
+				using (new GUILayout.HorizontalScope()) {
+					int sphOrVab = GUILayout.Toolbar(Array.IndexOf(SPH_VAB_STATES, model.craftType), SPH_VAB, GUILayout.Width(150), GUILayout.ExpandWidth(false));
+					model.craftType = SPH_VAB_STATES[sphOrVab];
 
-				//	if (GUILayout.Button("Change save folder", GUILayout.ExpandWidth(false))) {
-				//}
+					if (showSaveFileChoice) {
+						if (GUILayout.Button("<<", GUILayout.ExpandWidth(false))) {
+							showSaveFileChoice = false;
+						}
+						using (new GUILayout.HorizontalScope()) {
+							GUILayout.Space(10);
+							GUILayout.Label("Import from save:", GUILayout.ExpandWidth(false));
+							chooseSaveName.onGui(this, 200);
+						}
+					} else {
+						if (GUILayout.Button(">>", GUILayout.ExpandWidth(false))) {
+						showSaveFileChoice = true;
+						}
+						GUILayout.Space(10);
+					}
 
-				chooseSaveName.onGui(this, 200);
+					GUILayout.FlexibleSpace();
 
-				//if (GUILayout.Button("<<", GUILayout.ExpandWidth(false))) {
-				//}
-
-				bool displayCraftsFilteredWarning = model.craftsAreFiltered;
-				if (!displayCraftsFilteredWarning) {
-					GUI.BeginClip(Globals.ZERO_RECT);
+					string toggleManageTagsButtonLabel = showManageTagsToolbar ? "Manage Tags->" : "<-Manage Tags";
+					if (GUILayout.Button(toggleManageTagsButtonLabel, GUILayout.ExpandWidth(false))) {
+						showManageTagsToolbar = !showManageTagsToolbar;
+					}
 				}
-				GUILayout.Space(10);
-				GUILayout.Label("The filter modifies craft list", warningLabelStyle, GUILayout.ExpandWidth(false));
-				if (GUILayout.Button("Clear filter", GUILayout.ExpandWidth(false))) {
-					clearFilters();
-				}
 
-				if (!displayCraftsFilteredWarning) {
-					GUI.EndClip();
-				}
+		}
 
-				GUILayout.FlexibleSpace();
+		void drawCraftsFilteredWarning() {
+			bool displayCraftsFilteredWarning = model.craftsAreFiltered;
+			if (!displayCraftsFilteredWarning) {
+				GUI.BeginClip(Globals.ZERO_RECT);
+			}
+			GUILayout.Label("The filter modifies craft list", warningLabelStyle, GUILayout.ExpandWidth(false));
+			if (GUILayout.Button("Clear filter", GUILayout.ExpandWidth(false))) {
+				clearFilters();
+			}
 
-				string toggleManageTagsButtonLabel = showManageTagsToolbar ? "Manage Tags->" : "<-Manage Tags";
-				if (GUILayout.Button(toggleManageTagsButtonLabel, GUILayout.ExpandWidth(false))) {
-					showManageTagsToolbar = !showManageTagsToolbar;
-				}
+			if (!displayCraftsFilteredWarning) {
+				GUI.EndClip();
 			}
 		}
 
@@ -402,11 +419,28 @@ namespace KspCraftOrganizer {
 		}
 
 		public void load() {
-			if (editorListenerService.isModifiedSinceSave) {
-				shouldCurrentCraftBeSavedWindow.fileToLoad = model.primaryCraft.craftFile;
+			bool askSaveQuestion = editorListenerService.isModifiedSinceSave;
+			bool askAlreadyExistsQuestion = model.isCraftAlreadyExists(model.primaryCraft);
+
+			shouldCurrentCraftBeSavedWindow.okContinuation = () => { 
+				
+				craftAlreadyExistsQuestionWindow.craftName = model.primaryCraft.name;
+				craftAlreadyExistsQuestionWindow.okContinuation = () => {
+					model.loadCraftToWorkspace(model.primaryCraft);
+				};
+			
+				if (askAlreadyExistsQuestion) {
+					craftAlreadyExistsQuestionWindow.displayWindow();
+				} else {
+					craftAlreadyExistsQuestionWindow.okContinuation();
+				}
+
+			};
+
+			if (askSaveQuestion) {
 				shouldCurrentCraftBeSavedWindow.displayWindow();
 			} else {
-				model.loadCraftToWorkspace(model.primaryCraft);
+				shouldCurrentCraftBeSavedWindow.okContinuation();
 			}
 			hideWindow();
 		}

@@ -1,31 +1,27 @@
 ﻿using System;
+using System.IO;
 using UnityEngine;
-namespace KspCraftOrganizer {
-	public class ShouldCurrentCraftBeSavedQuestionWindow: BaseWindow {
-		
-		private IKspAl ksp = IKspAlProvider.instance;
 
-		public ShouldCurrentCraftBeSavedQuestionWindow() : base("Save current craft?") {
-			
+namespace KspCraftOrganizer {
+
+	public class CraftAlreadyExistsQuestionWindow : BaseWindow {
+		
+
+		public CraftAlreadyExistsQuestionWindow() : base("Load craft?") {
+
 		}
 
 		public Globals.Procedure okContinuation { get; set; }
-		public string fileToLoad { get; set; }
+		public string craftName { get; set; }
 
 		override protected void windowGUI(int WindowID) {
 			using (new GUILayout.VerticalScope()) {
-				GUILayout.Label("Do you want to save the current craft '" + ksp.getCurrentCraftName() + "' before loading new one?");
-				if (GUILayout.Button("Save and load new craft")) {
-					ksp.saveCurrentCraft();
+				GUILayout.Label("The craft '" + craftName + "' already exists. If you load this craft and save it without renaming the existing one will be overwritten.");
+				if (GUILayout.Button("Load")) {
 					okContinuation();
 					hideWindow();
 				}
 				if (GUILayout.Button("Cancel")) {
-					hideWindow();
-				}
-				if (GUILayout.Button("Don't Save and load new craft")) {
-					//ksp.loadCraftToWorkspace(fileToLoad);
-					okContinuation();
 					hideWindow();
 				}
 			}

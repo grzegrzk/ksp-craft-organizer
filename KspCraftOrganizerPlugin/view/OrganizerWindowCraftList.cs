@@ -147,6 +147,12 @@ namespace KspCraftOrganizer {
 					}
 					Rect thisShipRect = GUILayoutUtility.GetLastRect();
 					Color tagsColor = parent.originalSkin.label.normal.textColor;
+					GUIStyle tagsStyle = new GUIStyle(parent.skin.label);
+					tagsStyle.normal.textColor = tagsColor;
+					GUIStyle craftNameStyle = new GUIStyle(parent.skin.label);
+					craftNameStyle.normal.textColor = Color.yellow;
+					GUIStyle goodLabelStyle = new GUIStyle(parent.skin.label);
+					goodLabelStyle.normal.textColor = Color.green;
 
 					int leftOffset = (int)thisShipRect.x + 10;
 					int firstRowsLeftOffset = leftOffset;
@@ -158,25 +164,25 @@ namespace KspCraftOrganizer {
 
 					int costMaxWidth = thumbPosX - costPosX - 10;
 					int extraInfoMaxWidth = costPosX - firstRowsLeftOffset - 10;
-					drawLabel(Color.yellow, firstRowsLeftOffset, nextTop, craft.nameToDisplay, "!!craft" + index);
+					drawLabel(craftNameStyle, firstRowsLeftOffset, nextTop, craft.nameToDisplay, "!!craft" + index);
 					nextTop += 20;
 					if (parent.showManageTagsToolbar) {
-						drawScaledLabel(parent.skin.label.normal.textColor, firstRowsLeftOffset, nextTop, extraInfoMaxWidth, thisShipRect, "Parts: " + craft.partCount + ", Stages: " + craft.stagesCount);
+						drawScaledLabel(parent.skin.label, firstRowsLeftOffset, nextTop, extraInfoMaxWidth, thisShipRect, "Parts: " + craft.partCount + ", Stages: " + craft.stagesCount);
 					} else {
-						drawScaledLabel(parent.skin.label.normal.textColor, firstRowsLeftOffset, nextTop, extraInfoMaxWidth, thisShipRect, "Parts: " + craft.partCount + ", Mass: " + craft.massToDisplay + ", Stages: " + craft.stagesCount);
+						drawScaledLabel(parent.skin.label, firstRowsLeftOffset, nextTop, extraInfoMaxWidth, thisShipRect, "Parts: " + craft.partCount + ", Mass: " + craft.massToDisplay + ", Stages: " + craft.stagesCount);
 					}
-					drawScaledLabel(Color.green, costPosX, nextTop, costMaxWidth, thisShipRect, "Cost: " + craft.costToDisplay);
+					drawScaledLabel(craft.cost > model.availableFunds && model.availableFunds >= 0 ? parent.warningLabelStyle : goodLabelStyle, costPosX, nextTop, costMaxWidth, thisShipRect, "Cost: " + craft.costToDisplay);
 					nextTop += 20;
 					if (!craft.containsMissedParts) {
-						drawLabel(Color.red, leftOffset, nextTop, "*The craft contains missed or invalid parts*");
+						drawLabel(parent.warningLabelStyle, leftOffset, nextTop, "*The craft contains missed or invalid parts*");
 						nextTop += 20;
 					} else if (craft.notEnoughScience) {
-						drawLabel(Color.red, leftOffset, nextTop, "*Unavailable due to science level*");
+						drawLabel(parent.warningLabelStyle, leftOffset, nextTop, "*Unavailable due to science level*");
 						nextTop += 20;
 					}
 
 					foreach (CraftTagGroup tagGroup in tagsGrouper.groups) {
-						drawLabel(tagsColor, leftOffset, nextTop, tagGroup.displayName + ":");
+						drawLabel(tagsStyle, leftOffset, nextTop, tagGroup.displayName + ":");
 						drawMultilineLabel(tagsColor,
 										   tagValuesWidth,
 										   (int)(leftOffset + 10 + craft.tagGroupNameWidth),
@@ -185,7 +191,7 @@ namespace KspCraftOrganizer {
 						nextTop += (int)tagGroup.guiHeight;
 					}
 					if (tagsGrouper.restTags.Count > 0) {
-						drawLabel(tagsColor, leftOffset, nextTop, restOfTagsLabel);
+						drawLabel(tagsStyle, leftOffset, nextTop, restOfTagsLabel);
 						drawMultilineLabel(tagsColor,
 										   tagValuesWidth,
 										   (int)(leftOffset + 10 + craft.tagGroupNameWidth),
@@ -221,9 +227,7 @@ namespace KspCraftOrganizer {
 			return height;
 		}
 
-		private void drawScaledLabel(Color color, int x, int y, int maxWidth, Rect scopeRect, string text) {
-			GUIStyle style = new GUIStyle(parent.skin.label);
-			style.normal.textColor = color;
+		private void drawScaledLabel(GUIStyle style, int x, int y, int maxWidth, Rect scopeRect, string text) {
 
 			Vector2 size = style.CalcSize(new GUIContent(text));
 			float scale = 1;
@@ -241,13 +245,11 @@ namespace KspCraftOrganizer {
 			}
 		}
 
-		private void drawLabel(Color color, int x, int y, string text) {
-			drawLabel(color, x, y, text, "");
+		private void drawLabel(GUIStyle style, int x, int y, string text) {
+			drawLabel(style, x, y, text, "");
 		}
 
-		private void drawLabel(Color color, int x, int y, string text, string tooltip) {
-			GUIStyle style = new GUIStyle(parent.skin.label);
-			style.normal.textColor = color;
+		private void drawLabel(GUIStyle style, int x, int y, string text, string tooltip) {
 			Vector2 size = style.CalcSize(new GUIContent(text));
 			Rect position = new Rect();
 			position.x = x;

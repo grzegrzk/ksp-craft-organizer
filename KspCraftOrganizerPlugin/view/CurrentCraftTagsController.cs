@@ -9,11 +9,11 @@ namespace KspCraftOrganizer
 
 		public string name { get; set; }
 
-		public bool selected { get; set;  } 
+		public bool selected { get; set;  } 				//is currently selected
 
-		public bool selectedDuringLastEdit { get; set; }
+		public bool selectedDuringLastEdit { get; set; }    //used to remove selection if user clicks cancel
 
-		public bool selectedOriginally { get; set; }
+		public bool selectedOriginally { get; set; } 		//used to tell if file id dirty
 
 	}
 
@@ -32,6 +32,9 @@ namespace KspCraftOrganizer
 			craftListenerService.onEditorStarted += delegate () {
 				_availableTagsCache = null;
 			};
+			craftListenerService.onShipLoaded += delegate (string fileName) {
+				_availableTagsCache = null;
+			};
 
 			craftListenerService.onShipSaved += delegate (string craftFile, bool craftSavedToNewFile) {
 				saveTagsToCraftIfNeeded(craftFile, craftSavedToNewFile);
@@ -42,7 +45,6 @@ namespace KspCraftOrganizer
 			foreach (CurrentCraftTagEntity tagModel in availableTags) {
 				tagModel.selected = tagModel.selectedDuringLastEdit;
 			}
-			refreshExistingTags();
 		}
 
 		public void saveIfPossible() {
@@ -54,7 +56,7 @@ namespace KspCraftOrganizer
 			}
 		}
 
-		internal void addAvailableTag(string newTagText) {
+		internal void userAddAvailableTag(string newTagText) {
 			ensureTagsCacheLoaded();
 			if (!_availableTagsCache.ContainsKey(newTagText)) {
 				settingsService.addAvailableTag(ksp.getNameOfSaveFolder(), newTagText);
@@ -80,7 +82,8 @@ namespace KspCraftOrganizer
 				COLogger.logDebug("Selected tags that will be saved: " + Globals.join(dto.tags, ", "));
 
 				settingsService.writeCraftSettingsForCraftFile(fileLocationService.getCraftSettingsFileForCraftFile(craftFile), dto);
-			} 
+			}
+			_availableTagsCache = null;
 		}
 
 		private bool isDirty() {
@@ -123,27 +126,6 @@ namespace KspCraftOrganizer
 					COLogger.logDebug("Tags will not be read - editor is new or file '" + craftListenerService.originalShipFile + "' does not exist");
 				}
 
-			}
-		}
-
-		private void refreshExistingTags() {
-			if (_availableTagsCache == null) {
-				ensureTagsCacheLoaded();
-			} else {
-				SortedList<string, string> tagsNow = new SortedList<string, string>();
-				foreach (string tag in settingsService.readProfileSettings(ksp.getNameOfSaveFolder()).availableTags) {
-					addTagIfNeeded(tag);
-					tagsNow.Add(tag, tag);
-				}
-				List<string> toRemove = new List<string>();
-				foreach (string tag in _availableTagsCache.Keys) {
-					if (!tagsNow.ContainsKey(tag)) {
-						toRemove.Add(tag);
-					}
-				}
-				foreach (string tagToRemove in toRemove) {
-					_availableTagsCache.Remove(tagToRemove);
-				}
 			}
 		}
 

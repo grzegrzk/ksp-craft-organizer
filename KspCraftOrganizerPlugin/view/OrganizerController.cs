@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using UnityEngine;
@@ -166,14 +167,15 @@ namespace KspCraftOrganizer
 			//
 			if (this.currentSave != selectedSave) {
 				this.currentSave = selectedSave;
+				managementTagsGroups = new ManagementTagsGrouper(this);
 				craftList.clearCaches("save folder changed");
-				filter.recrateAvailableTags();
+				filter.recreateAvailableTags();
+				managementTagsGroups.update(availableTags);
 			}
 
 			filter.update();
 			craftList.update(selectAll, filter.filterChanged);
 			managementTagsGroups.update(availableTags);
-
 		}
 
 		public OrganizerControllerCraftList.CraftFilterPredicate craftFilterPredicate {
@@ -287,6 +289,16 @@ namespace KspCraftOrganizer
 			}
 		}
 
+		public double availableFunds {
+			get {
+				return ksp.getAvailableFunds();
+			}
+		}
+
+		internal bool isCraftAlreadyExists(OrganizerCraftEntity craft) {
+			string fileAfterSave = fileLocationService.getCraftSaveFilePathForShipName(craft.name);
+			return File.Exists(fileAfterSave) && fileAfterSave != craft.craftFile;
+		}
 	}
 }
 

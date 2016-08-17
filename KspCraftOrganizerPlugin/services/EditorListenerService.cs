@@ -231,7 +231,7 @@ namespace KspCraftOrganizer {
 		}
 
 		public bool canAutoSaveSomethingToDisk() {
-			return !newEditor && lastShipNameInEditor == _lastSavedShipName && File.Exists(originalShipFile);
+			return !newEditor && lastShipNameInEditor == _lastSavedShipName && File.Exists(originalShipFile) && fileLocattion.getCraftSaveFilePathForCurrentShip() == currentShipFile;
 		}
 
 		public string lastShipNameInEditor { get { return _lastShipNameInEditor; } }

@@ -182,6 +182,10 @@ namespace KspCraftOrganizer
 			toRet.defaultAvailableTags.Add(@"BuildingStage\Final");
 			return toRet;
 		}
+
+		public double getAvailableFunds() {
+			return 500;
+		}
 	}
 
 }

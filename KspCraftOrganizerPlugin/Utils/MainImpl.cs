@@ -20,8 +20,9 @@ namespace KspCraftOrganizer {
 			COLogger.logDebug("Craft organizer plugin - start");
 			IKspAlProvider.instance.start();
 
+			CraftAlreadyExistsQuestionWindow craftAlreadyExistsQuestionWindow = addWindow(new CraftAlreadyExistsQuestionWindow());
 			ShouldCurrentCraftBeSavedQuestionWindow shouldCraftBeSavedQuestionWindow = addWindow(new ShouldCurrentCraftBeSavedQuestionWindow());
-			craftOrganizerWindow = addWindow(new OrganizerWindow(shouldCraftBeSavedQuestionWindow));
+			craftOrganizerWindow = addWindow(new OrganizerWindow(shouldCraftBeSavedQuestionWindow, craftAlreadyExistsQuestionWindow));
 			manageThisCraftWindow = addWindow(new CurrentCraftTagsWindow());
 
 			addLauncherButtonInAllEditors(craftOrganizerWindow.displayWindow, "manage.png");

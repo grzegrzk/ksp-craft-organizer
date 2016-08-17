@@ -192,6 +192,8 @@ namespace KspCraftOrganizer {
 		//string getSavePathForCraftName(string shipName);
 
 		void saveCurrentCraft();
+
+		double getAvailableFunds();
 	}
 
 }
