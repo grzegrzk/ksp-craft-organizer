@@ -225,10 +225,10 @@ namespace KspCraftOrganizer {
 						tagScrollPosition = tagScrollScope.scrollPosition;
 						using (new GUILayout.VerticalScope(GUILayout.ExpandWidth(false))) {
 							foreach (FilterTagGroup tagGroup in filterTagsGrouper.groups) {
-								bool collapsed = tagGroup.collapsedInFilterView;
+								bool collapsed = tagGroup.isCollapsedInFilterView;
 								if (!collapsed) {
 									if (GUILayout.Button("- " + tagGroup.displayName + ":", this.skin.label)) {
-										tagGroup.collapsedInFilterView = !collapsed;
+										tagGroup.isCollapsedInFilterView = !collapsed;
 									}
 									if (tagGroup.isYesNoGroup) {
 										OrganizerTagEntity tag = tagGroup.firstTag.originalTag;
@@ -258,7 +258,7 @@ namespace KspCraftOrganizer {
 									}
 								} else {
 									if(GUILayout.Button("+ " + tagGroup.displayName, this.skin.label)){
-										tagGroup.collapsedInFilterView = !collapsed;
+										tagGroup.isCollapsedInFilterView = !collapsed;
 									}
 								}
 							}
@@ -273,12 +273,12 @@ namespace KspCraftOrganizer {
 								if (collapsed) {
 									if (GUILayout.Button("+ " + labelString, this.skin.label)) {
 										model.restTagsInFilterCollapsed = !collapsed;
-										model.markProfileSettingsAsDirty("rest tags group collapsed state changed");
+										//model.markProfileSettingsAsDirty("rest tags group collapsed state changed");
 									}
 								} else {
 									if (GUILayout.Button("- " + labelString + ":", this.skin.label)) {
 										model.restTagsInFilterCollapsed = !collapsed;
-										model.markProfileSettingsAsDirty("rest tags group collapsed state changed");
+										//model.markProfileSettingsAsDirty("rest tags group collapsed state changed");
 									}
 									foreach (OrganizerTagEntity tag in filterTagsGrouper.restTags) {
 										tag.selectedForFiltering = guiLayout_Toggle_OrigSkin(tag.selectedForFiltering, " " + tag.name);

@@ -15,13 +15,13 @@ namespace KspCraftOrganizer
 
 		public static readonly SettingsService instance = new SettingsService();
 
-		public ProfileSettingsDto readProfileSettings(){
-			return ksp.readProfileSettings(fileLocationService.getProfileSettingsFile(), getPluginSettings().defaultAvailableTags);
+		public ProfileSettingsDto readProfileSettings(string saveName){
+			return ksp.readProfileSettings(fileLocationService.getProfileSettingsFile(saveName), getPluginSettings().defaultAvailableTags);
 		}
 
-		public void writeProfileSettings(ProfileSettingsDto dto)
+		public void writeProfileSettings(string saveName, ProfileSettingsDto dto)
 		{
-			ksp.writeProfileSettings(fileLocationService.getProfileSettingsFile(), dto);
+			ksp.writeProfileSettings(fileLocationService.getProfileSettingsFile(saveName), dto);
 		}
 
 		public void writeCraftSettingsForCraftFile(string craftFilePath, CraftSettingsDto dto) {
@@ -36,8 +36,8 @@ namespace KspCraftOrganizer
 			return ksp.readCraftSettings(fileLocationService.getCraftSettingsFileForCraftFile(fileLocationService.getCraftSaveFilePathForCurrentShip()));
 		}
 
-		public void addAvailableTag(string newTag) {
-			ProfileSettingsDto profileSettings = readProfileSettings();
+		public void addAvailableTag(string saveName, string newTag) {
+			ProfileSettingsDto profileSettings = readProfileSettings(saveName);
 			SortedList<string, string> tags = new SortedList<string, string>();
 			foreach (string t in profileSettings.availableTags) {
 				if (!tags.ContainsKey(t)) {
@@ -47,7 +47,7 @@ namespace KspCraftOrganizer
 			if (!tags.ContainsKey(newTag)) {
 				tags.Add(newTag, newTag);
 				profileSettings.availableTags = tags.Keys;
-				writeProfileSettings(profileSettings);
+				writeProfileSettings(saveName, profileSettings);
 			}
 		}
 

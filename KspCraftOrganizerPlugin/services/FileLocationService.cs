@@ -78,8 +78,8 @@ namespace KspCraftOrganizer {
 			return Path.Combine(ksp.getStockCraftDirectory(), type.directoryName);
 		}
 
-		public string getProfileSettingsFile() { 
-			return Path.Combine(ksp.getBaseCraftDirectory(), "profile_settings.pcrmgr");  
+		public string getProfileSettingsFile(string saveName) { 
+			return Globals.combinePaths(ksp.getApplicationRootPath(), "saves", saveName, "profile_settings.pcrmgr");  
 		}
 
 		public string renameCraft(string oldFile, string newName) {

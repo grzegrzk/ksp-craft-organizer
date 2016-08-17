@@ -92,6 +92,7 @@
     <Compile Include="View\ShouldCurrentCraftBeSavedQuestionWindow.cs" />
     <Compile Include="UiUtils\DropDownList.cs" />
     <Compile Include="UiUtils\UIUtils.cs" />
+    <Compile Include="View\OrganizerControllerStateManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Services\" />

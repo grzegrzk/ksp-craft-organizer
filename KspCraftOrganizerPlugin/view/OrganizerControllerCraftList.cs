@@ -33,11 +33,11 @@ namespace KspCraftOrganizer {
 			string craftDirectory = fileLocationService.getCraftDirectoryForCraftType(saveName, type);
 			List<OrganizerCraftEntity> toRetList = new List<OrganizerCraftEntity>();
 			toRetList.AddRange(fetchAvailableCrafts(craftDirectory, type, false));
-			if (ksp.isShowStockCrafts()) {
+
+			if (ksp.isShowStockCrafts() && thisIsPrimarySave) {
 				craftDirectory = fileLocationService.getStockCraftDirectoryForCraftType(type);
 				toRetList.AddRange(fetchAvailableCrafts(craftDirectory, type, true));
 			}
-
 
 			toRetList.Sort(delegate (OrganizerCraftEntity c1, OrganizerCraftEntity c2) {
 				int craftComparisonResult = -c1.isAutosaved.CompareTo(c2.isAutosaved);
@@ -47,6 +47,12 @@ namespace KspCraftOrganizer {
 				return craftComparisonResult;
 			});
 			return toRetList;
+		}
+
+		private bool thisIsPrimarySave {
+			get {
+				return parent.currentSave == ksp.getNameOfSaveFolder();
+			}
 		}
 
 		private OrganizerCraftEntity[] fetchAvailableCrafts(String craftDirectory, CraftType type, bool isStock) {
@@ -62,7 +68,7 @@ namespace KspCraftOrganizer {
 
 				CraftSettingsDto craftSettings = settingsService.readCraftSettingsForCraftFile(toRet[i].craftFile);
 				foreach (string craftTag in craftSettings.tags) {
-					parent.addAvailableTag(craftTag);
+					//parent.addAvailableTag(craftTag);
 					toRet[i].addTag(craftTag);
 				}
 				toRet[i].nameFromSettingsFile = craftSettings.craftName;
@@ -99,12 +105,12 @@ namespace KspCraftOrganizer {
 		private FileLocationService fileLocationService = FileLocationService.instance;
 		//private SettingsService settingsService = SettingsService.instance;
 		private OrganizerController parent;
-		public string currentSave { get; private set;  }
+
+		private string currentSave { get { return parent.currentSave; } }
 
 		public OrganizerControllerCraftList(OrganizerController parent) {
 			this.parent = parent;
 			_craftType = ksp.getCurrentEditorFacilityType();
-			currentSave = ksp.getNameOfSaveFolder();
 		}
 
 
@@ -120,10 +126,9 @@ namespace KspCraftOrganizer {
 		}
 
 		public void update(string selectedSave, bool selectAll, bool filterChanged) {
-			if (this.currentSave != selectedSave) {
-				this.currentSave = selectedSave;
-				clearCaches("save folder changed");
-			}
+			//if (this.currentSave != selectedSave) {
+			//	clearCaches("save folder changed");
+			//}
 			if (this.cachedFilteredCrafts == null || filterChanged) {
 				this.cachedFilteredCrafts = createFilteredCrafts(parent.craftFilterPredicate);
 				parent.markFilterAsUpToDate();
@@ -280,7 +285,7 @@ namespace KspCraftOrganizer {
 			}
 		}
 
-		private void clearCaches(string reason) {
+		public void clearCaches(string reason) {
 			COLogger.logDebug("Clearing caches in OrganizerServiceCraftList, reason: " + reason);
 			//this.cachedAvailableCrafts = null;
 			this.cachedFilteredCrafts = null;

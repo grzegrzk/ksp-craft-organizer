@@ -3,8 +3,7 @@
 namespace KspCraftOrganizer {
 
 	public class FilterTagGroup : TagGroup<OrganizerTagEntity> {
-
-		private bool _collapsedInFilterView;
+		
 		private OrganizerController parent;
 
 		public FilterTagGroup(OrganizerController parent, string name) : base(name) {
@@ -12,23 +11,29 @@ namespace KspCraftOrganizer {
 		}
 
 
-		public bool collapsedInFilterView {
+		public bool isCollapsedInFilterView {
 			get {
-				return _collapsedInFilterView;
+				return parent.stateManager.isGroupCollapsedInFilters(name);
 			}
 			set {
-				if (_collapsedInFilterView != value) {
-					_collapsedInFilterView = value;
-					parent.markProfileSettingsAsDirty("Filter tag group collapsed state changed");
-				}
+				parent.stateManager.setGroupCollapsedInFilters(name, value);
 			}
 		}
 
+
+		public bool hasSelectedNoneFilter {
+			get {
+				return parent.stateManager.isGroupHasSelectedNoneFilter(name);
+			}
+			set {
+				parent.stateManager.setGroupHasSelectedNoneFilter(name, value);
+			}
+		}
 	}
 
 	public class FilterTagsGrouper : TagsGrouper<OrganizerTagEntity, FilterTagGroup> {
 
-		private Dictionary<string, string> groupsWithSelectedNone = new Dictionary<string, string>();
+		//private Dictionary<string, string> groupsWithSelectedNone = new Dictionary<string, string>();
 		private OrganizerController parent;
 
 		public FilterTagsGrouper(OrganizerController parent) : base(t => t.name, s => new FilterTagGroup(parent, s)) {
@@ -38,26 +43,22 @@ namespace KspCraftOrganizer {
 
 		public override void update(ICollection<OrganizerTagEntity> currentTags) {
 			base.update(currentTags);
-
-			List<string> groupsToRemove = new List<string>();
-			foreach (string g in groupsWithSelectedNone.Keys) {
-				if (!this.groupExists(g)) {
-					groupsToRemove.Add(g);
-				}
-			}
-
-			foreach (string g in groupsToRemove) {
-				groupsWithSelectedNone.Remove(g);
-			}
 		}
 
-		public bool restGroupCollapsed { get; set; }
+		public bool restGroupCollapsed { 
+			get{
+				return parent.stateManager.isRestTagsCollapsedInFilter();
+			}
+			set { 
+				parent.stateManager.setRestTagsCollapsedInFilter(value);
+			} 
+		}
 
 		public ICollection<string> collapsedFilterGroups {
 			get {
 				List<string> toRet = new List<string>();
 				foreach (FilterTagGroup tagGroup in this.groups) {
-					if (tagGroup.collapsedInFilterView) {
+					if (tagGroup.isCollapsedInFilterView) {
 						toRet.Add(tagGroup.name);
 					}
 				}
@@ -66,46 +67,51 @@ namespace KspCraftOrganizer {
 		}
 
 		public void setInitialGroupsWithSelectedNone(ICollection<string> filterGroupsWithSelectedNoneOption) {
-			groupsWithSelectedNone.Clear();
-			foreach (string groupName in filterGroupsWithSelectedNoneOption) {
-				if (!groupsWithSelectedNone.ContainsKey(groupName)) {
-					groupsWithSelectedNone.Add(groupName, groupName);
-				}
+
+			foreach (FilterTagGroup g in groups) {
+				g.hasSelectedNoneFilter = filterGroupsWithSelectedNoneOption.Contains(g.name);
 			}
 		}
 
 		public void setCollapsedGroups(ICollection<string> collapsedGroups) {
 			foreach (FilterTagGroup tagGroup in this.groups) {
-				tagGroup.collapsedInFilterView = collapsedGroups.Contains(tagGroup.name);
+				tagGroup.isCollapsedInFilterView = collapsedGroups.Contains(tagGroup.name);
 			}
 		}
 
 		public ICollection<string> groupsWithSelectedNoneOption {
 			get {
-				return groupsWithSelectedNone.Keys;
+				List<string> toRet = new List<string>();
+				foreach (FilterTagGroup tagGroup in this.groups) {
+					if (tagGroup.hasSelectedNoneFilter) {
+						toRet.Add(tagGroup.name);
+					}
+				}
+				return toRet;
 			}
 		}
 
 		public void clearFilters() {
-			groupsWithSelectedNone.Clear();
+			foreach (FilterTagGroup g in groups) {
+				g.hasSelectedNoneFilter = false;
+			}
 		}
 
 		public void setGroupHasSelectedNoneFilter(string groupName, bool isNoneFilterSelected) {
-			if (isNoneFilterSelected) {
-				if (!groupsWithSelectedNone.ContainsKey(groupName)) {
-					groupsWithSelectedNone.Add(groupName, groupName);
-					parent.markFilterAsChanged();
-				}
-			} else {
-				if (groupsWithSelectedNone.ContainsKey(groupName)) {
-					groupsWithSelectedNone.Remove(groupName);
+			if (groupExists(groupName)) {
+				if (getGroup(groupName).hasSelectedNoneFilter != isNoneFilterSelected) {
+					getGroup(groupName).hasSelectedNoneFilter = isNoneFilterSelected;
 					parent.markFilterAsChanged();
 				}
 			}
 		}
 
 		public bool hasGroupSelectedNoneFilter(string groupName) {
-			return groupsWithSelectedNone.ContainsKey(groupName);
+			if (groupExists(groupName)) {
+				return getGroup(groupName).hasSelectedNoneFilter;
+			} else {
+				return false;
+			}
 		}
 
 		public bool doesCraftPassFilter(OrganizerCraftEntity craft, out bool shouldBeVisibleByDefault) {

@@ -14,7 +14,7 @@ namespace KspCraftOrganizer {
 		private OrganizerWindow craftOrganizerWindow;
 		private CurrentCraftTagsWindow manageThisCraftWindow;
 
-		private FileLocationService locationService = FileLocationService.instance;
+		//private FileLocationService locationService = FileLocationService.instance;
 
 		private List<ApplicationLauncherButton> appLauncherButtons = new List<ApplicationLauncherButton>();
 

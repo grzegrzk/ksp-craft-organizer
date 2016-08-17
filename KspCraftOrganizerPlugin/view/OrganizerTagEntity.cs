@@ -1,5 +1,5 @@
 ﻿using System;
-
+using System.Collections.Generic;
 namespace KspCraftOrganizer
 {
 
@@ -13,7 +13,8 @@ namespace KspCraftOrganizer
 		private string _name;
 		private TagState _tagState = TagState.UNSET_IN_ALL;
 		private OrganizerController service;
-		private bool _selectedForFiltering = false;
+		//private OrganizerControllerTagsStateManager tagsStateManager;
+		//private bool _selectedForFiltering = false;
 
 		public OrganizerTagEntity(OrganizerController service, string name){
 			this._name = name;
@@ -23,13 +24,10 @@ namespace KspCraftOrganizer
 
 		public bool selectedForFiltering { 
 			get {
-				return _selectedForFiltering;
+				return service.stateManager.isTagSelectedForFiltering(_name);
 			}
 			set{
-				if (_selectedForFiltering != value) {
-					_selectedForFiltering = value;
-					service.markFilterAsChanged();
-				}
+				service.stateManager.setTagSelectedForFiltering(_name, value);
 			}
 		}
 
