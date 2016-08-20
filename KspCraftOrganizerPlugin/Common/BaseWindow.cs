@@ -17,7 +17,6 @@ namespace KspNalCommon
 		private int windowId = WINDOW_ID++;
 		private bool centered = false;
 		private GUIStyle fadeStyle;
-		private bool locked;
 		private bool wasLockedOnMouseOver;
 		private bool waitingForUnlockEditor;//to solve the problem with accidental clicks when user clicks "cancel"
 		private float waitingForUnlockEditorStartTime;
@@ -40,7 +39,6 @@ namespace KspNalCommon
 		virtual public void displayWindow()
 		{
 			PluginLogger.logDebug("DisplayWindow: " + _name);
-			locked = false;
 			//float height = getWindowHeight(windowPos);
 			//float windowWidth = getWindowWidth(windowPos);
 			windowPos = new Rect((Screen.width - windowWidthOnScreen) / 2, (Screen.height - windowHeightOnScreen) / 2, windowWidth, windowHeight);
@@ -126,11 +124,10 @@ namespace KspNalCommon
 				}
 				GUI.skin = skin;
 
-				if (!locked) {
+				if (!KSPBasics.locked) {
 					if (isPopupWindow()) {
 						KSPBasics.instance.lockEditor();
 					}
-					locked = true;
 				}
 				if (!isPopupWindow()) {
 					if (shouldLockEditor()) {

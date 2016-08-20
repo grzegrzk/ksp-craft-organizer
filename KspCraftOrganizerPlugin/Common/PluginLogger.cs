@@ -16,7 +16,7 @@ namespace KspNalCommon
 		}
 
 		public static bool debug { get {
-				if (!whileReadingSettings && PluginCommons.instance.canGetIsDebug()) {
+				if (!whileReadingSettings && PluginCommons.instance != null) {
 					try {
 						whileReadingSettings = true;
 						debug_ = PluginCommons.instance.isDebug();

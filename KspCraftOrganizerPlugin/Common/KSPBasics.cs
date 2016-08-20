@@ -6,6 +6,8 @@ namespace KspNalCommon {
 
 		public static readonly KSPBasics instance = new KSPBasics();
 
+		public static bool locked { get; private set; }
+
 		public KSPBasics() {
 		}
 
@@ -20,6 +22,7 @@ namespace KspNalCommon {
 			lockExit = false;
 #endif
 			EditorLogic.fetch.Lock(true, lockExit, true, LOCK_NAME);
+			locked = true;
 		}
 
 		public void unlockEditor() {
@@ -29,6 +32,7 @@ namespace KspNalCommon {
 				}
 				EditorLogic.fetch.enabled = true;
 				EditorLogic.fetch.Unlock(LOCK_NAME);
+				locked = false;
 			}
 		}
 	}
