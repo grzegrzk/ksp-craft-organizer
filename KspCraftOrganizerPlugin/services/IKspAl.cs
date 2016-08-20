@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
+using KspNalCommon;
 
 namespace KspCraftOrganizer {
 	public class CraftDaoDto {
@@ -19,27 +20,6 @@ namespace KspCraftOrganizer {
 	public class PluginSettings{
 		public bool debug;	
 		public ICollection<string> defaultAvailableTags { get; set; }
-	}
-
-	public class GuiStyleOption {
-
-		public static readonly GuiStyleOption Ksp = new GuiStyleOption("KSP", "KSP");
-		public static readonly GuiStyleOption Default = new GuiStyleOption("Default", "Default");
-
-		public static readonly string[] SKIN_DISPLAY_OPTIONS = { GuiStyleOption.Default.displayName, GuiStyleOption.Ksp.displayName };
-		public static readonly GuiStyleOption[] SKIN_STATES = { GuiStyleOption.Default, GuiStyleOption.Ksp };
-
-		private string _id;
-		private string _displayName;
-
-		public string id { get { return _id; }  }
-		public string displayName { get { return _displayName;} }
-
-		private GuiStyleOption(string id, string displayName) {
-			this._id = id;
-			this._displayName = displayName;
-		}
-		
 	}
 
 	public class ProfileFilterSettingsDto {
@@ -115,12 +95,12 @@ namespace KspCraftOrganizer {
 					if (type == null) {
 						type  = Type.GetType ("KspCraftOrganizer.KspAlMock");
 					}
-					COLogger.logDebug("Using dao " + type);
+					PluginLogger.logDebug("Using dao " + type);
 					try{
 						_instance = (IKspAl)Activator.CreateInstance (type);
-						COLogger.logDebug("Dao created");
+						PluginLogger.logDebug("Dao created");
 					}catch(Exception ex){
-						COLogger.logDebug("Cannot create instance of DAO, creating mock instead " + ex.Message);
+						PluginLogger.logDebug("Cannot create instance of DAO, creating mock instead " + ex.Message);
 						_instance = new KspAlMock ();
 					}
 				}

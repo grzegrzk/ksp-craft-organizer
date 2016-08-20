@@ -71,11 +71,6 @@
     <Compile Include="TagsGrouper\FilterTagsGrouper.cs" />
     <Compile Include="TagsGrouper\ManagementTagsGrouper.cs" />
     <Compile Include="TagsGrouper\TagsGrouper.cs" />
-    <Compile Include="UiUtils\BaseWindow.cs" />
-    <Compile Include="UiUtils\ParagraphBoxDrawer.cs" />
-    <Compile Include="UiUtils\ScaledGuiScope.cs" />
-    <Compile Include="Utils\COLogger.cs" />
-    <Compile Include="Utils\Globals.cs" />
     <Compile Include="Utils\MainDebug.cs" />
     <Compile Include="Utils\MainImpl.cs" />
     <Compile Include="Utils\MainRelease.cs" />
@@ -90,10 +85,18 @@
     <Compile Include="View\OrganizerWindowCraftList.cs" />
     <Compile Include="View\OrganizerWindowTagsManagementBar.cs" />
     <Compile Include="View\ShouldCurrentCraftBeSavedQuestionWindow.cs" />
-    <Compile Include="UiUtils\DropDownList.cs" />
-    <Compile Include="UiUtils\UIUtils.cs" />
     <Compile Include="View\OrganizerControllerStateManager.cs" />
-    <Compile Include="CraftAlreadyExistsQuestionWindow.cs" />
+    <Compile Include="View\CraftAlreadyExistsQuestionWindow.cs" />
+    <Compile Include="Common\BaseWindow.cs" />
+    <Compile Include="Common\DropDownList.cs" />
+    <Compile Include="Common\ParagraphBoxDrawer.cs" />
+    <Compile Include="Common\ScaledGuiScope.cs" />
+    <Compile Include="Common\UIUtils.cs" />
+    <Compile Include="Common\Globals.cs" />
+    <Compile Include="Common\GuiStyleOption.cs" />
+    <Compile Include="Common\PluginLogger.cs" />
+    <Compile Include="Common\PluginCommons.cs" />
+    <Compile Include="Common\KSPBasics.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Services\" />
@@ -101,6 +104,8 @@
     <Folder Include="UiUtils\" />
     <Folder Include="Utils\" />
     <Folder Include="View\" />
+    <Folder Include="Common\" />
+    <Folder Include="Common\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

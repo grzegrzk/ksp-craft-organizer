@@ -2,8 +2,36 @@
 using System.Collections.Generic;
 using System.IO;
 using KSP.UI.Screens;
+using KspNalCommon;
+using System;
 
 namespace KspCraftOrganizer {
+
+	public class KspCraftOrganizerProperties : CommonPluginProperties {
+		public bool canGetIsDebug() {
+			return SettingsService.instance != null;
+		}
+
+		public int getInitialWindowId() {
+			return 4430924;
+		}
+
+		public string getPluginDirectory() {
+			return FileLocationService.instance.getThisPluginDirectory();
+		}
+
+		public string getPluginLogName() {
+			return "CraftOrganizer";
+		}
+
+		public bool isDebug() {
+			return SettingsService.instance.getPluginSettings().debug;
+		}
+
+		public GUISkin kspSkin() {
+			return IKspAlProvider.instance.kspSkin();
+		}
+	}
 
 	/**
 	 * This class does not inherit from MonoBehaviour to make it easy to use Kramax reloader in debug builds and do not use it in normal builds.
@@ -17,7 +45,10 @@ namespace KspCraftOrganizer {
 		private List<ApplicationLauncherButton> appLauncherButtons = new List<ApplicationLauncherButton>();
 
 		public void Start() {
-			COLogger.logDebug("Craft organizer plugin - start");
+			PluginCommons.init(new KspCraftOrganizerProperties());
+
+			PluginLogger.logDebug("Craft organizer plugin - start");
+
 			IKspAlProvider.instance.start();
 
 			CraftAlreadyExistsQuestionWindow craftAlreadyExistsQuestionWindow = addWindow(new CraftAlreadyExistsQuestionWindow());
@@ -59,7 +90,7 @@ namespace KspCraftOrganizer {
 
 
 		private void CleanUp() {
-			COLogger.logDebug("Craft organizer plugin - CleanUp in " + EditorDriver.editorFacility);
+			PluginLogger.logDebug("Craft organizer plugin - CleanUp in " + EditorDriver.editorFacility);
 			EditorListenerService.instance.processOnEditorExit();
 
 			foreach (ApplicationLauncherButton button in appLauncherButtons) {
@@ -86,12 +117,12 @@ namespace KspCraftOrganizer {
 		}
 
 		public void OnDestroy() {
-			COLogger.logDebug("Craft organizer plugin - OnDestroy in " + EditorDriver.editorFacility);
+			PluginLogger.logDebug("Craft organizer plugin - OnDestroy in " + EditorDriver.editorFacility);
 			CleanUp();
 		}
 
 		public void OnDisable() {
-			COLogger.logDebug("Craft organizer plugin - OnDisable in " + EditorDriver.editorFacility);
+			PluginLogger.logDebug("Craft organizer plugin - OnDisable in " + EditorDriver.editorFacility);
 		}
 	}
 }

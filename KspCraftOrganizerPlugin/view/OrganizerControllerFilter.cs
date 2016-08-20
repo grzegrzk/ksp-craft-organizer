@@ -11,13 +11,13 @@ namespace KspCraftOrganizer {
 		private SortedList<string, OrganizerTagEntity> _usedTags = new SortedList<string, OrganizerTagEntity>();
 		public FilterTagsGrouper tagsGrouper { get; private set; }
 		private OrganizerController parent;
+		bool availableTagsCreated = false;
 
 		public OrganizerControllerFilter(OrganizerController parent) {
 			this.parent = parent;
 			this.tagsGrouper = new FilterTagsGrouper(parent);
 
 			_availableTags = new SortedList<string, OrganizerTagEntity>();
-			recreateAvailableTags();
 
 			craftNameFilter = parent.stateManager.getCraftNameFilter();
 		}
@@ -33,6 +33,7 @@ namespace KspCraftOrganizer {
 					addAvailableTag(tag);
 				}
 			}
+			availableTagsCreated = true;
 		}
 
 		public void init() {
@@ -117,6 +118,9 @@ namespace KspCraftOrganizer {
 		}
 
 		public void update() {
+			if (!availableTagsCreated) {
+				recreateAvailableTags();
+			}
 			foreach (OrganizerTagEntity tag in _availableTags.Values) {
 				tag.countOfSelectedCraftsWithThisTag = 0;
 			}

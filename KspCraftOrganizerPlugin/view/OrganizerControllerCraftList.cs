@@ -2,6 +2,7 @@
 using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
+using KspNalCommon;
 
 namespace KspCraftOrganizer {
 
@@ -28,7 +29,7 @@ namespace KspCraftOrganizer {
 		}
 
 		private List<OrganizerCraftEntity> fetchAvailableCrafts(CraftType type) {
-			COLogger.logDebug("fetching '" + type + "' crafts from disk");
+			PluginLogger.logDebug("fetching '" + type + "' crafts from disk");
 
 			string craftDirectory = fileLocationService.getCraftDirectoryForCraftType(saveName, type);
 			List<OrganizerCraftEntity> toRetList = new List<OrganizerCraftEntity>();
@@ -56,7 +57,7 @@ namespace KspCraftOrganizer {
 		}
 
 		private OrganizerCraftEntity[] fetchAvailableCrafts(String craftDirectory, CraftType type, bool isStock) {
-			COLogger.logDebug("fetching '" + type + "' crafts from disk from " + craftDirectory);
+			PluginLogger.logDebug("fetching '" + type + "' crafts from disk from " + craftDirectory);
 			float startLoadingTime = Time.realtimeSinceStartup;
 			string[] craftFiles = fileLocationService.getAllCraftFilesInDirectory(craftDirectory);
 			OrganizerCraftEntity[] toRet = new OrganizerCraftEntity[craftFiles.Length];
@@ -76,7 +77,7 @@ namespace KspCraftOrganizer {
 				toRet[i].finishCreationMode();
 			}
 			float endLoadingTime = Time.realtimeSinceStartup;
-			COLogger.logDebug("Finished fetching " + craftFiles.Length + " crafts, it took " + (endLoadingTime - startLoadingTime) + "s");
+			PluginLogger.logDebug("Finished fetching " + craftFiles.Length + " crafts, it took " + (endLoadingTime - startLoadingTime) + "s");
 			return toRet;
 		}
 
@@ -141,7 +142,7 @@ namespace KspCraftOrganizer {
 		}
 
 		private OrganizerCraftEntity[] createFilteredCrafts(CraftFilterPredicate craftFilterPredicate) {
-			COLogger.logDebug("Creating filtered crafts");
+			PluginLogger.logDebug("Creating filtered crafts");
 			List<OrganizerCraftEntity> filtered = new List<OrganizerCraftEntity>();
 			craftsAreFiltered = false;
 			foreach (OrganizerCraftEntity craft in availableCrafts) {
@@ -279,7 +280,7 @@ namespace KspCraftOrganizer {
 		}
 
 		public void clearCaches(string reason) {
-			COLogger.logDebug("Clearing caches in OrganizerServiceCraftList, reason: " + reason);
+			PluginLogger.logDebug("Clearing caches in OrganizerServiceCraftList, reason: " + reason);
 			this.cachedFilteredCrafts = null;
 			this.cachedSelectedCraftsCount = 0;
 		}

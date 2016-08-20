@@ -4,6 +4,7 @@ using System.Text;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using UnityEngine;
+using KspNalCommon;
 
 namespace KspCraftOrganizer
 {
@@ -46,7 +47,7 @@ namespace KspCraftOrganizer
 				if (craftDtoLazy == null) {
 					craftDtoLazy = service.getCraftInfo(_craftFile);
 					if (nameFromSettingsFile != craftDtoLazy.name) {
-						COLogger.logDebug(
+						PluginLogger.logDebug(
 							"The name from settings is different than name from craft file. Settings has: '" 
 							+ nameFromSettingsFile 
 							+ "', craft file has: '" + craftDtoLazy.name + "'");

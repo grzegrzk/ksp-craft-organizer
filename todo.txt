@@ -1,8 +1,8 @@
 TODO:
+ - check EditorTooltip.Instance.enabled
  - Add possibility to edit default tags
  - Highlights categories that do filter crafts
  - Add option to collapse/uncollapse all tags groups
- - Add possibility to read crafts from different save
  - Add help button to "manage tags"
  - Add button "+" inside craft that will add tag in a given category
  - Add button "+" inside craft that will add tag in any category
@@ -25,6 +25,7 @@ Cancelled or far future:
  
  
 Done:
+ - Add possibility to read crafts from different save
  - Allow to collapse tags on the "manage tags" list
  - Change icons to the ones provided by cy4n
  - Add mouse over image

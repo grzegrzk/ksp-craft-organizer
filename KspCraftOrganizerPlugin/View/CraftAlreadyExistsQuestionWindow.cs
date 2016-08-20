@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using UnityEngine;
+using KspNalCommon;
 
 namespace KspCraftOrganizer {
 

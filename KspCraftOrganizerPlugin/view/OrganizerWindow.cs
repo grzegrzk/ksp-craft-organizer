@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using System;
+using KspNalCommon;
 
 namespace KspCraftOrganizer {
 	public class OrganizerWindow : BaseWindow, IGuiOverlayContainer {
@@ -79,7 +80,7 @@ namespace KspCraftOrganizer {
 			EditorListenerService.instance.fireEventIfShipHasBeenSaved();
 			selectedGuiSkin = Array.IndexOf(GuiStyleOption.SKIN_STATES, model.selectedGuiStyle);
 			_modelLazy = null;
-			COLogger.logDebug("Current save: " + model.currentSave);
+			PluginLogger.logDebug("Current save: " + model.currentSave);
 			chooseSaveName.selectedItem = model.currentSave;
 		}
 

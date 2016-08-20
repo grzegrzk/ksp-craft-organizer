@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
+using KspNalCommon;
 
 namespace KspCraftOrganizer
 {
 	public class KspAlImpl: IKspAl {
-
-		private static readonly String LOCK_NAME = "KspAlImpl";
+		
 		private static readonly int SETTINGS_VER_1 = 1;
 		/**
 		 * In profile settings: introduced separated settings for VABinSPH, SPHinSPH, etc
@@ -53,7 +53,7 @@ namespace KspCraftOrganizer
 			//This code corrects this by remembering facility at the beginning and returning it until it is truly changed.
 			//
 			this.editorFacility = EditorDriver.editorFacility;
-			COLogger.logDebug("Setting editor facility to " + this.editorFacility);
+			PluginLogger.logDebug("Setting editor facility to " + this.editorFacility);
 			createKspSkin();
 		}
 
@@ -103,7 +103,7 @@ namespace KspCraftOrganizer
 		}
 
 		public CraftDaoDto getCraftInfo(string craftFile){
-			COLogger.logTrace ("reading craft file from '" + craftFile + "'");
+			PluginLogger.logTrace ("reading craft file from '" + craftFile + "'");
 
 			System.Random r = new System.Random(craftFile.GetHashCode());
 			CraftDaoDto toRet = new CraftDaoDto();
@@ -180,7 +180,7 @@ namespace KspCraftOrganizer
 				return availablePartCache[partName];
 			}
 
-			COLogger.logTrace("Part '" + partName + "' not found");
+			PluginLogger.logTrace("Part '" + partName + "' not found");
 			return null;
 		}
 
@@ -206,7 +206,7 @@ namespace KspCraftOrganizer
 		}
 
 		public ProfileSettingsDto readProfileSettings(string fileName, ICollection<string> defaultTags){
-			COLogger.logDebug ("reading profile settings from '" + fileName + "'");
+			PluginLogger.logDebug ("reading profile settings from '" + fileName + "'");
 			ProfileSettingsDto settings = new ProfileSettingsDto ();
 
 			List<string> tags = new List<string> ();
@@ -236,7 +236,7 @@ namespace KspCraftOrganizer
 					}
 
 					if (settingsVersion <= SETTINGS_VER_2) {
-						COLogger.logDebug("Profile settings were in version " + settingsVersion + ", adding new default tags");
+						PluginLogger.logDebug("Profile settings were in version " + settingsVersion + ", adding new default tags");
 						tags.AddRange(NEW_TAGS_IN_VER3);
 					}
 
@@ -320,7 +320,7 @@ namespace KspCraftOrganizer
 		}	
 
 		public void writeProfileSettings(string fileName, ProfileSettingsDto toWrite) {
-			COLogger.logDebug("Writing profile settings to '" + fileName);
+			PluginLogger.logDebug("Writing profile settings to '" + fileName);
 			ConfigNode node = new ConfigNode();
 			writeSettingsVersion(node);
 
@@ -369,7 +369,7 @@ namespace KspCraftOrganizer
 		}
 
 		public void renameCraftInsideFile(string craftFile, string newName){
-			COLogger.logDebug("Renaiming craft in file '" + craftFile + "' to " + newName );
+			PluginLogger.logDebug("Renaiming craft in file '" + craftFile + "' to " + newName );
 
 			ConfigNode nodes = ConfigNode.Load(craftFile);
 			nodes.SetValue("ship", newName);
@@ -377,7 +377,7 @@ namespace KspCraftOrganizer
 		}
 
 		public void writeCraftSettings(string fileName, CraftSettingsDto settings){
-			COLogger.logDebug("Writing craft " + settings.craftName + " settings to '" + fileName + "'");
+			PluginLogger.logDebug("Writing craft " + settings.craftName + " settings to '" + fileName + "'");
 			ConfigNode node = new ConfigNode();
 			foreach (string tag in settings.tags)
 			{
@@ -389,7 +389,7 @@ namespace KspCraftOrganizer
 		}
 
 		public CraftSettingsDto readCraftSettings(string fileName ){
-			COLogger.logTrace ("reading craft settings from '" + fileName + "'");
+			PluginLogger.logTrace ("reading craft settings from '" + fileName + "'");
 			CraftSettingsDto settings = new CraftSettingsDto ();
 
 			List<string> tags = new List<string>();
@@ -415,7 +415,7 @@ namespace KspCraftOrganizer
 		}
 
 		public void mergeCraftToWorkspace(string file){
-			COLogger.logDebug ("Mergin craft in '" + file + "' into workspace");
+			PluginLogger.logDebug ("Mergin craft in '" + file + "' into workspace");
 
 			ConfigNode nodes = ConfigNode.Load(file);
 			ShipConstruct shipConstruct = new ShipConstruct();
@@ -424,10 +424,10 @@ namespace KspCraftOrganizer
 		}
 
 		public void loadCraftToWorkspace(string file){
-			COLogger.logDebug ("Loading craft in '" + file + "' into workspace");
+			PluginLogger.logDebug ("Loading craft in '" + file + "' into workspace");
 
 			EditorLogic.LoadShipFromFile(file);
-			COLogger.logDebug("Craft loaded");
+			PluginLogger.logDebug("Craft loaded");
 		}
 
 		public GUISkin kspSkin(){
@@ -439,23 +439,11 @@ namespace KspCraftOrganizer
 		}
 
 		public void lockEditor (){
-			EditorLogic.fetch.toolsUI.enabled = false;
-			EditorLogic.fetch.enabled = false;
-			bool lockExit = true;
-#if DEBUG
-			lockExit = false;
-#endif
-			EditorLogic.fetch.Lock (true, lockExit, true, LOCK_NAME);
+			KSPBasics.instance.lockEditor();
 		}
 
 		public void unlockEditor (){
-			if (EditorLogic.fetch != null) {
-				if (EditorLogic.fetch.toolsUI != null) {
-					EditorLogic.fetch.toolsUI.enabled = true;
-				}
-				EditorLogic.fetch.enabled = true;
-				EditorLogic.fetch.Unlock(LOCK_NAME);
-			}
+			KSPBasics.instance.unlockEditor();
 		}
 
 		public Texture2D getThumbnail(string url) {
@@ -472,13 +460,13 @@ namespace KspCraftOrganizer
 
 		public void saveCurrentCraft() {
 			string savePath = ShipConstruction.GetSavePath(EditorLogic.fetch.ship.shipName);
-			COLogger.logDebug("Saving current shipt to " + savePath);
+			PluginLogger.logDebug("Saving current shipt to " + savePath);
 			EditorLogic.fetch.ship.SaveShip().Save(savePath);
-			COLogger.logDebug("Done Saving current shipt");
+			PluginLogger.logDebug("Done Saving current shipt");
 		}
 
 		public PluginSettings getPluginSettings(string fileName) {
-			COLogger.logDebug("Reading plugin settings from " + fileName);
+			PluginLogger.logDebug("Reading plugin settings from " + fileName);
 
 			PluginSettings toRet = new PluginSettings();
 			toRet.debug = false;
@@ -490,7 +478,7 @@ namespace KspCraftOrganizer
 
 			if (!File.Exists(fileName)) {
 				
-				COLogger.logDebug("Plugin settings do not exist, creating default file in " + fileName);
+				PluginLogger.logDebug("Plugin settings do not exist, creating default file in " + fileName);
 				toRet.defaultAvailableTags = getDefaultTags();
 
 				writePluginSettings(toRet, fileName);
@@ -503,12 +491,12 @@ namespace KspCraftOrganizer
 					defaultAvailableTags.Add(tag);
 				}
 				if (settingsVersion <= SETTINGS_VER_2) {
-					COLogger.logDebug("Plugin settings were in version " + settingsVersion + ", adding new default tags");
+					PluginLogger.logDebug("Plugin settings were in version " + settingsVersion + ", adding new default tags");
 					defaultAvailableTags.AddRange(NEW_TAGS_IN_VER3);
 					settingsChanged = true;
 				}
 				if (settingsVersion == SETTINGS_VER_3) {
-					COLogger.logDebug("Plugin settings were in version " + settingsVersion + " which had bug that default tags may not be created. Creating them now.");
+					PluginLogger.logDebug("Plugin settings were in version " + settingsVersion + " which had bug that default tags may not be created. Creating them now.");
 					defaultAvailableTags.AddUniqueRange(getDefaultTags());
 					settingsChanged = true;
 				}

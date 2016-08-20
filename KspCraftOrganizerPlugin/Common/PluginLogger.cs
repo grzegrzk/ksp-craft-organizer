@@ -1,27 +1,25 @@
 ﻿using System;
 using UnityEngine;
 
-namespace KspCraftOrganizer
+namespace KspNalCommon
 {
-	/**
-	 * COLogger = Craft Organizer Logger
-	 */
-	public static class COLogger
+	public static class PluginLogger
 	{
+		public static string pluginPrefix = "<undefined-plugin>";
 		private static bool debug_ = false;
 		private static bool whileReadingSettings = false;
 
 		public static void logTrace(object toLog) {
 			if (debug) {
-				Debug.Log("[CraftOrganizer]" + toLog);
+				Debug.Log("[" + pluginPrefix + "]" + toLog);
 			}
 		}
 
 		public static bool debug { get {
-				if (!whileReadingSettings && SettingsService.instance != null) {
+				if (!whileReadingSettings && PluginCommons.instance.canGetIsDebug()) {
 					try {
 						whileReadingSettings = true;
-						debug_ = SettingsService.instance.getPluginSettings().debug;
+						debug_ = PluginCommons.instance.isDebug();
 					} finally {
 						whileReadingSettings = false;
 					}

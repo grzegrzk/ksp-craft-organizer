@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using UnityEngine;
+using KspNalCommon;
 
 namespace KspCraftOrganizer
 {

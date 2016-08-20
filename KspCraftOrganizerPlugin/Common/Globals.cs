@@ -3,7 +3,7 @@ using System.IO;
 using System.Text;
 using UnityEngine;
 
-namespace KspCraftOrganizer
+namespace KspNalCommon
 {
 	public class Globals
 	{

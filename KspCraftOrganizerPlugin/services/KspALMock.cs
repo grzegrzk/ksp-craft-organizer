@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
+using KspNalCommon;
 
 namespace KspCraftOrganizer
 {
@@ -40,7 +41,7 @@ namespace KspCraftOrganizer
 		}
 
 		public CraftDaoDto getCraftInfo(string craftFile){
-			COLogger.logDebug ("reading craft file from '" + craftFile + "'");
+			PluginLogger.logDebug ("reading craft file from '" + craftFile + "'");
 			System.Random r = new System.Random(craftFile.GetHashCode());
 			CraftDaoDto toRet = new CraftDaoDto ();
 			toRet.name = Path.GetFileNameWithoutExtension (craftFile);
@@ -52,7 +53,7 @@ namespace KspCraftOrganizer
 		}
 
 		public ProfileSettingsDto readProfileSettings(string fileName, ICollection<string> defaultTags){
-			COLogger.logDebug ("reading profile settings from '" + fileName + "'");
+			PluginLogger.logDebug ("reading profile settings from '" + fileName + "'");
 			ProfileSettingsDto settings = new ProfileSettingsDto ();
 
 			List<string> tags = new List<string> ();
@@ -75,18 +76,18 @@ namespace KspCraftOrganizer
 		}
 
 		public void renameCraftInsideFile(string fileName, string newName){
-			COLogger.logDebug("Renaiming craft in file '" + fileName + "' to " + newName );
+			PluginLogger.logDebug("Renaiming craft in file '" + fileName + "' to " + newName );
 		}
 		public void writeProfileSettings(string fileName, ProfileSettingsDto toWrite){
-			COLogger.logDebug("Writing profile settings to '" + fileName + "'");
+			PluginLogger.logDebug("Writing profile settings to '" + fileName + "'");
 		}
 
 		public void writeCraftSettings(string fileName, CraftSettingsDto settings){
-			COLogger.logDebug("Writing craft settings to '" + fileName + "'");
+			PluginLogger.logDebug("Writing craft settings to '" + fileName + "'");
 		}
 
 		public CraftSettingsDto readCraftSettings(string fileName ){
-			COLogger.logDebug ("reading craft settings from '" + fileName + "'");
+			PluginLogger.logDebug ("reading craft settings from '" + fileName + "'");
 			CraftSettingsDto settings = new CraftSettingsDto ();
 			settings.tags = new string[] { "tag1", "tag2" };
 			settings.craftName = "";
@@ -98,11 +99,11 @@ namespace KspCraftOrganizer
 		}
 
 		public void mergeCraftToWorkspace(string file){
-			COLogger.logDebug ("Merging craft in '" + file + "' into workspace");
+			PluginLogger.logDebug ("Merging craft in '" + file + "' into workspace");
 		}
 
 		public void loadCraftToWorkspace(string file){
-			COLogger.logDebug ("Loading craft in '" + file + "' into workspace");
+			PluginLogger.logDebug ("Loading craft in '" + file + "' into workspace");
 		}
 
 		public GUISkin kspSkin(){
@@ -115,11 +116,11 @@ namespace KspCraftOrganizer
 		}
 
 		public void lockEditor (){
-			COLogger.logDebug ("Locking editor");
+			PluginLogger.logDebug ("Locking editor");
 		}
 
 		public void unlockEditor (){
-			COLogger.logDebug ("Unlocking editor");
+			PluginLogger.logDebug ("Unlocking editor");
 		}
 
 		public string getAutoSaveCraftName() {
@@ -139,7 +140,7 @@ namespace KspCraftOrganizer
 			return Path.Combine(getBaseCraftDirectory(), shipName + ".craft");	
 		}
 		public void saveCurrentCraft() {
-			COLogger.logDebug("Saving current craft");
+			PluginLogger.logDebug("Saving current craft");
 		}
 
 

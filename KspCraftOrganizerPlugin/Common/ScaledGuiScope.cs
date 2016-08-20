@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace KspCraftOrganizer {
+namespace KspNalCommon {
 	public class ScaledGuiScope : IDisposable {
 		private Matrix4x4 oldMatrix;
 		public ScaledGuiScope(float scale, float x, float y) {

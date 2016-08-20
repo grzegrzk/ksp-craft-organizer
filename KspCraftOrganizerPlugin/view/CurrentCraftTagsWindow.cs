@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using System;
+using KspNalCommon;
 
 namespace KspCraftOrganizer {
 	public class CurrentCraftTagsWindow : BaseWindow {

@@ -1,5 +1,7 @@
 ﻿using System;
 using UnityEngine;
+using KspNalCommon;
+
 namespace KspCraftOrganizer {
 	public class ShouldCurrentCraftBeSavedQuestionWindow: BaseWindow {
 		

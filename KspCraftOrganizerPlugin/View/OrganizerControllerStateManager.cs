@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using KspNalCommon;
 
 namespace KspCraftOrganizer {
 
@@ -374,13 +375,13 @@ namespace KspCraftOrganizer {
 		}
 
 		public void markPrimaryProfileDirty(string reason) {
-			COLogger.logDebug("Marking primary profile settings as dirty, reason: " + reason);
+			PluginLogger.logDebug("Marking primary profile settings as dirty, reason: " + reason);
 			this.primarySettingsChanged = true;
 		}
 
 		public void markCurrentSaveSettingsAsDirty(string reason) {
 			string currentSave = parent.currentSave;
-			COLogger.logDebug("Marking settings in '" + currentSave + "' as dirty, reason: " + reason);
+			PluginLogger.logDebug("Marking settings in '" + currentSave + "' as dirty, reason: " + reason);
 			perSaveSettingsFor(currentSave).changed = true;
 		}
 

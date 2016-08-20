@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using UnityEngine;
 
-namespace KspCraftOrganizer {
+namespace KspNalCommon {
 	
 	public static class UiUtils {
 		public static Texture2D loadIcon(string fileName) {
@@ -10,7 +10,7 @@ namespace KspCraftOrganizer {
 			if (fileName == null) {
 				texture = Texture2D.blackTexture;
 			} else {
-				texture = UiUtils.loadTextureFrom(Globals.combinePaths(FileLocationService.instance.getThisPluginDirectory(), "icons", fileName));
+				texture = UiUtils.loadTextureFrom(Globals.combinePaths(PluginCommons.instance.getPluginDirectory(), "icons", fileName));
 			}
 			return texture;
 
@@ -26,7 +26,7 @@ namespace KspCraftOrganizer {
 				tex = new Texture2D(2, 2);
 				tex.LoadImage(fileData);
 			} else {
-				COLogger.logError("Cannot find " + file);
+				PluginLogger.logError("Cannot find " + file);
 				tex = Texture2D.blackTexture;
 			}
 

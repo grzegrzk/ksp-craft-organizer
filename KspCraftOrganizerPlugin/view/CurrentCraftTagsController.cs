@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Collections.Generic;
+using KspNalCommon;
 
 namespace KspCraftOrganizer
 {
@@ -66,7 +67,7 @@ namespace KspCraftOrganizer
 
 		private void saveTagsToCraftIfNeeded(string craftFile, bool craftSavedToNewFile) {
 			if (isDirty() || craftSavedToNewFile) {
-				COLogger.logDebug("Writing craft settings from craft management window");
+				PluginLogger.logDebug("Writing craft settings from craft management window");
 
 				CraftSettingsDto dto = new CraftSettingsDto();
 
@@ -79,7 +80,7 @@ namespace KspCraftOrganizer
 				}
 				dto.craftName = ksp.getCurrentCraftName();
 				dto.tags = selectedTags.ToArray();
-				COLogger.logDebug("Selected tags that will be saved: " + Globals.join(dto.tags, ", "));
+				PluginLogger.logDebug("Selected tags that will be saved: " + Globals.join(dto.tags, ", "));
 
 				settingsService.writeCraftSettingsForCraftFile(fileLocationService.getCraftSettingsFileForCraftFile(craftFile), dto);
 			}
@@ -112,7 +113,7 @@ namespace KspCraftOrganizer
 					addTagIfNeeded(tag);
 				}
 
-				COLogger.logDebug("Reading current's craft tags assuming its file is " + craftListenerService.originalShipFile);
+				PluginLogger.logDebug("Reading current's craft tags assuming its file is " + craftListenerService.originalShipFile);
 				if (!craftListenerService.isNewEditor() && File.Exists(craftListenerService.originalShipFile)) {
 					ICollection<string> tags = settingsService.readCraftSettingsForCraftFile(craftListenerService.originalShipFile).tags;
 					foreach (string tag in tags) {
@@ -121,9 +122,9 @@ namespace KspCraftOrganizer
 						_availableTagsCache[tag].selectedOriginally = true;
 						_availableTagsCache[tag].selected = true;
 					}
-					COLogger.logDebug("Tags from file " + Globals.join(tags, ", "));
+					PluginLogger.logDebug("Tags from file " + Globals.join(tags, ", "));
 				} else {
-					COLogger.logDebug("Tags will not be read - editor is new or file '" + craftListenerService.originalShipFile + "' does not exist");
+					PluginLogger.logDebug("Tags will not be read - editor is new or file '" + craftListenerService.originalShipFile + "' does not exist");
 				}
 
 			}

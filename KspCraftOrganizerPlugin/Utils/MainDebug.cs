@@ -2,6 +2,7 @@
 
 using KspCraftOrganizer;
 using KramaxReloadExtensions;
+using KspNalCommon;
 
 /**
  * Only one of the two can be compiled: MainDebug or MainRelease. To compile debug version KramaxPluginReload must be added conditionally.
@@ -20,7 +21,7 @@ using KramaxReloadExtensions;
 		MainImpl impl = new MainImpl();
 
 		public void Start () {
-			COLogger.logDebug("Start in Debug mode");
+			PluginLogger.logDebug("Start in Debug mode");
 			impl.Start();
 		}
 

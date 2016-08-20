@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using KSP.UI.Screens;
-
+using KspNalCommon;
 using KSP.UI;
 
 namespace KspCraftOrganizer {
@@ -63,18 +63,18 @@ namespace KspCraftOrganizer {
 			GameEvents.onEditorUndo.Add(this.onEditorUndo);
 
 			onShipSaved += delegate (string path, bool craftSavedToNewFile) {
-				COLogger.logDebug("[Event spy]On Saved to " + path + ", is new file: " + craftSavedToNewFile);
+				PluginLogger.logDebug("[Event spy]On Saved to " + path + ", is new file: " + craftSavedToNewFile);
 			};
 
 			onShipLoaded += delegate (string path) {
-				COLogger.logDebug("[Event spy]On Loaded from " + path);
+				PluginLogger.logDebug("[Event spy]On Loaded from " + path);
 			};
 			onEditorStarted += delegate () {
-				COLogger.logDebug("[Event spy]On Editor started");
+				PluginLogger.logDebug("[Event spy]On Editor started");
 			};
 
 			if (EditorLogic.fetch.ship == null) {
-				COLogger.logDebug("Ship in editor is null");
+				PluginLogger.logDebug("Ship in editor is null");
 				_lastSavedShipName = "";
 				_lastShipNameInEditor = "";
 				originalShipRealFileOrNull = null;
@@ -85,14 +85,14 @@ namespace KspCraftOrganizer {
 				newEditor = EditorLogic.fetch.ship.Count == 0;
 				string file = EditorDriver.filePathToLoad;//this path may be invalid when editor starts
 				if (file != "" && Path.GetFullPath(fileLocattion.getCraftSaveFilePathForShipName(_lastSavedShipName)) != Path.GetFullPath(file)) {
-					COLogger.logDebug("Name of the ship is '" + _lastSavedShipName + "' but KSP claims it is loaded from '" + file + "' which is probably a bug. Assuming that file was loaded from autosave.");
+					PluginLogger.logDebug("Name of the ship is '" + _lastSavedShipName + "' but KSP claims it is loaded from '" + file + "' which is probably a bug. Assuming that file was loaded from autosave.");
 					file = fileLocattion.getAutoSaveShipPath();//this path may be invalid when we use dynamic plugin reload but it is relevant only during development so lets stick to it
 				}
 				if (newEditor) {
 					file = null;
 				}
 				originalShipRealFileOrNull = file;
-				COLogger.logDebug("Ship name in editor: " + _lastSavedShipName + ", number of parts: " + EditorLogic.fetch.ship.Count + ", file:" + originalShipRealFileOrNull);
+				PluginLogger.logDebug("Ship name in editor: " + _lastSavedShipName + ", number of parts: " + EditorLogic.fetch.ship.Count + ", file:" + originalShipRealFileOrNull);
 				if (!newEditor && onShipLoaded != null) {
 					onShipLoaded(file);
 				}
@@ -136,7 +136,7 @@ namespace KspCraftOrganizer {
 
 
 		private void processOnEditorStarted() {
-			COLogger.logDebug("processOnEditorStarted");
+			PluginLogger.logDebug("processOnEditorStarted");
 			fireEventIfShipHasBeenSaved();
 
 			isModifiedSinceSave = false;
@@ -152,7 +152,7 @@ namespace KspCraftOrganizer {
 
 		private void processOnEditorLoaded(ShipConstruct c, CraftBrowserDialog.LoadType lt) {
 			if (lt == CraftBrowserDialog.LoadType.Normal) {
-				COLogger.logDebug("processOnEditorLoaded, file: " + EditorDriver.filePathToLoad);
+				PluginLogger.logDebug("processOnEditorLoaded, file: " + EditorDriver.filePathToLoad);
 				string file = EditorDriver.filePathToLoad;
 				if (!newEditor) {
 					fireEventIfShipHasBeenSaved();
@@ -178,7 +178,7 @@ namespace KspCraftOrganizer {
 			if (File.Exists(fileSavePath)) {
 				lastSaveDate = File.GetLastWriteTime(fileSavePath);
 			} else {
-				COLogger.logDebug("Cannot update last save date because file does not exist " + fileSavePath);
+				PluginLogger.logDebug("Cannot update last save date because file does not exist " + fileSavePath);
 				lastSaveDate = new DateTime(0);
 			}
 		}
@@ -194,14 +194,14 @@ namespace KspCraftOrganizer {
 			if (File.Exists(fileSavePath)) {
 				DateTime newWriteTime = File.GetLastWriteTime(fileSavePath);
 				if (newWriteTime > lastSaveDate) {
-					COLogger.logDebug("Craft file for " + lastShipNameInEditor + " changed, previous save date: " + lastSaveDate + ", current save date: " + File.GetLastWriteTime(fileSavePath));
+					PluginLogger.logDebug("Craft file for " + lastShipNameInEditor + " changed, previous save date: " + lastSaveDate + ", current save date: " + File.GetLastWriteTime(fileSavePath));
 					if (onShipSaved != null) {
 						onShipSaved(fileSavePath,
 									_lastSavedShipName != lastShipNameInEditor ||
 									newEditor ||
 									(originalShipRealFileOrNull != null && originalShipRealFileOrNull != fileSavePath));
 					} else {
-						COLogger.logDebug("onShipSaved will not be called because it is null");
+						PluginLogger.logDebug("onShipSaved will not be called because it is null");
 					}
 
 					lastSaveDate = File.GetLastWriteTime(fileSavePath);
@@ -210,10 +210,10 @@ namespace KspCraftOrganizer {
 					newEditor = false;
 					isModifiedSinceSave = false;
 				} else {
-					COLogger.logDebug("It was detected that file was not saved because it is not newer, new date: " + newWriteTime + ", old date: " + lastSaveDate + ", file: " + fileSavePath);
+					PluginLogger.logDebug("It was detected that file was not saved because it is not newer, new date: " + newWriteTime + ", old date: " + lastSaveDate + ", file: " + fileSavePath);
 				}
 			} else {
-				COLogger.logDebug("It was detected that file was not saved because it does not exist: " + fileSavePath);
+				PluginLogger.logDebug("It was detected that file was not saved because it does not exist: " + fileSavePath);
 			}
 
 		}
@@ -221,7 +221,7 @@ namespace KspCraftOrganizer {
 
 		private void processOnShipNameChanged(string newName) {
 			if (lastShipNameInEditor != newName) {
-				COLogger.logDebug("processOnShipNameChanged, old name: " + lastShipNameInEditor + ", new name: " + newName);
+				PluginLogger.logDebug("processOnShipNameChanged, old name: " + lastShipNameInEditor + ", new name: " + newName);
 
 				fireEventIfShipHasBeenSaved();
 

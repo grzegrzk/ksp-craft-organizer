@@ -2,7 +2,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-namespace KspCraftOrganizer {
+namespace KspNalCommon {
 	public class ParagraphBoxDrawer {
 
 		private static readonly float MARGINX = 10;

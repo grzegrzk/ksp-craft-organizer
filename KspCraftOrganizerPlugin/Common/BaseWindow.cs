@@ -2,23 +2,23 @@
 using System.Collections.Generic;
 using System;
 
-namespace KspCraftOrganizer
+namespace KspNalCommon
 {
 	public abstract class BaseWindow
 	{
 		private static readonly float UNLOCK_WAIT_THRESHOLD = 0.5f;
-		private static int WINDOW_ID = 1986769;
+		private static int WINDOW_ID = PluginCommons.instance.getInitialWindowId();
 
 		private string _name;
 		protected Rect windowPos { get; private set;} 
 		private bool _windowDisplayed;
 		private GUISkin _originalSkin;
 		private GUISkin _skin;
-		private IKspAl ksp = IKspAlProvider.instance;
 		private int windowId = WINDOW_ID++;
 		private bool centered = false;
 		private GUIStyle fadeStyle;
 		private bool locked;
+		private bool wasLockedOnMouseOver;
 		private bool waitingForUnlockEditor;//to solve the problem with accidental clicks when user clicks "cancel"
 		private float waitingForUnlockEditorStartTime;
 
@@ -34,12 +34,12 @@ namespace KspCraftOrganizer
 
 		virtual public void start()
 		{
-			COLogger.logDebug("Start in window: " + _name);
+			PluginLogger.logDebug("Start in window: " + _name);
 		}
 
 		virtual public void displayWindow()
 		{
-			COLogger.logDebug("DisplayWindow: " + _name);
+			PluginLogger.logDebug("DisplayWindow: " + _name);
 			locked = false;
 			//float height = getWindowHeight(windowPos);
 			//float windowWidth = getWindowWidth(windowPos);
@@ -120,15 +120,26 @@ namespace KspCraftOrganizer
 
 				_originalSkin = GUI.skin;
 				if (guiStyleOption == GuiStyleOption.Ksp) {
-					_skin = ksp.kspSkin();
+					_skin = PluginCommons.instance.kspSkin();
 				} else {
 					_skin = GUI.skin;
 				}
 				GUI.skin = skin;
 
 				if (!locked) {
-					ksp.lockEditor();
+					if (isPopupWindow()) {
+						KSPBasics.instance.lockEditor();
+					}
 					locked = true;
+				}
+				if (!isPopupWindow()) {
+					if (shouldLockEditor()) {
+						wasLockedOnMouseOver = true;
+						KSPBasics.instance.lockEditor();
+					} else if(wasLockedOnMouseOver){
+						KSPBasics.instance.unlockEditor();
+						wasLockedOnMouseOver = false;
+					}
 				}
 				if (fadeStyle == null) {
 					fadeStyle = new GUIStyle(_skin.box);
@@ -139,7 +150,9 @@ namespace KspCraftOrganizer
 					backgroundTexture.Apply();
 					fadeStyle.normal.background = backgroundTexture;
 				}
-				GUI.Box(new Rect(0, 0, Screen.width, Screen.height), "", fadeStyle);
+				if (isPopupWindow()) {
+					GUI.Box(new Rect(0, 0, Screen.width, Screen.height), "", fadeStyle);
+				}
 
 				using (new ScaledGuiScope(getGuiScale(), windowPos.x, windowPos.y)) {
 					//GUIUtility.ScaleAroundPivot(new Vector2(getGuiScale(), getGuiScale()), new Vector2(windowPos.x, windowPos.y));
@@ -158,10 +171,19 @@ namespace KspCraftOrganizer
 				}
 			} else if (waitingForUnlockEditor && (Time.realtimeSinceStartup - waitingForUnlockEditorStartTime) > UNLOCK_WAIT_THRESHOLD) {
 				waitingForUnlockEditor = false;
-				ksp.unlockEditor();
+				if (isPopupWindow()) {
+					KSPBasics.instance.unlockEditor();
+				}
 			}
 		}
 
+		private bool shouldLockEditor() {
+			return isPopupWindow() || windowPos.Contains(Event.current.mousePosition);
+		}
+
+		virtual protected bool isPopupWindow() {
+			return true;
+		}
 
 		public GuiStyleOption guiStyleOption { get; set; }
 
@@ -171,7 +193,7 @@ namespace KspCraftOrganizer
 
 		virtual public void hideWindow()
 		{
-			COLogger.logDebug("hideWindow: " + _name);
+			PluginLogger.logDebug("hideWindow: " + _name);
 			waitingForUnlockEditor = true;
 			waitingForUnlockEditorStartTime = Time.realtimeSinceStartup;
 			this._windowDisplayed = false;

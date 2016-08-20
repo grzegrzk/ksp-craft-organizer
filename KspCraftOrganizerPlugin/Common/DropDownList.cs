@@ -2,7 +2,7 @@
 using UnityEngine;
 using System;
 
-namespace KspCraftOrganizer {
+namespace KspNalCommon {
 
 	public delegate void DrawOverlay();
 
