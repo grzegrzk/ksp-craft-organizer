@@ -19,6 +19,7 @@ namespace KspNalCommon
 				if (!whileReadingSettings && PluginCommons.instance != null) {
 					try {
 						whileReadingSettings = true;
+						pluginPrefix = PluginCommons.instance.getPluginLogName();
 						debug_ = PluginCommons.instance.isDebug();
 					} finally {
 						whileReadingSettings = false;
@@ -30,14 +31,14 @@ namespace KspNalCommon
 
 		public static void logDebug(object toLog){
 			if (debug) {
-				Debug.LogWarning("[CraftOrganizer]" + toLog);
+				Debug.LogWarning("[" + pluginPrefix + "]" + toLog);
 			} else {
-				Debug.Log("[CraftOrganizer]" + toLog);
+				Debug.Log("[" + pluginPrefix + "]" + toLog);
 			}
 		}
 
 		internal static void logError(string toLog) {
-			Debug.LogError("[CraftOrganizer]" + toLog);
+			Debug.LogError("[" + pluginPrefix + "]" + toLog);
 		}
 }
 }

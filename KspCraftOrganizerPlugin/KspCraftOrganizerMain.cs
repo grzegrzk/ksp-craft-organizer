@@ -6,7 +6,6 @@ using KspNalCommon;
 using System;
 
 namespace KspCraftOrganizer {
-
 	public class KspCraftOrganizerProperties : CommonPluginProperties {
 		public bool canGetIsDebug() {
 			return SettingsService.instance != null;
@@ -33,10 +32,8 @@ namespace KspCraftOrganizer {
 		}
 	}
 
-	/**
-	 * This class does not inherit from MonoBehaviour to make it easy to use Kramax reloader in debug builds and do not use it in normal builds.
-	 */
-	public class MainImpl {
+	[KSPAddon(KSPAddon.Startup.EditorAny, false)]
+	public class KspCraftOrganizerMain: MonoBehaviour2 {
 		private List<BaseWindow> windows = new List<BaseWindow>();
 
 		private OrganizerWindow craftOrganizerWindow;

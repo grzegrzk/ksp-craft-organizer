@@ -33,6 +33,7 @@ namespace KspCraftOrganizer {
 					addAvailableTag(tag);
 				}
 			}
+			parent.refreshDefaultTagsToAdd();
 			availableTagsCreated = true;
 		}
 

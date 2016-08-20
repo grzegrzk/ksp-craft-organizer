@@ -138,6 +138,7 @@ namespace KspCraftOrganizer {
 
 		private IKspAl ksp = IKspAlProvider.instance;
 		private SettingsService settingsService = SettingsService.instance;
+		private bool lockMarkingPrimarySettingsAsChanged = false;
 
 		public OrganizerControllerStateManager(OrganizerController parent) {
 			this.parent = parent;
@@ -253,15 +254,20 @@ namespace KspCraftOrganizer {
 
 
 		void readPrimarySaveSettings() {
-			ProfileSettingsDto dto = settingsService.readProfileSettings(ksp.getNameOfSaveFolder());
+			lockMarkingPrimarySettingsAsChanged = true;
+			try {
+				ProfileSettingsDto dto = settingsService.readProfileSettings(ksp.getNameOfSaveFolder());
 
-			ProfileAllFilterSettingsDto allFilter = dto.allFilter;
-			readFilterSettings(allFilter, CraftType.SPH, CraftType.VAB);
-			readFilterSettings(allFilter, CraftType.SPH, CraftType.SPH);
-			readFilterSettings(allFilter, CraftType.VAB, CraftType.VAB);
-			readFilterSettings(allFilter, CraftType.VAB, CraftType.SPH);
+				ProfileAllFilterSettingsDto allFilter = dto.allFilter;
+				readFilterSettings(allFilter, CraftType.SPH, CraftType.VAB);
+				readFilterSettings(allFilter, CraftType.SPH, CraftType.SPH);
+				readFilterSettings(allFilter, CraftType.VAB, CraftType.VAB);
+				readFilterSettings(allFilter, CraftType.VAB, CraftType.SPH);
 
-			this.selectedGuiStyle = dto.selectedGuiStyle;
+				this.selectedGuiStyle = dto.selectedGuiStyle;
+			} finally {
+				lockMarkingPrimarySettingsAsChanged = false;
+			}
 
 			primarySettingsChanged = false;
 		}
@@ -375,8 +381,10 @@ namespace KspCraftOrganizer {
 		}
 
 		public void markPrimaryProfileDirty(string reason) {
-			PluginLogger.logDebug("Marking primary profile settings as dirty, reason: " + reason);
-			this.primarySettingsChanged = true;
+			if (!lockMarkingPrimarySettingsAsChanged) {
+				PluginLogger.logDebug("Marking primary profile settings as dirty, reason: " + reason);
+				this.primarySettingsChanged = true;
+			}
 		}
 
 		public void markCurrentSaveSettingsAsDirty(string reason) {

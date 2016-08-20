@@ -71,9 +71,6 @@
     <Compile Include="TagsGrouper\FilterTagsGrouper.cs" />
     <Compile Include="TagsGrouper\ManagementTagsGrouper.cs" />
     <Compile Include="TagsGrouper\TagsGrouper.cs" />
-    <Compile Include="Utils\MainDebug.cs" />
-    <Compile Include="Utils\MainImpl.cs" />
-    <Compile Include="Utils\MainRelease.cs" />
     <Compile Include="View\CurrentCraftTagsController.cs" />
     <Compile Include="View\CurrentCraftTagsWindow.cs" />
     <Compile Include="View\OrganizerController.cs" />
@@ -97,12 +94,12 @@
     <Compile Include="Common\PluginLogger.cs" />
     <Compile Include="Common\PluginCommons.cs" />
     <Compile Include="Common\KSPBasics.cs" />
+    <Compile Include="Common\MonoBehaviour2.cs" />
+    <Compile Include="KspCraftOrganizerMain.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Services\" />
     <Folder Include="TagsGrouper\" />
-    <Folder Include="UiUtils\" />
-    <Folder Include="Utils\" />
     <Folder Include="View\" />
     <Folder Include="Common\" />
     <Folder Include="Common\" />

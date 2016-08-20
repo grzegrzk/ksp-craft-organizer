@@ -35,7 +35,7 @@ namespace KspCraftOrganizer {
 			List<OrganizerCraftEntity> toRetList = new List<OrganizerCraftEntity>();
 			toRetList.AddRange(fetchAvailableCrafts(craftDirectory, type, false));
 
-			if (ksp.isShowStockCrafts() && thisIsPrimarySave) {
+			if (ksp.isShowStockCrafts() && parent.thisIsPrimarySave) {
 				craftDirectory = fileLocationService.getStockCraftDirectoryForCraftType(type);
 				toRetList.AddRange(fetchAvailableCrafts(craftDirectory, type, true));
 			}
@@ -50,11 +50,6 @@ namespace KspCraftOrganizer {
 			return toRetList;
 		}
 
-		private bool thisIsPrimarySave {
-			get {
-				return parent.currentSave == ksp.getNameOfSaveFolder();
-			}
-		}
 
 		private OrganizerCraftEntity[] fetchAvailableCrafts(String craftDirectory, CraftType type, bool isStock) {
 			PluginLogger.logDebug("fetching '" + type + "' crafts from disk from " + craftDirectory);

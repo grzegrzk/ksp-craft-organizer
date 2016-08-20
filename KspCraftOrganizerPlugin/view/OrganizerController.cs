@@ -35,12 +35,11 @@ namespace KspCraftOrganizer
 			this.craftList = new OrganizerControllerCraftList(this);
 			this.filter = new OrganizerControllerFilter(this);
 			this.defaultTagsToAdd = new Dictionary<string, bool>();
-			refreshDefaultTagsToAdd();
 
 			this.filter.init();
 		}
 
-		private void refreshDefaultTagsToAdd() {
+		public void refreshDefaultTagsToAdd() {
 			defaultTagsNotToAdd = new List<string>();
 			foreach (string tag in settingsService.getPluginSettings().defaultAvailableTags) {
 				if (!filter.doesTagExist(tag)) {
@@ -173,6 +172,7 @@ namespace KspCraftOrganizer
 				craftList.primaryCraft = null;
 				filter.recreateAvailableTags();
 				managementTagsGroups.update(availableTags);
+				refreshDefaultTagsToAdd();
 			}
 
 			filter.update();
@@ -297,9 +297,16 @@ namespace KspCraftOrganizer
 			}
 		}
 
-		internal bool isCraftAlreadyExists(OrganizerCraftEntity craft) {
+		public bool isCraftAlreadyExists(OrganizerCraftEntity craft) {
 			string fileAfterSave = fileLocationService.getCraftSaveFilePathForShipName(craft.name);
 			return File.Exists(fileAfterSave) && fileAfterSave != craft.craftFile;
+		}
+
+
+		public bool thisIsPrimarySave {
+			get {
+				return currentSave == ksp.getNameOfSaveFolder();
+			}
 		}
 	}
 }

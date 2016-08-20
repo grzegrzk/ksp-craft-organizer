@@ -78,7 +78,9 @@ namespace KspCraftOrganizer {
 					GUILayout.Label("<No tags exist yet>");
 				}
 				GUILayout.Label("Add new tag:");
+
 				using (new GUILayout.HorizontalScope(GUILayout.ExpandWidth(false))) {
+
 					GUI.SetNextControlName(GUI_ID_ADD_NEW_TAG_TEXT);
 					newTagText = GUILayout.TextField(newTagText, GUILayout.Width(150));
 
@@ -95,6 +97,9 @@ namespace KspCraftOrganizer {
 						model.addAvailableTag(newTagText.Trim());
 						newTagWasJustAdded = true;
 					}
+				}
+				if (!model.thisIsPrimarySave) {
+					GUILayout.Label("The tag will be added only to the currently selected save game", parent.warningLabelStyle);
 				}
 				GUILayout.Space(10);
 
