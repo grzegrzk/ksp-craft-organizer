@@ -82,7 +82,7 @@ namespace KspCraftOrganizer {
 				using (new GUILayout.HorizontalScope(GUILayout.ExpandWidth(false))) {
 
 					GUI.SetNextControlName(GUI_ID_ADD_NEW_TAG_TEXT);
-					newTagText = GUILayout.TextField(newTagText, GUILayout.Width(150));
+					newTagText = GUILayout.TextField(newTagText, GUILayout.Width(145));
 
 					focusNewTagTextFieldIfNeeded();
 
@@ -103,7 +103,7 @@ namespace KspCraftOrganizer {
 				}
 				GUILayout.Space(10);
 
-				if (GUILayout.Button("Default tags " + (showDefaultTagsToAdd ? "<<" : ">>"))) {
+				if (GUILayout.Button("Default tags " + (showDefaultTagsToAdd ? "<<" : ">>"), GUILayout.Width(OrganizerWindow.MANAGE_TAGS_TOOLBAR_WIDTH - (parent.isKspSkin() ? 20 : 10) - 20))) {
 					showDefaultTagsToAdd = !showDefaultTagsToAdd;
 				}
 				if (showDefaultTagsToAdd) {
