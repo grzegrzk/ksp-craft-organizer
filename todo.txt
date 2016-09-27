@@ -1,8 +1,9 @@
 TODO:
+ - Add possibility to sort crafts
+ - Add option to collapse/uncollapse all tags groups
  - check EditorTooltip.Instance.enabled
  - Add possibility to edit default tags
  - Highlights categories that do filter crafts
- - Add option to collapse/uncollapse all tags groups
  - Add help button to "manage tags"
  - Add button "+" inside craft that will add tag in a given category
  - Add button "+" inside craft that will add tag in any category

@@ -417,7 +417,7 @@ namespace KspCraftOrganizer {
 			availableTagsForCurrentSave.Add(newName);
 
 			markCurrentSaveSettingsAsDirty("renamed tag");
-			markPrimaryProfileDirty("removed tag");
+			markPrimaryProfileDirty("renamed tag");
 		}
 	}
 

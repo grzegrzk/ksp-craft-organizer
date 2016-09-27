@@ -136,7 +136,7 @@ namespace KspCraftOrganizer
 			}
 		}
 
-		public bool containsMissedParts { get { return craftDto.containsMissedParts; } }
+		public bool available { get { return craftDto.available; } }
 
 		public bool notEnoughScience { get { return craftDto.notEnoughScience; } }
 

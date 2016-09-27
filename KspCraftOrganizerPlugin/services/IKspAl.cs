@@ -12,7 +12,7 @@ namespace KspCraftOrganizer {
 		public int partCount { get; set; }
 		public float mass { get; set; }
 		public bool isStock { get; set; }
-		public bool containsMissedParts { get; set; }
+		public bool available { get; set; }
 		public bool notEnoughScience { get; set; }
 		public string description { get; internal set; }
 	}

@@ -7,7 +7,6 @@
     <OutputType>Library</OutputType>
     <RootNamespace>KspCraftOrganizerPlugin</RootNamespace>
     <AssemblyName>KspCraftOrganizerPlugin</AssemblyName>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -20,10 +19,13 @@
     <ConsolePause>false</ConsolePause>
     <CustomCommands>
       <CustomCommands>
-        <Command type="AfterBuild" command="echo &quot;${TargetFile}&quot; &quot;/Users/nal/Library/Application Support/Steam/steamapps/common/Kerbal Space Program/GameData/KspCraftOrganizerPlugin/Plugins&quot;" />
+        <Command>
+          <type>AfterBuild</type>
+          <command>echo "${TargetFile}" "/Users/nal/Library/Application Support/Steam/steamapps/common/Kerbal Space Program/GameData/KspCraftOrganizerPlugin/Plugins"</command>
+        </Command>
       </CustomCommands>
     </CustomCommands>
-    <LangVersion>3</LangVersion>
+    <LangVersion>4</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -32,7 +34,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
-    <LangVersion>3</LangVersion>
+    <LangVersion>4</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -96,6 +98,15 @@
     <Compile Include="Common\KSPBasics.cs" />
     <Compile Include="Common\MonoBehaviour2.cs" />
     <Compile Include="KspCraftOrganizerMain.cs" />
+    <Compile Include="Common\KerIntegration.cs" />
+    <Compile Include="Common\FastShipConstruct.cs" />
+    <Compile Include="KerVesselSimulator\AttachNodeSim.cs" />
+    <Compile Include="KerVesselSimulator\EngineSim.cs" />
+    <Compile Include="KerVesselSimulator\PartSim.cs" />
+    <Compile Include="KerVesselSimulator\ResourceContainer.cs" />
+    <Compile Include="KerVesselSimulator\SimManager.cs" />
+    <Compile Include="KerVesselSimulator\Simulation.cs" />
+    <Compile Include="KerVesselSimulator\Stage.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Services\" />
@@ -103,6 +114,7 @@
     <Folder Include="View\" />
     <Folder Include="Common\" />
     <Folder Include="Common\" />
+    <Folder Include="KerVesselSimulator\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

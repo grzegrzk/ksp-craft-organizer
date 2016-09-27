@@ -118,7 +118,7 @@ namespace KspCraftOrganizer {
 						}
 
 						craft.guiHeight = 60 + craft.tagsHeight;
-						if (!craft.containsMissedParts || craft.notEnoughScience) {
+						if (!craft.available || craft.notEnoughScience) {
 							craft.guiHeight += 20;
 						}
 					}
@@ -174,7 +174,7 @@ namespace KspCraftOrganizer {
 					}
 					drawScaledLabel(craft.cost > model.availableFunds && model.availableFunds >= 0 ? parent.warningLabelStyle : goodLabelStyle, costPosX, nextTop, costMaxWidth, thisShipRect, "Cost: " + craft.costToDisplay);
 					nextTop += 20;
-					if (!craft.containsMissedParts) {
+					if (!craft.available) {
 						drawLabel(parent.warningLabelStyle, leftOffset, nextTop, "*The craft contains missed or invalid parts*");
 						nextTop += 20;
 					} else if (craft.notEnoughScience) {

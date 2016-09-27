@@ -126,7 +126,7 @@ namespace KspCraftOrganizer
 				String stageString = part.GetValue("istg");
 				if (stageString != null && stageString != "")
 				{
-					int partStage = int.Parse(stageString);
+					int partStage = int.Parse(stageString) + 1;
 					if (partStage > stagesCount)
 					{
 						stagesCount = partStage;
@@ -150,6 +150,7 @@ namespace KspCraftOrganizer
 					float dryMass;
 					float fuelMass;
 					ShipConstruction.GetPartTotalMass(part, availablePart, out dryMass, out fuelMass);
+
 					massSum += dryMass + fuelMass;
 					if (!ResearchAndDevelopment.PartTechAvailable(availablePart)) {
 						notEnoughScience = true;
@@ -162,8 +163,24 @@ namespace KspCraftOrganizer
 			toRet.partCount = parts.Length;
 			toRet.mass = massSum;
 			toRet.cost = costSum;
-			toRet.containsMissedParts = available;
+			toRet.available = available;
 			toRet.notEnoughScience = notEnoughScience;
+
+
+			if (toRet.available) {
+				double startTime = Time.realtimeSinceStartup;
+				FastShipConstruct shipConstruct = new FastShipConstruct();
+				shipConstruct.LoadShip(nodes);
+
+				double endOfLoadingTime = Time.realtimeSinceStartup;
+				PluginLogger.logDebug("Time of loading ship: " + (endOfLoadingTime - startTime));
+				PluginLogger.logDebug("DeltaV for '" + toRet.name + "':" +  new KerIntegration().getTotalDeltaV(shipConstruct.Parts));
+				PluginLogger.logDebug("Time of simulating ship: " + (Time.realtimeSinceStartup - endOfLoadingTime));
+
+				shipConstruct.Release();
+			}
+
+
 			return toRet;
 		}
 
