@@ -41,6 +41,8 @@ namespace KspCraftOrganizer {
 
 		private List<ApplicationLauncherButton> appLauncherButtons = new List<ApplicationLauncherButton>();
 
+		private bool alreadyAfterCleanup = false;
+
 		public void Start() {
 			PluginCommons.init(new KspCraftOrganizerProperties());
 
@@ -105,6 +107,20 @@ namespace KspCraftOrganizer {
 			EditorListenerService.instance.destroy();
 			IKspAlProvider.instance.destroy();
 
+			alreadyAfterCleanup = true;
+
+		}
+
+		//
+		//Making cleanup in OnDestroy in not a good idea since ksp 1.2 because some global data no longer exist 
+		//when this event is fired, so we make cleanup in onGameSceneLoadRequested. We still need to handle OnDestroy
+		//in case plugin is reloaded using Kramax Plugin Reload.
+		//
+		public void OnDestroy() {
+			PluginLogger.logDebug("OnDestroy");
+			if (!alreadyAfterCleanup) {
+				CleanUp();
+			}
 		}
 
 		public void Update() {

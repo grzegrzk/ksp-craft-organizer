@@ -23,7 +23,6 @@ namespace KspCraftOrganizer {
 		private OrganizerController model { get { return parent.model; } }
 
 		public void drawCraftsList() {
-
 			int manageTagsWidth = parent.showManageTagsToolbar ? OrganizerWindow.MANAGE_TAGS_TOOLBAR_WIDTH : OrganizerWindow.NO_MANAGE_TAGS_TOOLBAR_WIDTH;
 			using (new GUILayout.VerticalScope(GUILayout.Width(parent.windowWidth - manageTagsWidth - 30 - OrganizerWindow.FILTER_TOOLBAR_WIDTH))) {
 				
@@ -200,7 +199,12 @@ namespace KspCraftOrganizer {
 										   tagsGrouper.restTagsAsString);
 						nextTop += (int)tagsGrouper.restTagsGuiHeight;
 					}
-					GUI.Label(new Rect(thumbPosX, thumbPosY, thumbSize, thumbSize), new GUIContent(craft.thumbTexture, "!!craft" + index));
+					//
+					//Starting from KSP 1.2 the textures for labels are no longer stretched to the whole label. So we draw the label first
+					//to enable tooltip and then we draw texture by hand over the whole area:
+					//
+					GUI.Label(new Rect(thumbPosX, thumbPosY, thumbSize, thumbSize), new GUIContent("", "!!craft" + index));
+					GUI.DrawTexture(new Rect(thumbPosX, thumbPosY, thumbSize, thumbSize), craft.thumbTexture);
 				}
 			}
 		}
