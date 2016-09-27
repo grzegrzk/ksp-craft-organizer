@@ -142,14 +142,11 @@ namespace KspCraftOrganizer
 					float dryCost;
 					float fuelCost;
 
-					ShipConstruction.GetPartCosts(part, availablePart, out dryCost, out fuelCost);
-					//COLogger.Log("For part" + getPartName(part)  + " dry cost: " + dryCost + ", fuelCost: " + fuelCost + ", smth: " + partCostsSmth);
-					costSum += dryCost + fuelCost;
-
-
 					float dryMass;
 					float fuelMass;
-					ShipConstruction.GetPartTotalMass(part, availablePart, out dryMass, out fuelMass);
+					ShipConstruction.GetPartCostsAndMass(part, availablePart, out dryCost, out fuelCost, out dryMass, out fuelMass);
+					//COLogger.Log("For part" + getPartName(part)  + " dry cost: " + dryCost + ", fuelCost: " + fuelCost + ", smth: " + partCostsSmth);
+					costSum += dryCost + fuelCost;
 					massSum += dryMass + fuelMass;
 					if (!ResearchAndDevelopment.PartTechAvailable(availablePart)) {
 						notEnoughScience = true;

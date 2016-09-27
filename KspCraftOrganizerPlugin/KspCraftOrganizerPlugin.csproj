@@ -20,7 +20,10 @@
     <ConsolePause>false</ConsolePause>
     <CustomCommands>
       <CustomCommands>
-        <Command type="AfterBuild" command="echo &quot;${TargetFile}&quot; &quot;/Users/nal/Library/Application Support/Steam/steamapps/common/Kerbal Space Program/GameData/KspCraftOrganizerPlugin/Plugins&quot;" />
+        <Command>
+          <type>AfterBuild</type>
+          <command>echo "${TargetFile}" "/Users/nal/Library/Application Support/Steam/steamapps/common/Kerbal Space Program/GameData/KspCraftOrganizerPlugin/Plugins"</command>
+        </Command>
       </CustomCommands>
     </CustomCommands>
     <LangVersion>3</LangVersion>
@@ -41,12 +44,6 @@
     </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>..\..\..\Library\Application Support\Steam\steamapps\common\Kerbal Space Program\KSP.app\Contents\Resources\Data\Managed\UnityEngine.UI.dll</HintPath>
-    </Reference>
-    <Reference Include="KSPCore">
-      <HintPath>..\..\..\Library\Application Support\Steam\steamapps\common\Kerbal Space Program\KSP.app\Contents\Resources\Data\Managed\KSPCore.dll</HintPath>
-    </Reference>
-    <Reference Include="KSPUtil">
-      <HintPath>..\..\..\Library\Application Support\Steam\steamapps\common\Kerbal Space Program\KSP.app\Contents\Resources\Data\Managed\KSPUtil.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath>..\..\..\Library\Application Support\Steam\steamapps\common\Kerbal Space Program\KSP.app\Contents\Resources\Data\Managed\Assembly-CSharp.dll</HintPath>

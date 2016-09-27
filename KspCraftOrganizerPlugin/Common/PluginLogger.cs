@@ -30,10 +30,15 @@ namespace KspNalCommon
 		}
 
 		public static void logDebug(object toLog){
-			if (debug) {
-				Debug.LogWarning("[" + pluginPrefix + "]" + toLog);
-			} else {
-				Debug.Log("[" + pluginPrefix + "]" + toLog);
+			try {
+				if (debug) {
+					Debug.LogWarning("[" + pluginPrefix + "]" + toLog);
+				} else {
+					Debug.Log("[" + pluginPrefix + "]" + toLog);
+				}
+			} catch (Exception ex) {
+				Debug.Log("Exception while logging");
+				Debug.LogException(ex);
 			}
 		}
 

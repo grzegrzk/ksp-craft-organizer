@@ -57,7 +57,7 @@ namespace KspCraftOrganizer {
 		public void start() {
 			GameEvents.onEditorStarted.Add(this.processOnEditorStarted);
 			GameEvents.onEditorLoad.Add(this.processOnEditorLoaded);
-			EditorLogic.fetch.shipNameField.onValueChange.AddListener(this.processOnShipNameChanged);
+			EditorLogic.fetch.shipNameField.onValueChanged.AddListener(this.processOnShipNameChanged);
 
 			GameEvents.onEditorShipModified.Add(this.onEditorShipModified);
 			GameEvents.onEditorUndo.Add(this.onEditorUndo);
@@ -123,7 +123,7 @@ namespace KspCraftOrganizer {
 			GameEvents.onEditorShipModified.Remove(this.onEditorShipModified);
 			GameEvents.onEditorUndo.Remove(this.onEditorUndo);
 
-			EditorLogic.fetch.shipNameField.onValueChange.RemoveListener(this.processOnShipNameChanged);
+			EditorLogic.fetch.shipNameField.onValueChanged.RemoveListener(this.processOnShipNameChanged);
 
 		}
 

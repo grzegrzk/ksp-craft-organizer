@@ -62,6 +62,13 @@ namespace KspCraftOrganizer {
 
 			EditorListenerService.instance.start();
 
+			GameEvents.onGameSceneLoadRequested.Add(OnSceneLoadRequested);
+
+		}
+
+		public void OnSceneLoadRequested(GameScenes gs) {
+			PluginLogger.logDebug("OnSceneLoadRequested");
+			CleanUp();
 		}
 
 		private void addLauncherButtonInAllEditors(Globals.Procedure callback, string textureFile) {
@@ -88,6 +95,8 @@ namespace KspCraftOrganizer {
 
 		private void CleanUp() {
 			PluginLogger.logDebug("Craft organizer plugin - CleanUp in " + EditorDriver.editorFacility);
+
+			GameEvents.onGameSceneLoadRequested.Remove(OnSceneLoadRequested);
 			EditorListenerService.instance.processOnEditorExit();
 
 			foreach (ApplicationLauncherButton button in appLauncherButtons) {
@@ -111,11 +120,6 @@ namespace KspCraftOrganizer {
 			foreach (BaseWindow window in windows) {
 				window.onGUI();
 			}
-		}
-
-		public void OnDestroy() {
-			PluginLogger.logDebug("Craft organizer plugin - OnDestroy in " + EditorDriver.editorFacility);
-			CleanUp();
 		}
 
 		public void OnDisable() {
