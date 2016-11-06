@@ -106,6 +106,7 @@ namespace KspCraftOrganizer {
 				}
 				sortingModeDropDown.items = sortingFields;
 
+
 				ICraftSortFunction selectedSortingFunction = model.getCraftSortingFunction();
 
 				for (int index = 0; index < sortingFields.Count; ++index) {
@@ -160,8 +161,10 @@ namespace KspCraftOrganizer {
 						using (new GUILayout.HorizontalScope()) {
 							drawCraftsFilteredWarning();
 							GUILayout.FlexibleSpace();
-							GUILayout.Label("Sort by:");
-							sortingModeDropDown.onGui(this, 100);
+							if (!showManageTagsToolbar) {
+								GUILayout.Label("Sort by:");
+							}
+							sortingModeDropDown.onGui(this, showManageTagsToolbar ? 100 : 200);
 						}
 						craftList.drawCraftsList();
 					}
@@ -263,9 +266,16 @@ namespace KspCraftOrganizer {
 				using (new GUILayout.VerticalScope(GUILayout.ExpandWidth(false))) {
 					GUILayout.Label("Filter crafts by name:", GUILayout.ExpandWidth(false));
 					GUI.SetNextControlName(TEXT_FILTER_CONTROL_NAME);
-					model.craftNameFilter = GUILayout.TextField(model.craftNameFilter, GUILayout.Width(FILTER_TOOLBAR_WIDTH - 10 - skin.verticalScrollbar.CalcScreenSize(skin.verticalScrollbar.CalcSize(new GUIContent(""))).x));
-					if (justAfterWindowDisplay) {
-						GUI.FocusControl(TEXT_FILTER_CONTROL_NAME);
+					using (new GUILayout.HorizontalScope(GUILayout.ExpandWidth(true))) {
+						model.craftNameFilter = GUILayout.TextField(model.craftNameFilter, GUILayout.Width(FILTER_TOOLBAR_WIDTH - 10 - skin.verticalScrollbar.CalcScreenSize(skin.verticalScrollbar.CalcSize(new GUIContent(""))).x));
+						if (justAfterWindowDisplay) {
+							GUI.FocusControl(TEXT_FILTER_CONTROL_NAME);
+						}
+						if (model.craftNameFilter != "") {
+							if (GUILayout.Button("x", originalSkin.button, GUILayout.ExpandWidth(false))) {
+								model.craftNameFilter = "";
+							}
+						}
 					}
 				}
 
@@ -278,9 +288,14 @@ namespace KspCraftOrganizer {
 						using (new GUILayout.VerticalScope(GUILayout.ExpandWidth(false))) {
 							foreach (FilterTagGroup tagGroup in filterTagsGrouper.groups) {
 								bool collapsed = tagGroup.isCollapsedInFilterView;
+
 								if (!collapsed) {
-									if (GUILayout.Button("- " + tagGroup.displayName + ":", this.skin.label)) {
-										tagGroup.isCollapsedInFilterView = !collapsed;
+									using (new GUILayout.HorizontalScope(GUILayout.ExpandWidth(true))) {
+										if (GUILayout.Button("- " + tagGroup.displayName + ":", this.skin.label)) {
+											tagGroup.isCollapsedInFilterView = !collapsed;
+										}
+										GUILayout.FlexibleSpace();
+										drawClearTagGroupFilterButton(tagGroup);
 									}
 									if (tagGroup.isYesNoGroup) {
 										OrganizerTagEntity tag = tagGroup.firstTag.originalTag;
@@ -309,8 +324,12 @@ namespace KspCraftOrganizer {
 
 									}
 								} else {
-									if(GUILayout.Button("+ " + tagGroup.displayName, this.skin.label)){
-										tagGroup.isCollapsedInFilterView = !collapsed;
+									using (new GUILayout.HorizontalScope(GUILayout.ExpandWidth(true))) {
+										if (GUILayout.Button("+ " + tagGroup.displayName, this.skin.label)) {
+											tagGroup.isCollapsedInFilterView = !collapsed;
+										}
+										GUILayout.FlexibleSpace();
+										drawClearTagGroupFilterButton(tagGroup);
 									}
 								}
 							}
@@ -340,6 +359,16 @@ namespace KspCraftOrganizer {
 							}
 						}
 					}
+				}
+			}
+		}
+
+		void drawClearTagGroupFilterButton(FilterTagGroup tagGroup) {
+			FilterTagsGrouper filterTagsGrouper = model.filterTagsGrouper;
+			bool shouldClearBeDisplayed = filterTagsGrouper.canGroupBeCleared(tagGroup.name);
+			if (shouldClearBeDisplayed) {
+				if (GUILayout.Button("x", originalSkin.button, GUILayout.ExpandWidth(false))) {
+					filterTagsGrouper.clearGroup(tagGroup.name);
 				}
 			}
 		}

@@ -107,11 +107,11 @@ namespace KspCraftOrganizer {
 						craft.tagsHeight = 0;
 						tagValuesWidth = tagsWidth - craft.tagGroupNameWidth - 10;
 						foreach (CraftTagGroup tagGroup in tagsGrouper.groups) {
-							tagGroup.guiHeight = calcMultilineLabelHeight(tagValuesWidth, tagGroup.tagsAsString) - (parent.isKspSkin() ? 7 : 2);
+							tagGroup.guiHeight = calcMultilineLabelHeight(tagValuesWidth, tagGroup.tagsAsString) - (parent.isKspSkin() ? 3 : 2);
 							craft.tagsHeight += tagGroup.guiHeight;
 						}
 						if (tagsGrouper.restTags.Count > 0) {
-							tagsGrouper.restTagsGuiHeight = calcMultilineLabelHeight(tagValuesWidth, tagsGrouper.restTagsAsString) - (parent.isKspSkin() ? 7 : 2);
+							tagsGrouper.restTagsGuiHeight = calcMultilineLabelHeight(tagValuesWidth, tagsGrouper.restTagsAsString) - (parent.isKspSkin() ? 3 : 2);
 
 							craft.tagsHeight += tagsGrouper.restTagsGuiHeight;
 						}

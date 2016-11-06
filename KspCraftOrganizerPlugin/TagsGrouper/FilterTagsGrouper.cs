@@ -114,6 +114,58 @@ namespace KspCraftOrganizer {
 			}
 		}
 
+		public bool canGroupBeCleared(string groupName) {
+			bool canBeCleared = false;
+			if (groupExists(groupName)) {
+				FilterTagGroup tagGroup = getGroup(groupName);
+				bool byDefaultNegative = false;
+				foreach (TagInGroup<OrganizerTagEntity> tag in tagGroup.tags) {
+					if (YesNoTag.isByDefaultNegativeTag(tag.originalTag.name)) {
+						canBeCleared = canBeCleared || tag.originalTag.selectedForFiltering;
+						byDefaultNegative = true;
+					} else if (YesNoTag.isByDefaultPositiveTag(tag.originalTag.name)) {
+						canBeCleared = canBeCleared || !tag.originalTag.selectedForFiltering;
+					} else {
+						if (tag.originalTag.selectedForFiltering) {
+							canBeCleared = true;
+							break;
+						}
+					}
+
+				}
+				if (byDefaultNegative) {
+					canBeCleared = canBeCleared || !hasGroupSelectedNoneFilter(tagGroup.name);
+				} else {
+					canBeCleared = canBeCleared || hasGroupSelectedNoneFilter(tagGroup.name);
+				}
+			}
+			return canBeCleared;
+		}
+
+		public void clearGroup(string groupName) {
+			if (groupExists(groupName)) {
+				FilterTagGroup tagGroup = getGroup(groupName);
+				bool byDefaultNegative = false;
+				foreach (TagInGroup<OrganizerTagEntity> tag in tagGroup.tags) {
+					if (YesNoTag.isByDefaultNegativeTag(tag.originalTag.name)) {
+						tag.originalTag.selectedForFiltering = false;
+						byDefaultNegative = true;
+					} else if (YesNoTag.isByDefaultPositiveTag(tag.originalTag.name)) {
+						tag.originalTag.selectedForFiltering = true;
+					} else {
+
+						tag.originalTag.selectedForFiltering = false;
+					}
+
+				}
+				if (byDefaultNegative) {
+					setGroupHasSelectedNoneFilter(groupName, true);
+				} else {
+					setGroupHasSelectedNoneFilter(groupName, false);
+				}
+			}
+		}
+
 		public bool doesCraftPassFilter(OrganizerCraftEntity craft, out bool shouldBeVisibleByDefault) {
 			bool pass = true;
 			shouldBeVisibleByDefault = true;
@@ -129,10 +181,10 @@ namespace KspCraftOrganizer {
 						craftPassesAnythingInThisGroup = craftPassesAnythingInThisGroup || craftHasThisTag;
 					}
 
-					if (YesNoTag.isByDefaultNegativeTag(tag.originalTag.name) && craft.containsTag(tag.originalTag.name)) {
+					if (YesNoTag.isByDefaultNegativeTag(tag.originalTag.name) && craftHasThisTag) {
 						shouldBeVisibleByDefault = false;
 					}
-					if (YesNoTag.isByDefaultPositiveTag(tag.originalTag.name) && !craft.containsTag(tag.originalTag.name)) {
+					if (YesNoTag.isByDefaultPositiveTag(tag.originalTag.name) && !craftHasThisTag) {
 						shouldBeVisibleByDefault = false;
 					}
 
