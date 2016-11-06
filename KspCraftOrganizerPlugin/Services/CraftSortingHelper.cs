@@ -172,6 +172,11 @@ namespace KspCraftOrganizer {
 			return this.function == c2.function;
 		}
 
+
+		public override int GetHashCode() {
+			return this.function.GetHashCode();
+		}
+
 		public bool isSame(ICraftSortFunction other) {
 			return this.Equals(other);
 		}
@@ -202,7 +207,12 @@ namespace KspCraftOrganizer {
 				return this.tagGroupName == c2.tagGroupName;
 			}
 
+			public override int GetHashCode() {
+				return this.tagGroupName.GetHashCode();
+			}
+
 			public override string functionData { get { return tagGroupName; } }
+
 		}
 	}
 
