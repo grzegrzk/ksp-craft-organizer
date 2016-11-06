@@ -1,5 +1,5 @@
 # KSP craft organizer
-Plugin for Kerbal Space Program (KSP) that helps searching crafts by name and allows to tag them
+Plugin for Kerbal Space Program (KSP) that helps searching crafts by name and allows to tag them. It also allows to load crafts from different saves.
 
 # What is it exactly?
 You can see features in this gallery: http://imgur.com/a/MfQlk
