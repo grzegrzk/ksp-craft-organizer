@@ -9,12 +9,51 @@ namespace KspCraftOrganizer {
 	public interface ICraftSortFunction {
 		int apply(OrganizerCraftEntity c1, OrganizerCraftEntity c2);
 		bool isSame(ICraftSortFunction other);
+
+		string functionTypeId { get; }
+		string functionData { get; }
+		bool isReversed { get; }
+	}
+
+	public class CraftSortFunctionFactory{
+
+		public delegate CraftSortFunction CraftSortFunctionProvider(string data);
+		private static Dictionary<String, CraftSortFunctionProvider> sortFunctionDictionary = new Dictionary<String, CraftSortFunctionProvider>();
+
+		static CraftSortFunctionFactory() {
+			addSingletonFunction(CraftSortFunction.SORT_CRAFTS_BY_NAME);
+			addSingletonFunction(CraftSortFunction.SORT_CRAFTS_BY_MASS);
+			addSingletonFunction(CraftSortFunction.SORT_CRAFTS_BY_COST);
+			addSingletonFunction(CraftSortFunction.SORT_CRAFTS_BY_STAGES);
+			addSingletonFunction(CraftSortFunction.SORT_CRAFTS_BY_PARTS_COUNT);
+
+			sortFunctionDictionary.Add(CraftSortFunction.SORT_ID_BY_TAG, (data) => { return CraftSortFunction.createByTagSorting(data);});
+		}
+
+		static void addSingletonFunction(CraftSortFunction function) {
+			sortFunctionDictionary.Add(function.functionTypeId, (data) => { return function; });	
+		}
+
+		public static ICraftSortFunction createFunction(CraftSortingEntry sortingEntry) {
+			ICraftSortFunction function = sortFunctionDictionary[sortingEntry.sortingId](sortingEntry.sortingData);
+			if (sortingEntry.isReversed) {
+				return new ReversedCraftSortingFunction(function);
+			} else {
+				return function;
+			}
+		}
 	}
 
 	public class CraftSortFunction : ICraftSortFunction {
 
+		public static readonly string SORT_ID_BY_NAME = "byName";
+		public static readonly string SORT_ID_BY_PARTS_COUNT = "byPartsCount";
+		public static readonly string SORT_ID_BY_MASS = "byMass";
+		public static readonly string SORT_ID_BY_STAGES_COUNT = "byStagesCount";
+		public static readonly string SORT_ID_BY_COST = "byCost";
+		public static readonly string SORT_ID_BY_TAG = "ByTag";
 
-		public static CraftSortFunction SORT_CRAFTS_BY_NAME = new CraftSortFunction((c1, c2) => {
+		public static CraftSortFunction SORT_CRAFTS_BY_NAME = new CraftSortFunction(SORT_ID_BY_NAME, (c1, c2) => {
 			int craftComparisonResult = -c1.isAutosaved.CompareTo(c2.isAutosaved);
 			if (craftComparisonResult == 0) {
 				craftComparisonResult = stringsNaturalCompare(c1.name, c2.name);
@@ -45,19 +84,19 @@ namespace KspCraftOrganizer {
 			return maxDigits;
 		}
 
-		public static CraftSortFunction SORT_CRAFTS_BY_PARTS_COUNT = new CraftSortFunction((c1, c2) => {
+		public static CraftSortFunction SORT_CRAFTS_BY_PARTS_COUNT = new CraftSortFunction(SORT_ID_BY_PARTS_COUNT, (c1, c2) => {
 			int craftComparisonResult = c1.partCount.CompareTo(c2.partCount);
 			return craftComparisonResult;
 		});
-		public static CraftSortFunction SORT_CRAFTS_BY_MASS = new CraftSortFunction((c1, c2) => {
+		public static CraftSortFunction SORT_CRAFTS_BY_MASS = new CraftSortFunction(SORT_ID_BY_MASS, (c1, c2) => {
 			int craftComparisonResult = c1.mass.CompareTo(c2.mass);
 			return craftComparisonResult;
 		});
-		public static CraftSortFunction SORT_CRAFTS_BY_STAGES = new CraftSortFunction((c1, c2) => {
+		public static CraftSortFunction SORT_CRAFTS_BY_STAGES = new CraftSortFunction(SORT_ID_BY_STAGES_COUNT, (c1, c2) => {
 			int craftComparisonResult = c1.stagesCount.CompareTo(c2.stagesCount);
 			return craftComparisonResult;
 		});
-		public static CraftSortFunction SORT_CRAFTS_BY_COST = new CraftSortFunction((c1, c2) => {
+		public static CraftSortFunction SORT_CRAFTS_BY_COST = new CraftSortFunction(SORT_ID_BY_COST, (c1, c2) => {
 			int craftComparisonResult = c1.cost.CompareTo(c2.cost);
 			return craftComparisonResult;
 		});
@@ -87,9 +126,11 @@ namespace KspCraftOrganizer {
 		}
 
 		private delegate int CraftSortDelegateDoNotUseDirectly(OrganizerCraftEntity c1, OrganizerCraftEntity c2);
+		private readonly string _functionTypeId;
 		private CraftSortDelegateDoNotUseDirectly function;
 
-		private CraftSortFunction(CraftSortDelegateDoNotUseDirectly function) {
+		private CraftSortFunction(String _functionTypeId, CraftSortDelegateDoNotUseDirectly function) {
+			this._functionTypeId = _functionTypeId;
 			this.function = function;
 		}
 
@@ -116,6 +157,10 @@ namespace KspCraftOrganizer {
 			if (object.ReferenceEquals(c2Objs, null)) {
 				return false;
 			}
+			ReversedCraftSortingFunction c2Reversed = c2Objs as ReversedCraftSortingFunction;
+			if (!object.ReferenceEquals(c2Reversed, null)) {
+				c2Objs = c2Reversed.inner;
+			}
 			CraftSortFunction c2 = c2Objs as CraftSortFunction;
 			CraftSortFunction c2Tag = c2Objs as CraftSortFunctionByTag;
 			if (!object.ReferenceEquals(c2Tag, null)) {
@@ -132,11 +177,17 @@ namespace KspCraftOrganizer {
 		}
 
 
+		public string functionTypeId { get { return _functionTypeId; } }
+
+		public virtual string functionData { get { return ""; } }
+
+		public bool isReversed { get { return false; } }
+
 		class CraftSortFunctionByTag : CraftSortFunction {
 
 			private string tagGroupName;
 
-			public CraftSortFunctionByTag(string tagGroupName, CraftSortDelegateDoNotUseDirectly function) : base(function) {
+			public CraftSortFunctionByTag(string tagGroupName, CraftSortDelegateDoNotUseDirectly function) : base(SORT_ID_BY_TAG, function) {
 				this.tagGroupName = tagGroupName;
 			}
 
@@ -150,13 +201,15 @@ namespace KspCraftOrganizer {
 				}
 				return this.tagGroupName == c2.tagGroupName;
 			}
+
+			public override string functionData { get { return tagGroupName; } }
 		}
 	}
 
 
 	class ReversedCraftSortingFunction : ICraftSortFunction {
 
-		private ICraftSortFunction inner;
+		public ICraftSortFunction inner;
 
 		public ReversedCraftSortingFunction(ICraftSortFunction _inner) {
 			this.inner = _inner;
@@ -170,6 +223,11 @@ namespace KspCraftOrganizer {
 			return inner.isSame(other);
 		}
 
+		public string functionTypeId { get { return inner.functionTypeId; } }
+
+		public string functionData { get { return inner.functionData; } }
+
+		public bool isReversed { get { return true; } }
 	}
 
 	public class CraftSortData {
@@ -204,9 +262,15 @@ namespace KspCraftOrganizer {
 
 	public class CraftSortingHelper {
 		
-		private List<ICraftSortFunction> craftSortingFunctions = new List<ICraftSortFunction>();
+		private OrganizerControllerStateManager stateManager;
+
+		public CraftSortingHelper(OrganizerControllerStateManager stateManager) {
+			this.stateManager = stateManager;
+		}
 
 		public void sortCrafts(List<OrganizerCraftEntity> crafts) {
+			PluginLogger.logDebug("Sorting crafts");
+			List<ICraftSortFunction> craftSortingFunctions = new List<ICraftSortFunction>(stateManager.getCraftSortFunctions());
 			crafts.Sort((c1, c2) => {
 				int toRet = 0;
 				for (int i = craftSortingFunctions.Count - 1; i >= 0; --i) {
@@ -222,20 +286,22 @@ namespace KspCraftOrganizer {
 			});
 		}
 
+
 		public bool addCraftSortingFunction(CraftSortFunction function) {
 			PluginLogger.logDebug("Setting sorting function");
-			if (craftSortingFunctions.Count == 0 || !craftSortingFunctions[craftSortingFunctions.Count - 1].isSame(function)) {
-				craftSortingFunctions.Add(function);
-				if (craftSortingFunctions.Count > 10) {
-					craftSortingFunctions.RemoveAt(0);
-				}
+			ICraftSortFunction lastSortFunction = stateManager.getLastSortFunction();
+			if (lastSortFunction == null || !lastSortFunction.isSame(function)) {
+				stateManager.addCraftSortingFunction(function);
 				return true;
 			} else {
-				ICraftSortFunction oldSortFunction = craftSortingFunctions[craftSortingFunctions.Count - 1];
-				craftSortingFunctions.RemoveAt(craftSortingFunctions.Count - 1);
-				craftSortingFunctions.Add(new ReversedCraftSortingFunction(oldSortFunction));
+				stateManager.removeLastSortingFunction();
+				stateManager.addCraftSortingFunction(new ReversedCraftSortingFunction(lastSortFunction));
 				return true;
 			}
+		}
+
+		public ICraftSortFunction getLastSortFunction() {
+			return stateManager.getLastSortFunction();
 		}
 
 	}

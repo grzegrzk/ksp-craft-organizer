@@ -9,8 +9,6 @@ namespace KspCraftOrganizer {
 		private static readonly string[] SPH_VAB = { "VAB", "SPH" };
 		private static readonly CraftType[] SPH_VAB_STATES = { CraftType.VAB, CraftType.SPH };
 
-
-
 		private static readonly string TEXT_FILTER_CONTROL_NAME = "OrganizerWindow_TEXT_FILTER_CONTROL_NAME";
 
 		public static readonly int FILTER_TOOLBAR_WIDTH = 220;
@@ -36,7 +34,7 @@ namespace KspCraftOrganizer {
 		private List<DrawOverlay> startOverlaysToDraw = new List<DrawOverlay>();
 		private bool showSaveFileChoice = false;
 
-		private DropDownList<string> chooseSaveName;// = new DropDownList<string>(new string[] { "default", "science", "something something darkness", "ab", "cd", "ef", "gh", "ij" }, t => t);
+		private DropDownList<string> chooseSaveName;
 		private DropDownList<CraftSortData> sortingModeDropDown;
 
 		public OrganizerController model { get {
@@ -103,10 +101,20 @@ namespace KspCraftOrganizer {
 						sortingFields.Add(new CraftSortData("tag:" + tagGroup.displayName, CraftSortFunction.createByTagSorting(tagGroup.name)));
 					}
 				}
-				if(sortingModeDropDown.selectedItem != null && sortingModeDropDown.getAndClearItemChangedFlag()){
-					model.setCraftSortingFunction(sortingModeDropDown.selectedItem.function);
+				if(sortingModeDropDown.selectedItem != null && sortingModeDropDown.getAndClearItemChangedByUserFlag()){
+					model.onCraftSortingFunctionSelected(sortingModeDropDown.selectedItem.function);
 				}
 				sortingModeDropDown.items = sortingFields;
+
+				ICraftSortFunction selectedSortingFunction = model.getCraftSortingFunction();
+
+				for (int index = 0; index < sortingFields.Count; ++index) {
+					CraftSortData s = sortingFields[index];
+					if (s.function.isSame(selectedSortingFunction)) {
+						sortingModeDropDown.selectedItemIndex = index;
+					}
+				}
+
 				model.update(chooseSaveName.selectedItem, selectAllFiltered);
 				this.selectAllFiltered = model.selectAllFiltered;
 

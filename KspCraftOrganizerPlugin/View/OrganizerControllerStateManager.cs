@@ -136,6 +136,8 @@ namespace KspCraftOrganizer {
 
 		private SortedList<string, OrganizerControllerPerSaveSettings> perSaveSettings = new SortedList<string, OrganizerControllerPerSaveSettings>();
 
+		private List<ICraftSortFunction> craftSortingFunctions = new List<ICraftSortFunction>();
+
 		private IKspAl ksp = IKspAlProvider.instance;
 		private SettingsService settingsService = SettingsService.instance;
 		private bool lockMarkingPrimarySettingsAsChanged = false;
@@ -258,6 +260,8 @@ namespace KspCraftOrganizer {
 			try {
 				ProfileSettingsDto dto = settingsService.readProfileSettings(ksp.getNameOfSaveFolder());
 
+				this.craftSortingFunctions = readCraftSortingfunctions(dto.craftSorting);
+
 				ProfileAllFilterSettingsDto allFilter = dto.allFilter;
 				readFilterSettings(allFilter, CraftType.SPH, CraftType.VAB);
 				readFilterSettings(allFilter, CraftType.SPH, CraftType.SPH);
@@ -270,6 +274,14 @@ namespace KspCraftOrganizer {
 			}
 
 			primarySettingsChanged = false;
+		}
+
+		List<ICraftSortFunction> readCraftSortingfunctions(ICollection<CraftSortingEntry> craftSorting) {
+			List<ICraftSortFunction> toRet = new List<ICraftSortFunction>();
+			foreach (CraftSortingEntry entry in craftSorting) {
+				toRet.Add(CraftSortFunctionFactory.createFunction(entry));
+			}
+			return toRet;
 		}
 
 		void readFilterSettings(ProfileAllFilterSettingsDto dto, CraftType facility, CraftType craftType) {
@@ -318,6 +330,7 @@ namespace KspCraftOrganizer {
 
 				dto.allFilter = allFilter;
 				dto.selectedGuiStyle = this.selectedGuiStyle;
+				dto.craftSorting = createCraftSortingSettings();
 
 				settingsService.writeProfileSettings(ksp.getNameOfSaveFolder(), dto);
 			}
@@ -343,6 +356,18 @@ namespace KspCraftOrganizer {
 						}
 					}
 				}
+		}
+
+		ICollection<CraftSortingEntry> createCraftSortingSettings() {
+			List<CraftSortingEntry> toRet = new List<CraftSortingEntry>();
+			foreach (ICraftSortFunction f in this.craftSortingFunctions) {
+				CraftSortingEntry craftSortingEntry = new CraftSortingEntry();
+				craftSortingEntry.sortingId = f.functionTypeId;
+				craftSortingEntry.sortingData = f.functionData;
+				craftSortingEntry.isReversed = f.isReversed;
+				toRet.Add(craftSortingEntry);
+			}
+			return toRet;
 		}
 
 		void saveFilterSettings(ProfileAllFilterSettingsDto dto, CraftType facility, CraftType craftType) {
@@ -418,6 +443,29 @@ namespace KspCraftOrganizer {
 
 			markCurrentSaveSettingsAsDirty("renamed tag");
 			markPrimaryProfileDirty("removed tag");
+		}
+
+		public void addCraftSortingFunction(ICraftSortFunction function) {
+			craftSortingFunctions.Add(function);
+			if (craftSortingFunctions.Count > 10) {
+				craftSortingFunctions.RemoveAt(0);
+			}
+			markPrimaryProfileDirty("added craft sorting function");
+		}
+
+		public ICraftSortFunction getLastSortFunction() {
+			return craftSortingFunctions.Count == 0 ? null : craftSortingFunctions[craftSortingFunctions.Count - 1];
+		}
+
+		public void removeLastSortingFunction() {
+			if (craftSortingFunctions.Count > 0) {
+				craftSortingFunctions.RemoveAt(craftSortingFunctions.Count - 1);
+			}
+			markPrimaryProfileDirty("removed craft sorting function");
+		}
+
+		public IEnumerable<ICraftSortFunction> getCraftSortFunctions() {
+			return craftSortingFunctions;
 		}
 	}
 

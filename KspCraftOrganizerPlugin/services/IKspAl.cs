@@ -71,8 +71,17 @@ namespace KspCraftOrganizer {
 		}
 	}
 
+	public class CraftSortingEntry {
+		public string sortingId;
+		public string sortingData;
+		public bool isReversed;
+	}
+
 	public class ProfileSettingsDto {
+		
 		public ICollection<string> availableTags { get; set; }
+
+		public ICollection<CraftSortingEntry> craftSorting { get; set; }
 
 		public ProfileAllFilterSettingsDto allFilter { get; set; }
 

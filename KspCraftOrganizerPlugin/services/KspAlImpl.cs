@@ -24,10 +24,15 @@ namespace KspCraftOrganizer
 		 * In plugin settings: Eliminated bug that default tags may not be created
 		 */
 		private static readonly int SETTINGS_VER_4 = 4;
+		/**
+		 * In profile settings: aded sorting settings
+		 * In plugin settings: no changes
+		 */
+		private static readonly int SETTINGS_VER_5 = 5;
 
 		private List<string> NEW_TAGS_IN_VER3 = new List<string>(new string[] { "MasterpieceAmongCrafts"});
 
-		private static readonly int SETTINGS_VER_NOW = SETTINGS_VER_4;
+		private static readonly int SETTINGS_VER_NOW = SETTINGS_VER_5;
 
 		private Dictionary<string, AvailablePart> _availablePartCache;
 		private EditorFacility editorFacility;
@@ -207,6 +212,7 @@ namespace KspCraftOrganizer
 			ProfileSettingsDto settings = new ProfileSettingsDto ();
 
 			List<string> tags = new List<string> ();
+			List<CraftSortingEntry> craftSorting = new List<CraftSortingEntry>();
 			GuiStyleOption style = GuiStyleOption.Ksp;
 
 			ProfileAllFilterSettingsDto allFilterSettings = new ProfileAllFilterSettingsDto();
@@ -238,10 +244,21 @@ namespace KspCraftOrganizer
 					}
 
 
-					//if (settingsVersion == SETTINGS_VER_3) {
-					//	COLogger.logDebug("Profile settings were in version " + settingsVersion + " which had bug that default tags were not created. Adding them now.");
-					//	tags.AddRange(createDefaultTags());
-					//}
+					if (settingsVersion <= SETTINGS_VER_4) {
+						PluginLogger.logDebug("Profile settings were in version " + settingsVersion + ", adding craft sorting");
+						craftSorting.Add(createDefaultSorting());
+					}
+
+
+					foreach (ConfigNode craftSortingNode in node.GetNodes("craftSorting")) {
+
+						CraftSortingEntry craftSortingEntry = new CraftSortingEntry();
+						craftSortingEntry.sortingId = craftSortingNode.GetValue("sortingId");
+						craftSortingEntry.sortingData = craftSortingNode.GetValue("sortingData");
+						craftSortingEntry.isReversed = readBoolFromSettings(craftSortingNode, "isReversed", false);
+
+						craftSorting.Add(craftSortingEntry);
+					}
 
 					string styleId = node.GetValue("guiStyle");
 					foreach (GuiStyleOption candidateStyle in GuiStyleOption.SKIN_STATES) {
@@ -252,14 +269,25 @@ namespace KspCraftOrganizer
 					}
 				}
 			} else {
+				craftSorting.Add(createDefaultSorting());
+
 				tags.AddRange(defaultTags);
 			}
 
-
+			settings.craftSorting = craftSorting;
 			settings.availableTags = tags.ToArray();
 			settings.selectedGuiStyle = style;
 			settings.allFilter = allFilterSettings;
 			return settings;
+		}
+
+		public CraftSortingEntry createDefaultSorting() {
+			CraftSortFunction defaultSorting = CraftSortFunction.SORT_CRAFTS_BY_NAME;
+			CraftSortingEntry defaultSortingEntry = new CraftSortingEntry();
+			defaultSortingEntry.sortingId = defaultSorting.functionTypeId;
+			defaultSortingEntry.sortingData = defaultSorting.functionData;
+			defaultSortingEntry.isReversed = defaultSorting.isReversed;
+			return defaultSortingEntry;
 		}
 
 		static int readSettingsVersion(ConfigNode node) {
@@ -323,6 +351,14 @@ namespace KspCraftOrganizer
 
 			foreach (string availableTag in toWrite.availableTags) {
 				node.AddValue("availableTag", availableTag);
+			}
+
+			foreach (CraftSortingEntry sortingEntry in toWrite.craftSorting) {
+				ConfigNode sortingNode = new ConfigNode();
+				sortingNode.AddValue("sortingId", sortingEntry.sortingId);
+				sortingNode.AddValue("sortingData", sortingEntry.sortingData);
+				sortingNode.AddValue("isReversed", sortingEntry.isReversed);
+				node.AddNode("craftSorting", sortingNode);
 			}
 
 			writeFilterSettingsFromDto(toWrite.allFilter.filterSphInSph, node, "SphInSph_");

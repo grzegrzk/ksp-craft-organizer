@@ -180,7 +180,7 @@ namespace KspNalCommon {
 			}
 		}
 
-		internal bool getAndClearItemChangedFlag() {
+		internal bool getAndClearItemChangedByUserFlag() {
 			bool toRet = itemChangedFlag;
 			itemChangedFlag = false;
 			return toRet;
@@ -219,9 +219,6 @@ namespace KspNalCommon {
 				}
 				if (!found) {
 					selectedItemIndex = -1;
-				}
-				if (oldSelected != selectedItemIndex) {
-					itemChangedFlag = true;
 				}
 			}
 		}

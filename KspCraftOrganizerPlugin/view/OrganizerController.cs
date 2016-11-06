@@ -180,8 +180,12 @@ namespace KspCraftOrganizer {
 			managementTagsGroups.update(availableTags);
 		}
 
-		internal void setCraftSortingFunction(CraftSortFunction function) {
+		internal void onCraftSortingFunctionSelected(CraftSortFunction function) {
 			craftList.addCraftSortingFunction(function);
+		}
+
+		internal ICraftSortFunction getCraftSortingFunction() {
+			return craftList.getCraftSortingFunction();
 		}
 
 		public OrganizerControllerCraftList.CraftFilterPredicate craftFilterPredicate {

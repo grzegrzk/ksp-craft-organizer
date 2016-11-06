@@ -95,7 +95,7 @@ namespace KspCraftOrganizer {
 		private int cachedSelectedCraftsCount;
 		private CraftType _craftType;
 		private Dictionary<string, ListOfCraftsInSave> saveToListOfCrafts = new Dictionary<string, ListOfCraftsInSave>();
-		private CraftSortingHelper sortingHelper = new CraftSortingHelper();
+		private CraftSortingHelper sortingHelper;
 			
 		private IKspAl ksp = IKspAlProvider.instance;
 		private FileLocationService fileLocationService = FileLocationService.instance;
@@ -105,6 +105,7 @@ namespace KspCraftOrganizer {
 
 		public OrganizerControllerCraftList(OrganizerController parent) {
 			this.parent = parent;
+			this.sortingHelper = new CraftSortingHelper(parent.stateManager);
 			_craftType = ksp.getCurrentEditorFacilityType();
 		}
 
@@ -130,6 +131,10 @@ namespace KspCraftOrganizer {
 			if (sortingHelper.addCraftSortingFunction(function)) {
 				cachedFilteredCrafts = null;
 			}
+		}
+
+		public ICraftSortFunction getCraftSortingFunction() {
+			return sortingHelper.getLastSortFunction();
 		}
 
 		public bool craftsAreFiltered { get; private set; }
