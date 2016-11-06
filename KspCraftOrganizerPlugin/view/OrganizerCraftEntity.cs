@@ -37,6 +37,7 @@ namespace KspCraftOrganizer
 		private bool _selected;
 		private string _craftFile;
 		private SortedList<string, string> _tags = new SortedList<string, string>();
+		private CraftTagsGrouper _groupedTagsCache;
 		private readonly OrganizerController service;
 		private Texture2D thumbTextureCache;
 		private bool duringCreation;
@@ -56,6 +57,15 @@ namespace KspCraftOrganizer
 				}
 				return craftDtoLazy;
 			}}
+
+		public CraftTagsGrouper groupedTags {
+			get {
+				if (_groupedTagsCache == null) {
+					_groupedTagsCache = new CraftTagsGrouper(this.tags);
+				}
+				return _groupedTagsCache;
+			}
+		}
 
 		public OrganizerCraftEntity(OrganizerController service, string craftFile){
 			this.service = service;
@@ -197,6 +207,7 @@ namespace KspCraftOrganizer
 		public void addTag(string tag){
 			if (!_tags.ContainsKey (tag)) {
 				_tags.Add (tag, tag);
+				_groupedTagsCache = null;
 				craftSettingsFileIsDirty = true;
 				if (!duringCreation) {
 					service.markFilterAsChanged();
@@ -207,6 +218,7 @@ namespace KspCraftOrganizer
 		public void removeTag(string tag){
 			if (_tags.ContainsKey (tag)) {
 				_tags.Remove (tag);
+				_groupedTagsCache = null;
 				craftSettingsFileIsDirty = true;
 				service.markFilterAsChanged ();
 			}

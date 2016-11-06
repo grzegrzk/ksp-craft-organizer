@@ -5,8 +5,8 @@ using System.Collections.ObjectModel;
 using UnityEngine;
 using KspNalCommon;
 
-namespace KspCraftOrganizer
-{
+namespace KspCraftOrganizer {
+	
 
 	public class OrganizerController {
 		private IKspAl ksp = IKspAlProvider.instance;
@@ -147,7 +147,7 @@ namespace KspCraftOrganizer
 
 		public FilterTagsGrouper filterTagsGrouper {
 			get {
-				return filter.tagsGrouper;
+				return filter.usedTagsGrouper;
 			}
 		}
 
@@ -178,6 +178,10 @@ namespace KspCraftOrganizer
 			filter.update();
 			craftList.update(selectAll, filter.filterChanged);
 			managementTagsGroups.update(availableTags);
+		}
+
+		internal void setCraftSortingFunction(CraftSortFunction function) {
+			craftList.addCraftSortingFunction(function);
 		}
 
 		public OrganizerControllerCraftList.CraftFilterPredicate craftFilterPredicate {

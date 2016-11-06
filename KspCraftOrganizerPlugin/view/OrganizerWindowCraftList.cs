@@ -73,7 +73,7 @@ namespace KspCraftOrganizer {
 				}
 				using (new GUILayout.VerticalScope(GUILayout.ExpandWidth(true))) {
 					GUIStyle thisCraftButtonStyle = craft.isSelectedPrimary ? parent.toggleButtonStyleTrue : parent.toggleButtonStyleFalse;
-					CraftTagsGrouper tagsGrouper = new CraftTagsGrouper(craft.tags);
+					CraftTagsGrouper tagsGrouper = craft.groupedTags;
 
 					using (new GUI.ClipScope(Globals.ZERO_RECT)) {
 						GUILayout.Button("", thisCraftButtonStyle, GUILayout.Height(0));

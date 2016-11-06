@@ -9,13 +9,13 @@ namespace KspCraftOrganizer {
 		
 		private SortedList<string, OrganizerTagEntity> _availableTags;
 		private SortedList<string, OrganizerTagEntity> _usedTags = new SortedList<string, OrganizerTagEntity>();
-		public FilterTagsGrouper tagsGrouper { get; private set; }
+		public FilterTagsGrouper usedTagsGrouper { get; private set; }
 		private OrganizerController parent;
 		bool availableTagsCreated = false;
 
 		public OrganizerControllerFilter(OrganizerController parent) {
 			this.parent = parent;
-			this.tagsGrouper = new FilterTagsGrouper(parent);
+			this.usedTagsGrouper = new FilterTagsGrouper(parent);
 
 			_availableTags = new SortedList<string, OrganizerTagEntity>();
 
@@ -41,11 +41,11 @@ namespace KspCraftOrganizer {
 			//
 		}
 
-		public bool restTagsCollapsed { get { return tagsGrouper.restGroupCollapsed; } set { tagsGrouper.restGroupCollapsed = value; } }
+		public bool restTagsCollapsed { get { return usedTagsGrouper.restGroupCollapsed; } set { usedTagsGrouper.restGroupCollapsed = value; } }
 
 		public ICollection<string> groupsWithSelectedNoneOption {
 			get {
-				return tagsGrouper.groupsWithSelectedNoneOption;
+				return usedTagsGrouper.groupsWithSelectedNoneOption;
 			}
 		}
 
@@ -95,18 +95,18 @@ namespace KspCraftOrganizer {
 			shouldBeVisibleByDefault = true;
 			bool pass = true;
 			pass = pass && (craft.nameToDisplay.ToUpper().Contains(upperFilter) || craftNameFilter == "");
-			pass = tagsGrouper.doesCraftPassFilter(craft, out shouldBeVisibleByDefault) && pass;
+			pass = usedTagsGrouper.doesCraftPassFilter(craft, out shouldBeVisibleByDefault) && pass;
 			return pass;
 		}
 
 
 		public void clearFilters() {
 			craftNameFilter = "";
-			tagsGrouper.clearFilters();
+			usedTagsGrouper.clearFilters();
 			foreach (OrganizerTagEntity tag in availableTags) {
 				tag.selectedForFiltering = false;
 				if (YesNoTag.isByDefaultNegativeTag(tag.name)) {
-					tagsGrouper.setGroupHasSelectedNoneFilter(tag.name, true);
+					usedTagsGrouper.setGroupHasSelectedNoneFilter(tag.name, true);
 				}
 				if (YesNoTag.isByDefaultPositiveTag(tag.name)) {
 					tag.selectedForFiltering = true;
@@ -115,7 +115,7 @@ namespace KspCraftOrganizer {
 		}
 
 		public void setGroupHasSelectedNoneFilter(string groupName, bool selectedNoneFilter) {
-			tagsGrouper.setGroupHasSelectedNoneFilter(groupName, selectedNoneFilter);
+			usedTagsGrouper.setGroupHasSelectedNoneFilter(groupName, selectedNoneFilter);
 		}
 
 		public void update() {
@@ -136,7 +136,7 @@ namespace KspCraftOrganizer {
 				tag.updateTagState();
 			}
 			updateUsedTags();
-			tagsGrouper.update(usedTags);
+			usedTagsGrouper.update(usedTags);
 		}
 
 		public ICollection<OrganizerTagEntity> usedTags {

@@ -11,6 +11,8 @@ namespace KspNalCommon {
 		void addOverlayAtStart(DrawOverlay drawOverlay);
 
 		void addOverlayAtEnd(DrawOverlay drawOverlay);
+
+		float maxX { get; }
 }
 
 	public class DropDownList<T> {
@@ -18,7 +20,7 @@ namespace KspNalCommon {
 		public delegate string Stringizer(T value);
 
 		private Texture2D downArrowImage;
-		private List<T> items;
+		private List<T> _items;
 		private Stringizer stringizer;
 		private Texture2D hoverBackgroundTexture = UiUtils.createSingleColorTexture(new Color(200, 200, 200));
 		private float openedListMaxItemWidth;
@@ -27,11 +29,24 @@ namespace KspNalCommon {
 		private Rect openedListRect = new Rect(0, 0, 0, 0);
 		private Rect openedListViewRect = new Rect(0, 0, 0, 0);
 		private Rect dropDownRect = new Rect(0, 0, 0, 0);
+		private bool itemChangedFlag = false;
 
 		public DropDownList(ICollection<T> items, Stringizer stringizer) {
-			this.items = new List<T>(items);
+			this._items = new List<T>(items);
 			this.stringizer = stringizer;
 			this.maxOpenedListVisibleItemsCount = 6;
+		}
+
+		public List<T> items {
+			get {
+				return _items;
+			}
+			set {
+				T oldSelectedItem = this.selectedItem;
+				_items = value;
+				this.selectedItem = oldSelectedItem;
+			}
+
 		}
 
 		public void onGui(IGuiOverlayContainer overlayContainer, int width) {
@@ -59,7 +74,7 @@ namespace KspNalCommon {
 				Vector2 perfectSize = style.CalcSize(content);
 
 				if (perfectSize.x > dropDownRect.width) {
-					while (perfectSize.x > dropDownRect.width || content.text.Length < 5) {
+					while (perfectSize.x > dropDownRect.width && content.text.Length > 3) {
 						content.text = content.text.Substring(0, content.text.Length - 1);
 						perfectSize = style.CalcSize(content);
 					}
@@ -79,16 +94,19 @@ namespace KspNalCommon {
 				float scrollbarWidth = scrollbarStyle.CalcSize(new GUIContent("")).x + scrollbarStyle.margin.left;
 				if (Event.current.type == EventType.Repaint) {
 					int displayedCount = this.maxOpenedListVisibleItemsCount;
-					if (displayedCount > items.Count) {
-						displayedCount = items.Count;
+					if (displayedCount > _items.Count) {
+						displayedCount = _items.Count;
 					}
-					bool scrollbarVisible = displayedCount < items.Count;
+					bool scrollbarVisible = displayedCount < _items.Count;
 					float optionalScrollbarWidth = scrollbarVisible ? scrollbarWidth : 0;
 					openedListRect = new Rect(dropDownRect.x, dropDownRect.y + dropDownRect.height, openedListMaxItemWidth + optionalScrollbarWidth, openedListItemHeight * displayedCount);
 					if (openedListRect.width < dropDownRect.width) {
 						openedListRect.width = dropDownRect.width;
 					}
-					openedListViewRect = new Rect(0, 0, openedListRect.width - optionalScrollbarWidth, openedListItemHeight*items.Count);
+					if (openedListRect.x + openedListRect.width > overlayContainer.maxX) {
+						openedListRect.x = dropDownRect.x + dropDownRect.width - openedListRect.width;
+					}
+					openedListViewRect = new Rect(0, 0, openedListRect.width - optionalScrollbarWidth, openedListItemHeight*_items.Count);
 				}
 
 				overlayContainer.addOverlayAtStart(delegate () {
@@ -131,7 +149,7 @@ namespace KspNalCommon {
 				float itemWidth = openedListViewRect.width;
 				int currentIndex = 0;
 				this.openedListMaxItemWidth = 0;
-				foreach (T item in items) {
+				foreach (T item in _items) {
 					GUIContent itemContent = new GUIContent(stringizer(item));
 
 					GUIStyle itemStyle = new GUIStyle();
@@ -153,12 +171,19 @@ namespace KspNalCommon {
 					this.openedListMaxItemWidth = Math.Max(itemSize.x, openedListMaxItemWidth);
 					if (GUI.Button(new Rect(itemX, itemY, itemWidth, itemHeight), itemContent, itemStyle)) {
 						this.selectedItemIndex = currentIndex;
+						this.itemChangedFlag = true;
 						this.opened = false;
 					}
 					itemY += itemHeight;
 					++currentIndex;
 				}
 			}
+		}
+
+		internal bool getAndClearItemChangedFlag() {
+			bool toRet = itemChangedFlag;
+			itemChangedFlag = false;
+			return toRet;
 		}
 
 		public int maxOpenedListVisibleItemsCount { get; set;}
@@ -169,25 +194,34 @@ namespace KspNalCommon {
 
 		public bool someItemSelected {
 			get {
-				return selectedItemIndex < items.Count && selectedItemIndex >= 0;
+				return selectedItemIndex < _items.Count && selectedItemIndex >= 0;
 			}
 		}
 
 		public T selectedItem {
 			get {
 				if (someItemSelected) {
-					return items[selectedItemIndex];
+					return _items[selectedItemIndex];
 				} else {
 					return default(T);
 				}
 			}
 			set {
 				int index = 0;
-				foreach (T item in items) {
+				bool found = false;
+				int oldSelected = selectedItemIndex;
+				foreach (T item in _items) {
 					if (EqualityComparer<T>.Default.Equals(item, value)) {
 						selectedItemIndex = index;
+						found = true;
 					}
 					++index;					
+				}
+				if (!found) {
+					selectedItemIndex = -1;
+				}
+				if (oldSelected != selectedItemIndex) {
+					itemChangedFlag = true;
 				}
 			}
 		}

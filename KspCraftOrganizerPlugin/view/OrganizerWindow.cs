@@ -37,6 +37,7 @@ namespace KspCraftOrganizer {
 		private bool showSaveFileChoice = false;
 
 		private DropDownList<string> chooseSaveName;// = new DropDownList<string>(new string[] { "default", "science", "something something darkness", "ab", "cd", "ef", "gh", "ij" }, t => t);
+		private DropDownList<CraftSortData> sortingModeDropDown;
 
 		public OrganizerController model { get {
 				if (_modelLazy == null) { 
@@ -64,6 +65,9 @@ namespace KspCraftOrganizer {
 			this.craftAlreadyExistsQuestionWindow = craftAlreadyExistsQuestionWindow;
 			this.chooseSaveName = new DropDownList<string>(model.availableSaveNames, t => t);
 			chooseSaveName.selectedItem = model.currentSave;
+
+			sortingModeDropDown = new DropDownList<CraftSortData>(new CraftSortData[0], t => t.name);
+			sortingModeDropDown.selectedItemIndex = 0;
 		}
 
 		protected override float getWindowWidthOnScreen(Rect pos) {
@@ -87,6 +91,22 @@ namespace KspCraftOrganizer {
 		override public void update() {
 			base.update();
 			if (windowDisplayed) {
+				List<CraftSortData> sortingFields = new List<CraftSortData>(new CraftSortData[] { 
+					new CraftSortData("name", CraftSortFunction.SORT_CRAFTS_BY_NAME), 
+					new CraftSortData("parts", CraftSortFunction.SORT_CRAFTS_BY_PARTS_COUNT), 
+					new CraftSortData("mass", CraftSortFunction.SORT_CRAFTS_BY_MASS), 
+					new CraftSortData("stages", CraftSortFunction.SORT_CRAFTS_BY_STAGES), 
+					new CraftSortData("cost", CraftSortFunction.SORT_CRAFTS_BY_COST)
+				});
+				foreach (FilterTagGroup tagGroup in model.filterTagsGrouper.groups) {
+					if (!tagGroup.isYesNoGroup) {
+						sortingFields.Add(new CraftSortData("tag:" + tagGroup.displayName, CraftSortFunction.createByTagSorting(tagGroup.name)));
+					}
+				}
+				if(sortingModeDropDown.selectedItem != null && sortingModeDropDown.getAndClearItemChangedFlag()){
+					model.setCraftSortingFunction(sortingModeDropDown.selectedItem.function);
+				}
+				sortingModeDropDown.items = sortingFields;
 				model.update(chooseSaveName.selectedItem, selectAllFiltered);
 				this.selectAllFiltered = model.selectAllFiltered;
 
@@ -131,6 +151,9 @@ namespace KspCraftOrganizer {
 					using (new GUILayout.VerticalScope()) {
 						using (new GUILayout.HorizontalScope()) {
 							drawCraftsFilteredWarning();
+							GUILayout.FlexibleSpace();
+							GUILayout.Label("Sort by:");
+							sortingModeDropDown.onGui(this, 100);
 						}
 						craftList.drawCraftsList();
 					}
@@ -166,6 +189,12 @@ namespace KspCraftOrganizer {
 
 		public void addOverlayAtEnd(DrawOverlay drawOverlay) {
 			endOverlaysToDraw.Add(drawOverlay);
+		}
+
+		public float maxX {
+			get {
+				return windowWidth;
+			}
 		}
 
 		private void drawEndOverlays() {

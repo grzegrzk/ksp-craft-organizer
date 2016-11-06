@@ -84,7 +84,9 @@ namespace KspCraftOrganizer {
 		}
 	}
 
+
 	public class OrganizerControllerCraftList {
+		
 
 		public delegate bool CraftFilterPredicate(OrganizerCraftEntity craft, out bool shouldBeVisibleByDefault);
 
@@ -93,6 +95,7 @@ namespace KspCraftOrganizer {
 		private int cachedSelectedCraftsCount;
 		private CraftType _craftType;
 		private Dictionary<string, ListOfCraftsInSave> saveToListOfCrafts = new Dictionary<string, ListOfCraftsInSave>();
+		private CraftSortingHelper sortingHelper = new CraftSortingHelper();
 			
 		private IKspAl ksp = IKspAlProvider.instance;
 		private FileLocationService fileLocationService = FileLocationService.instance;
@@ -104,8 +107,6 @@ namespace KspCraftOrganizer {
 			this.parent = parent;
 			_craftType = ksp.getCurrentEditorFacilityType();
 		}
-
-
 
 		public bool selectAllFiltered {
 			get;
@@ -123,6 +124,12 @@ namespace KspCraftOrganizer {
 				parent.markFilterAsUpToDate();
 			}
 			updateSelectedCrafts(selectAll);
+		}
+
+		public void addCraftSortingFunction(CraftSortFunction function) {
+			if (sortingHelper.addCraftSortingFunction(function)) {
+				cachedFilteredCrafts = null;
+			}
 		}
 
 		public bool craftsAreFiltered { get; private set; }
@@ -157,9 +164,14 @@ namespace KspCraftOrganizer {
 					craft.setSelectedInternal(false);
 				}
 			}
+			sortCrafts(filtered);
 			return filtered.ToArray();
 		}
 
+
+		private void sortCrafts(List<OrganizerCraftEntity> crafts) {
+			sortingHelper.sortCrafts(crafts);
+		}
 	
 
 		public OrganizerCraftEntity primaryCraft {

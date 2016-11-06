@@ -93,6 +93,7 @@
     <Compile Include="Common\KSPBasics.cs" />
     <Compile Include="Common\MonoBehaviour2.cs" />
     <Compile Include="KspCraftOrganizerMain.cs" />
+    <Compile Include="Services\CraftSortingHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Services\" />
