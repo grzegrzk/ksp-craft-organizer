@@ -41,9 +41,14 @@ namespace KspCraftOrganizer {
 			}
 
 			toRetList.Sort(delegate (OrganizerCraftEntity c1, OrganizerCraftEntity c2) {
-				int craftComparisonResult = -c1.isAutosaved.CompareTo(c2.isAutosaved);
-				if (craftComparisonResult == 0) {
-					craftComparisonResult = c1.name.CompareTo(c2.name);
+				int craftComparisonResult = 0;
+				try {
+					craftComparisonResult = -c1.isAutosaved.CompareTo(c2.isAutosaved);
+					if (craftComparisonResult == 0) {
+						craftComparisonResult = c1.name.CompareTo(c2.name);
+					}
+				} catch (Exception ex) {
+					PluginLogger.logError("Error during craft file loading - cannot compare '" + c1.craftFile + "' with '" + c2.craftFile + "'", ex);
 				}
 				return craftComparisonResult;
 			});
@@ -55,25 +60,31 @@ namespace KspCraftOrganizer {
 			PluginLogger.logDebug("fetching '" + type + "' crafts from disk from " + craftDirectory);
 			float startLoadingTime = Time.realtimeSinceStartup;
 			string[] craftFiles = fileLocationService.getAllCraftFilesInDirectory(craftDirectory);
-			OrganizerCraftEntity[] toRet = new OrganizerCraftEntity[craftFiles.Length];
+			List<OrganizerCraftEntity> toRet = new List<OrganizerCraftEntity>();
 
-			for (int i = 0; i < craftFiles.Length; ++i) {
-				toRet[i] = new OrganizerCraftEntity(parent, craftFiles[i]);
-				toRet[i].isAutosaved = ksp.getAutoSaveCraftName() == Path.GetFileNameWithoutExtension(craftFiles[i]);
-				toRet[i].isStock = isStock;
+			foreach (string craftFile in craftFiles){
+				try {
+					OrganizerCraftEntity newCraft = new OrganizerCraftEntity(parent, craftFile);
+					newCraft.isAutosaved = ksp.getAutoSaveCraftName() == Path.GetFileNameWithoutExtension(craftFile);
+					newCraft.isStock = isStock;
 
-				CraftSettingsDto craftSettings = settingsService.readCraftSettingsForCraftFile(toRet[i].craftFile);
-				foreach (string craftTag in craftSettings.tags) {
-					toRet[i].addTag(craftTag);
+					CraftSettingsDto craftSettings = settingsService.readCraftSettingsForCraftFile(newCraft.craftFile);
+					foreach (string craftTag in craftSettings.tags) {
+						newCraft.addTag(craftTag);
+					}
+					newCraft.nameFromSettingsFile = craftSettings.craftName;
+					newCraft.craftSettingsFileIsDirty = false;
+
+					newCraft.finishCreationMode();
+
+					toRet.Add(newCraft);
+				} catch (Exception ex) {
+					PluginLogger.logError("Error during craft file loading '" + craftFile + "'", ex);
 				}
-				toRet[i].nameFromSettingsFile = craftSettings.craftName;
-				toRet[i].craftSettingsFileIsDirty = false;
-
-				toRet[i].finishCreationMode();
 			}
 			float endLoadingTime = Time.realtimeSinceStartup;
 			PluginLogger.logDebug("Finished fetching " + craftFiles.Length + " crafts, it took " + (endLoadingTime - startLoadingTime) + "s");
-			return toRet;
+			return toRet.ToArray();
 		}
 
 
@@ -154,19 +165,23 @@ namespace KspCraftOrganizer {
 			craftsAreFiltered = false;
 			foreach (OrganizerCraftEntity craft in availableCrafts) {
 				bool shouldBeVisibleByDefault;
-				if (craftFilterPredicate(craft, out shouldBeVisibleByDefault)) {
-					filtered.Add(craft);
-					if (!shouldBeVisibleByDefault) {
-						craftsAreFiltered = true;
+				try {
+					if (craftFilterPredicate(craft, out shouldBeVisibleByDefault)) {
+						filtered.Add(craft);
+						if (!shouldBeVisibleByDefault) {
+							craftsAreFiltered = true;
+						}
+					} else {
+						if (shouldBeVisibleByDefault) {
+							craftsAreFiltered = true;
+						}
+						if (craft.isSelectedPrimary) {
+							primaryCraft = null;
+						}
+						craft.setSelectedInternal(false);
 					}
-				} else {
-					if (shouldBeVisibleByDefault) {
-						craftsAreFiltered = true;
-					}
-					if (craft.isSelectedPrimary) {
-						primaryCraft = null;
-					}
-					craft.setSelectedInternal(false);
+				}catch (Exception ex) {
+					PluginLogger.logError("Error while evaluating  if craft '" + craft.craftFile + "' is available in current filter", ex);
 				}
 			}
 			sortCrafts(filtered);

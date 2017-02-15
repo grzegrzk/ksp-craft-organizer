@@ -158,8 +158,8 @@ namespace KspCraftOrganizer
 					}
 				}
 			}
-			toRet.name = nodes.GetValue("ship");
-			toRet.description = nodes.GetValue("description");
+			toRet.name = guardedGedNode(nodes, "ship", craftFile);
+			toRet.description = guardedGedNode(nodes, "description", craftFile);
 			toRet.stagesCount = stagesCount;
 			toRet.partCount = parts.Length;
 			toRet.mass = massSum;
@@ -167,6 +167,16 @@ namespace KspCraftOrganizer
 			toRet.containsMissedParts = available;
 			toRet.notEnoughScience = notEnoughScience;
 			return toRet;
+		}
+
+		string guardedGedNode(ConfigNode nodes, String propertyName, String fileName) {
+			String v = nodes.GetValue(propertyName);
+			if (v == null) {
+				PluginLogger.logDebug("Value of '" + propertyName + "' is null in '" + fileName + "', coercing it to empty string.");
+				return "";
+			} else {
+				return v;
+			}
 		}
 
 		public string getAutoSaveCraftName() {

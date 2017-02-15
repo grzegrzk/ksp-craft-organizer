@@ -45,6 +45,13 @@ namespace KspNalCommon
 		internal static void logError(string toLog) {
 			Debug.LogError("[" + pluginPrefix + "]" + toLog);
 		}
+
+
+
+		internal static void logError(string toLog, Exception ex) {
+			logError(toLog);
+			Debug.LogException(ex);
+		}
 }
 }
 

@@ -283,14 +283,18 @@ namespace KspCraftOrganizer {
 			List<ICraftSortFunction> craftSortingFunctions = new List<ICraftSortFunction>(stateManager.getCraftSortFunctions());
 			crafts.Sort((c1, c2) => {
 				int toRet = 0;
-				for (int i = craftSortingFunctions.Count - 1; i >= 0; --i) {
-					toRet = craftSortingFunctions[i].apply(c1, c2);
-					if (toRet != 0) {
-						break;
+				try {
+					for (int i = craftSortingFunctions.Count - 1; i >= 0; --i) {
+						toRet = craftSortingFunctions[i].apply(c1, c2);
+						if (toRet != 0) {
+							break;
+						}
 					}
-				}
-				if (toRet == 0) {
-					toRet = CraftSortFunction.SORT_CRAFTS_BY_NAME.apply(c1, c2);
+					if (toRet == 0) {
+						toRet = CraftSortFunction.SORT_CRAFTS_BY_NAME.apply(c1, c2);
+					}
+				} catch (Exception ex) {
+					PluginLogger.logError("Error while comparing craft '" + c1.craftFile + "' witch '" + c2.craftFile, ex);
 				}
 				return toRet;
 			});

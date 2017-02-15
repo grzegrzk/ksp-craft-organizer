@@ -20,7 +20,7 @@ namespace KspCraftOrganizer {
 		}
 
 		public string getPluginLogName() {
-			return "CraftOrganizer";
+			return "CraftOrganizer 1.4.1";
 		}
 
 		public bool isDebug() {
