@@ -108,6 +108,10 @@ namespace KspCraftOrganizer
 			}
 		}
 
+		public DateTime lastWriteTime { get {
+				return File.GetLastWriteTime(this.craftFile);
+			}}
+
 
 		public float cost { get { return craftDto.cost; } }
 

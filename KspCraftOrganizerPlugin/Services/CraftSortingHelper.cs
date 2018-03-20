@@ -26,6 +26,7 @@ namespace KspCraftOrganizer {
 			addSingletonFunction(CraftSortFunction.SORT_CRAFTS_BY_COST);
 			addSingletonFunction(CraftSortFunction.SORT_CRAFTS_BY_STAGES);
 			addSingletonFunction(CraftSortFunction.SORT_CRAFTS_BY_PARTS_COUNT);
+			addSingletonFunction(CraftSortFunction.SORT_CRAFTS_BY_DATE);
 
 			sortFunctionDictionary.Add(CraftSortFunction.SORT_ID_BY_TAG, (data) => { return CraftSortFunction.createByTagSorting(data);});
 		}
@@ -51,6 +52,8 @@ namespace KspCraftOrganizer {
 		public static readonly string SORT_ID_BY_MASS = "byMass";
 		public static readonly string SORT_ID_BY_STAGES_COUNT = "byStagesCount";
 		public static readonly string SORT_ID_BY_COST = "byCost";
+		public static readonly string SORT_ID_BY_DATE = "byDate";
+
 		public static readonly string SORT_ID_BY_TAG = "ByTag";
 
 		public static CraftSortFunction SORT_CRAFTS_BY_NAME = new CraftSortFunction(SORT_ID_BY_NAME, (c1, c2) => {
@@ -98,6 +101,10 @@ namespace KspCraftOrganizer {
 		});
 		public static CraftSortFunction SORT_CRAFTS_BY_COST = new CraftSortFunction(SORT_ID_BY_COST, (c1, c2) => {
 			int craftComparisonResult = c1.cost.CompareTo(c2.cost);
+			return craftComparisonResult;
+		});
+		public static CraftSortFunction SORT_CRAFTS_BY_DATE = new CraftSortFunction(SORT_ID_BY_DATE, (c1, c2) => {
+			int craftComparisonResult = c1.lastWriteTime.CompareTo(c2.lastWriteTime);
 			return craftComparisonResult;
 		});
 

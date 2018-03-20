@@ -115,8 +115,13 @@ namespace KspCraftOrganizer {
 
 							craft.tagsHeight += tagsGrouper.restTagsGuiHeight;
 						}
-
-						craft.guiHeight = 60 + craft.tagsHeight;
+						//20 pixels for margins (10 top & 10 bottom) + 20 pixels for each label line + tags height.
+						//label lines:
+						// - name
+						// - Parts / cost
+						// - Last modification time
+						// - Warning label for missed parts / not enough science
+						craft.guiHeight = 20 + 60 + craft.tagsHeight;
 						if (!craft.containsMissedParts || craft.notEnoughScience) {
 							craft.guiHeight += 20;
 						}
@@ -172,6 +177,8 @@ namespace KspCraftOrganizer {
 						drawScaledLabel(parent.skin.label, firstRowsLeftOffset, nextTop, extraInfoMaxWidth, thisShipRect, "Parts: " + craft.partCount + ", Mass: " + craft.massToDisplay + ", Stages: " + craft.stagesCount);
 					}
 					drawScaledLabel(craft.cost > model.availableFunds && model.availableFunds >= 0 ? parent.warningLabelStyle : goodLabelStyle, costPosX, nextTop, costMaxWidth, thisShipRect, "Cost: " + craft.costToDisplay);
+					nextTop += 20;
+					drawLabel(parent.skin.label, firstRowsLeftOffset, nextTop, "Last modification time: " + craft.lastWriteTime.ToString("yyyy/MM/dd HH:mm:ss"));
 					nextTop += 20;
 					if (!craft.containsMissedParts) {
 						drawLabel(parent.warningLabelStyle, leftOffset, nextTop, "*The craft contains missed or invalid parts*");

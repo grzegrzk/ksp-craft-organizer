@@ -94,7 +94,8 @@ namespace KspCraftOrganizer {
 					new CraftSortData("parts", CraftSortFunction.SORT_CRAFTS_BY_PARTS_COUNT), 
 					new CraftSortData("mass", CraftSortFunction.SORT_CRAFTS_BY_MASS), 
 					new CraftSortData("stages", CraftSortFunction.SORT_CRAFTS_BY_STAGES), 
-					new CraftSortData("cost", CraftSortFunction.SORT_CRAFTS_BY_COST)
+					new CraftSortData("cost", CraftSortFunction.SORT_CRAFTS_BY_COST),
+					new CraftSortData("modification time", CraftSortFunction.SORT_CRAFTS_BY_DATE)
 				});
 				foreach (FilterTagGroup tagGroup in model.filterTagsGrouper.groups) {
 					if (!tagGroup.isYesNoGroup) {
