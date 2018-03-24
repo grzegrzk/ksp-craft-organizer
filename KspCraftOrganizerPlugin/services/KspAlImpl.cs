@@ -36,6 +36,7 @@ namespace KspCraftOrganizer
 
 		private Dictionary<string, AvailablePart> _availablePartCache;
 		private EditorFacility editorFacility;
+		private bool onGuiInitialized = false;
 
 		public KspAlImpl() {
 			onEditorStarted();
@@ -77,7 +78,28 @@ namespace KspCraftOrganizer
 			//It will add default left/right padding:
 			//
 			_kspSkin.button.padding.left = _kspSkin.button.padding.right = 12;
+			onGuiInitialized = false;
 
+		}
+
+		public void onGUI(GUISkin defaultGuiSkin)
+		{
+			if (!onGuiInitialized && _kspSkin != null)
+			{
+				if (GameSettings.UI_SCALE != 1.0f)
+				{
+					//
+					//If UI Scale is not 1.0 then it seems font from ksp skin causes troubles with GUILayout.FlexibleSpace.
+					//Lets change it to font from default unity gui style which unfortunately is not so crispy but
+					//at least does not cause bugs
+					//
+					PluginLogger.logDebug("Changing font for GUI, UI scale: " + GameSettings.UI_SCALE + ". Old font: " + _kspSkin.font.name + ", new font: " + defaultGuiSkin.font.name);
+					_kspSkin.font = defaultGuiSkin.font;
+					_kspSkin.label = new GUIStyle(_kspSkin.label);
+					_kspSkin.label.font = defaultGuiSkin.font;
+				}
+				onGuiInitialized = true;
+			}	
 		}
 
 		public string getBaseCraftDirectory(){

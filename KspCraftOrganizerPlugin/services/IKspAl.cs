@@ -183,6 +183,8 @@ namespace KspCraftOrganizer {
 		void saveCurrentCraft();
 
 		double getAvailableFunds();
+		
+		void onGUI(GUISkin originalSkin);
 	}
 
 }

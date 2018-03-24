@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using System;
+using KspCraftOrganizer;
 
 namespace KspNalCommon
 {
@@ -109,6 +110,7 @@ namespace KspNalCommon
 				scale = windowWidthOnScreen /minWidth;
 				//COLogger.logTrace("True scale: " + scale);
 			}
+			scale = Math.Min(scale, 1.3f);
 			return scale;
 		}
 
@@ -117,6 +119,7 @@ namespace KspNalCommon
 			if (_windowDisplayed) {
 
 				_originalSkin = GUI.skin;
+				IKspAlProvider.instance.onGUI(_originalSkin);
 				if (guiStyleOption == GuiStyleOption.Ksp) {
 					_skin = PluginCommons.instance.kspSkin();
 				} else {

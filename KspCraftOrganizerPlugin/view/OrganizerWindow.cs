@@ -163,7 +163,7 @@ namespace KspCraftOrganizer {
 							drawCraftsFilteredWarning();
 							GUILayout.FlexibleSpace();
 							if (!showManageTagsToolbar) {
-								GUILayout.Label("Sort by:");
+								GUILayout.Button("Sort by:", skin.label);
 							}
 							sortingModeDropDown.onGui(this, showManageTagsToolbar ? 100 : 200);
 						}

@@ -31,6 +31,11 @@ namespace KspCraftOrganizer
 			return "sandbox";
 		}
 
+		public void onGUI(GUISkin defaultGuiSking)
+		{
+			
+		}
+		
 		public bool isShowStockCrafts()
 		{
 			return true;

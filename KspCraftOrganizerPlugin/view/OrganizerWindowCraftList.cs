@@ -215,10 +215,11 @@ namespace KspCraftOrganizer {
 				}
 			}
 		}
-
+		
+		
 		private float calcLabelWidth(string text) {
 			GUIStyle style = new GUIStyle(parent.skin.label);
-			return style.CalcSize(new GUIContent(text)).x;
+			return UiUtils.calcLabelSize(style, text).x;
 		}
 
 		private float calcMultilineLabelHeight(float maxWidth, string text) {
@@ -241,7 +242,7 @@ namespace KspCraftOrganizer {
 
 		private void drawScaledLabel(GUIStyle style, int x, int y, int maxWidth, Rect scopeRect, string text) {
 
-			Vector2 size = style.CalcSize(new GUIContent(text));
+			Vector2 size = UiUtils.calcLabelSize(style, text);
 			float scale = 1;
 
 			if (size.x > maxWidth) {
@@ -262,7 +263,7 @@ namespace KspCraftOrganizer {
 		}
 
 		private void drawLabel(GUIStyle style, int x, int y, string text, string tooltip) {
-			Vector2 size = style.CalcSize(new GUIContent(text));
+			Vector2 size = UiUtils.calcLabelSize(style, text);
 			Rect position = new Rect();
 			position.x = x;
 			position.y = y;

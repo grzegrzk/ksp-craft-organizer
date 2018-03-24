@@ -38,6 +38,18 @@ namespace KspNalCommon {
 			tex.SetPixel(0, 0, color);
 			return tex;
 		}
+		
+		public static Vector2 calcLabelSize(GUIStyle style, string text)
+		{
+			Vector2 size = style.CalcSize(new GUIContent(text));
+			if (GameSettings.UI_SCALE != 1.0f)
+			{
+				//it seems that CalcSize returns incorrect results for labels if ui scale is not 100%. Lets compensate for it in stupid and naive way.
+				//Tested with scale 130%.
+				size.x += 20;
+			}
+			return size;
+		}
 	}
 }
 
