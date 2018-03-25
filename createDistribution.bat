@@ -1,0 +1,1 @@
+@powershell -ExecutionPolicy Unrestricted -FILE createDistribution.ps1

@@ -42,3 +42,4 @@ Thumbs.db
 dist/
 .idea
 *.iml
+Manual_MSBuild*.log

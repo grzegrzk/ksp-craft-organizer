@@ -1,0 +1,111 @@
+Build started 25.03.2018 13:25:47.
+__________________________________________________
+Project "C:\Users\grzeg\RiderProjects\ksp-craft-organizer\KspCraftOrganizerPlugin.sln" (default targets):
+
+Target ValidateSolutionConfiguration:
+    Building solution configuration "ReleaseWindows|Any CPU".
+Target Build:
+    __________________________________________________
+    Project "C:\Users\grzeg\RiderProjects\ksp-craft-organizer\KspCraftOrganizerPlugin.sln" is building "C:\Users\grzeg\RiderProjects\ksp-craft-organizer\KspCraftOrganizerPlugin\KspCraftOrganizerPlugin.csproj" (default targets):
+
+    Target PrepareForBuild:
+        Creating directory "bin\ReleaseWindows\".
+    Target ResolveAssemblyReferences:
+        Primary reference "UnityEngine".
+        C:\Windows\Microsoft.NET\Framework64\v4.0.30319\Microsoft.Common.targets(1605,5): warning MSB3245: Could not resolve this reference. Could not locate the assembly "UnityEngine". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors.
+                For SearchPath "{HintPathFromItem}".
+                Considered "..\..\..\Library\Application Support\Steam\steamapps\common\Kerbal Space Program\KSP.app\Contents\Resources\Data\Managed\UnityEngine.dll", but it didn't exist.
+                For SearchPath "{TargetFrameworkDirectory}".
+                Considered "C:\Windows\Microsoft.NET\Framework64\v2.0.50727\UnityEngine.winmd", but it didn't exist.
+                Considered "C:\Windows\Microsoft.NET\Framework64\v2.0.50727\UnityEngine.dll", but it didn't exist.
+                Considered "C:\Windows\Microsoft.NET\Framework64\v2.0.50727\UnityEngine.exe", but it didn't exist.
+                For SearchPath "{AssemblyFolders}".
+                Considered "C:\Program Files\Reference Assemblies\Microsoft\Framework\v3.5\UnityEngine.winmd", but it didn't exist.
+                Considered "C:\Program Files\Reference Assemblies\Microsoft\Framework\v3.5\UnityEngine.dll", but it didn't exist.
+                Considered "C:\Program Files\Reference Assemblies\Microsoft\Framework\v3.5\UnityEngine.exe", but it didn't exist.
+                For SearchPath "{GAC}".
+                Considered "UnityEngine", which was not found in the GAC.
+                For SearchPath "{RawFileName}".
+                Considered treating "UnityEngine" as a file name, but it didn't exist.
+                For SearchPath "bin\ReleaseWindows\".
+                Considered "bin\ReleaseWindows\UnityEngine.winmd", but it didn't exist.
+                Considered "bin\ReleaseWindows\UnityEngine.dll", but it didn't exist.
+                Considered "bin\ReleaseWindows\UnityEngine.exe", but it didn't exist.
+        Primary reference "UnityEngine.UI".
+        C:\Windows\Microsoft.NET\Framework64\v4.0.30319\Microsoft.Common.targets(1605,5): warning MSB3245: Could not resolve this reference. Could not locate the assembly "UnityEngine.UI". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors.
+                For SearchPath "{HintPathFromItem}".
+                Considered "..\..\..\Library\Application Support\Steam\steamapps\common\Kerbal Space Program\KSP.app\Contents\Resources\Data\Managed\UnityEngine.UI.dll", but it didn't exist.
+                For SearchPath "{TargetFrameworkDirectory}".
+                Considered "C:\Windows\Microsoft.NET\Framework64\v2.0.50727\UnityEngine.UI.winmd", but it didn't exist.
+                Considered "C:\Windows\Microsoft.NET\Framework64\v2.0.50727\UnityEngine.UI.dll", but it didn't exist.
+                Considered "C:\Windows\Microsoft.NET\Framework64\v2.0.50727\UnityEngine.UI.exe", but it didn't exist.
+                For SearchPath "{AssemblyFolders}".
+                Considered "C:\Program Files\Reference Assemblies\Microsoft\Framework\v3.5\UnityEngine.UI.winmd", but it didn't exist.
+                Considered "C:\Program Files\Reference Assemblies\Microsoft\Framework\v3.5\UnityEngine.UI.dll", but it didn't exist.
+                Considered "C:\Program Files\Reference Assemblies\Microsoft\Framework\v3.5\UnityEngine.UI.exe", but it didn't exist.
+                For SearchPath "{GAC}".
+                Considered "UnityEngine.UI", which was not found in the GAC.
+                For SearchPath "{RawFileName}".
+                Considered treating "UnityEngine.UI" as a file name, but it didn't exist.
+                For SearchPath "bin\ReleaseWindows\".
+                Considered "bin\ReleaseWindows\UnityEngine.UI.winmd", but it didn't exist.
+                Considered "bin\ReleaseWindows\UnityEngine.UI.dll", but it didn't exist.
+                Considered "bin\ReleaseWindows\UnityEngine.UI.exe", but it didn't exist.
+        Primary reference "Assembly-CSharp".
+        C:\Windows\Microsoft.NET\Framework64\v4.0.30319\Microsoft.Common.targets(1605,5): warning MSB3245: Could not resolve this reference. Could not locate the assembly "Assembly-CSharp". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors.
+                For SearchPath "{HintPathFromItem}".
+                Considered "..\..\..\Library\Application Support\Steam\steamapps\common\Kerbal Space Program\KSP.app\Contents\Resources\Data\Managed\Assembly-CSharp.dll", but it didn't exist.
+                For SearchPath "{TargetFrameworkDirectory}".
+                Considered "C:\Windows\Microsoft.NET\Framework64\v2.0.50727\Assembly-CSharp.winmd", but it didn't exist.
+                Considered "C:\Windows\Microsoft.NET\Framework64\v2.0.50727\Assembly-CSharp.dll", but it didn't exist.
+                Considered "C:\Windows\Microsoft.NET\Framework64\v2.0.50727\Assembly-CSharp.exe", but it didn't exist.
+                For SearchPath "{AssemblyFolders}".
+                Considered "C:\Program Files\Reference Assemblies\Microsoft\Framework\v3.5\Assembly-CSharp.winmd", but it didn't exist.
+                Considered "C:\Program Files\Reference Assemblies\Microsoft\Framework\v3.5\Assembly-CSharp.dll", but it didn't exist.
+                Considered "C:\Program Files\Reference Assemblies\Microsoft\Framework\v3.5\Assembly-CSharp.exe", but it didn't exist.
+                For SearchPath "{GAC}".
+                Considered "Assembly-CSharp", which was not found in the GAC.
+                For SearchPath "{RawFileName}".
+                Considered treating "Assembly-CSharp" as a file name, but it didn't exist.
+                For SearchPath "bin\ReleaseWindows\".
+                Considered "bin\ReleaseWindows\Assembly-CSharp.winmd", but it didn't exist.
+                Considered "bin\ReleaseWindows\Assembly-CSharp.dll", but it didn't exist.
+                Considered "bin\ReleaseWindows\Assembly-CSharp.exe", but it didn't exist.
+        There was a conflict between "UnityEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" and "UnityEngine".
+        C:\Windows\Microsoft.NET\Framework64\v4.0.30319\Microsoft.Common.targets(1605,5): warning MSB3243: No way to resolve conflict between "UnityEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" and "UnityEngine". Choosing "UnityEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" arbitrarily.
+        There was a conflict between "UnityEngine.UI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" and "UnityEngine.UI".
+        C:\Windows\Microsoft.NET\Framework64\v4.0.30319\Microsoft.Common.targets(1605,5): warning MSB3243: No way to resolve conflict between "UnityEngine.UI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" and "UnityEngine.UI". Choosing "UnityEngine.UI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" arbitrarily.
+        There was a conflict between "Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" and "Assembly-CSharp".
+        C:\Windows\Microsoft.NET\Framework64\v4.0.30319\Microsoft.Common.targets(1605,5): warning MSB3243: No way to resolve conflict between "Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" and "Assembly-CSharp". Choosing "Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" arbitrarily.
+    Done building target "ResolveAssemblyReferences" in project "KspCraftOrganizerPlugin.csproj".
+    Target CoreCompile:
+      Skipping target "CoreCompile" because all output files are up-to-date with respect to the input files.
+    Target _CopyFilesMarkedCopyLocal:
+        Copying file from "C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed\Assembly-CSharp-firstpass.dll" to "bin\ReleaseWindows\Assembly-CSharp-firstpass.dll".
+        Copying file from "C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed\Assembly-CSharp.dll" to "bin\ReleaseWindows\Assembly-CSharp.dll".
+        Copying file from "C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.dll" to "bin\ReleaseWindows\UnityEngine.dll".
+        Copying file from "C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed\UnityEngine.UI.dll" to "bin\ReleaseWindows\UnityEngine.UI.dll".
+        Copying file from "C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed\KSPTrackIR.dll" to "bin\ReleaseWindows\KSPTrackIR.dll".
+        Copying file from "C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed\KSPAssets.dll" to "bin\ReleaseWindows\KSPAssets.dll".
+        Copying file from "C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed\Mono.Cecil.dll" to "bin\ReleaseWindows\Mono.Cecil.dll".
+        Copying file from "C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed\Ionic.Zip.dll" to "bin\ReleaseWindows\Ionic.Zip.dll".
+        Copying file from "C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed\TDx.TDxInput.dll" to "bin\ReleaseWindows\TDx.TDxInput.dll".
+        Copying file from "C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_x64_Data\Managed\RedShellSDK.dll" to "bin\ReleaseWindows\RedShellSDK.dll".
+    Target CopyFilesToOutputDirectory:
+        Copying file from "obj\ReleaseWindows\KspCraftOrganizerPlugin.dll" to "bin\ReleaseWindows\KspCraftOrganizerPlugin.dll".
+        KspCraftOrganizerPlugin -> C:\Users\grzeg\RiderProjects\ksp-craft-organizer\KspCraftOrganizerPlugin\bin\ReleaseWindows\KspCraftOrganizerPlugin.dll
+
+    Done building project "KspCraftOrganizerPlugin.csproj".
+
+Build succeeded.
+
+C:\Windows\Microsoft.NET\Framework64\v4.0.30319\Microsoft.Common.targets(1605,5): warning MSB3245: Could not resolve this reference. Could not locate the assembly "UnityEngine". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors.
+C:\Windows\Microsoft.NET\Framework64\v4.0.30319\Microsoft.Common.targets(1605,5): warning MSB3245: Could not resolve this reference. Could not locate the assembly "UnityEngine.UI". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors.
+C:\Windows\Microsoft.NET\Framework64\v4.0.30319\Microsoft.Common.targets(1605,5): warning MSB3245: Could not resolve this reference. Could not locate the assembly "Assembly-CSharp". Check to make sure the assembly exists on disk. If this reference is required by your code, you may get compilation errors.
+C:\Windows\Microsoft.NET\Framework64\v4.0.30319\Microsoft.Common.targets(1605,5): warning MSB3243: No way to resolve conflict between "UnityEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" and "UnityEngine". Choosing "UnityEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" arbitrarily.
+C:\Windows\Microsoft.NET\Framework64\v4.0.30319\Microsoft.Common.targets(1605,5): warning MSB3243: No way to resolve conflict between "UnityEngine.UI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" and "UnityEngine.UI". Choosing "UnityEngine.UI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" arbitrarily.
+C:\Windows\Microsoft.NET\Framework64\v4.0.30319\Microsoft.Common.targets(1605,5): warning MSB3243: No way to resolve conflict between "Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" and "Assembly-CSharp". Choosing "Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null" arbitrarily.
+    6 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:00.21
