@@ -1,6 +1,6 @@
 ﻿using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using KspNalCommon;
 
 namespace KspCraftOrganizer {
@@ -27,9 +27,20 @@ namespace KspCraftOrganizer {
 		}
 
 		public string getCraftSaveFilePathForShipName(string shipName) {
-			//return ksp.getSavePathForCraftName(shipName);
-			return Path.Combine(getCraftSaveDirectory(), shipName) + ".craft";
+			return getCraftFilePathFromPathAndCraftName(getCraftSaveDirectory(), shipName);
 		}
+
+		private string getCraftFilePathFromPathAndCraftName(string path, string shipName) {
+			//we do not use shipName directly because it may contain special characters. We use translated file name
+			// - the translation is done by KSP itself.
+			String kraftPathProvidedByKsp = ksp.getSavePathForCraftName(shipName);
+			String fileName = Path.GetFileName(kraftPathProvidedByKsp);
+			PluginLogger.logDebug("Craft name: " + shipName + ", file path provided by KSP: "+ kraftPathProvidedByKsp + ", final file name: " + fileName);
+			String finalPath = Path.Combine(path, fileName);
+			PluginLogger.logDebug("Final path: " + finalPath);
+			return finalPath;
+		}
+
 
 		public string getCraftFileFilter() {
 			return "*.craft";
@@ -55,7 +66,6 @@ namespace KspCraftOrganizer {
 			}	
 			return Path.Combine(saveFolder, Path.GetFileNameWithoutExtension(craftFile)) + ".crmgr";
 		}
-
 
 		public ICollection<string> getAvailableSaveNames() {
 			string savesFolder = Globals.combinePaths(ksp.getApplicationRootPath(), "saves");
@@ -85,7 +95,7 @@ namespace KspCraftOrganizer {
 
 		public string renameCraft(string oldFile, string newName) {
 			
-			string newFile = Path.Combine(Path.GetDirectoryName(oldFile), newName + ".craft");
+			string newFile =  getCraftFilePathFromPathAndCraftName(Path.GetDirectoryName(oldFile), newName);
 
 			File.Move(oldFile, newFile);
 			ksp.renameCraftInsideFile(newFile, newName);
