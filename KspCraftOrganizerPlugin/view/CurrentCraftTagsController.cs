@@ -42,6 +42,11 @@ namespace KspCraftOrganizer
 			};
 		}
 
+		public void clearCache()
+		{
+			_availableTagsCache = null;
+		}
+		
 		public void resetToLastlyEditied() {
 			foreach (CurrentCraftTagEntity tagModel in availableTags) {
 				tagModel.selected = tagModel.selectedDuringLastEdit;

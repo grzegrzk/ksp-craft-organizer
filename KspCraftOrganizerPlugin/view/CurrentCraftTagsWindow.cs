@@ -19,6 +19,7 @@ namespace KspCraftOrganizer {
 		override public void displayWindow() {
 			base.displayWindow();
 			//model = new CurrentCraftTagsController();
+			model.clearCache();
 			model.resetToLastlyEditied();
 		}
 
