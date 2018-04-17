@@ -1,4 +1,6 @@
 TODO:
+ - Store craft history?
+ 
  - check EditorTooltip.Instance.enabled
  - Add possibility to edit default tags
  - Highlights categories that do filter crafts
@@ -25,6 +27,11 @@ Cancelled or far future:
  
  
 Done:
+ - add .version file
+ - check assigment of tags to local craft and write comment how to test it in the future 
+ - Add arrow with indication what is current sort order
+ - check generation of preview pictures. Done: standard KSP do not generate it as well
+ - Check situation when there is a craft with parts that are not available due to science level. Done: standard KSP allows to read craft without problems
  - Add possibility to read crafts from different save
  - Allow to collapse tags on the "manage tags" list
  - Change icons to the ones provided by cy4n

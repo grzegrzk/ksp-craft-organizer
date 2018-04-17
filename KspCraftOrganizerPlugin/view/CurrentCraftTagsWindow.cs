@@ -4,6 +4,24 @@ using System;
 using KspNalCommon;
 
 namespace KspCraftOrganizer {
+	/**
+	 * This class is extremely tricky because there is no easy way in KSP to detect when craft in VAB/SPH is saved + it is not possible
+	 * to prevent loading new craft in editor only if user confirms that. It is possible to do things like that only if we replaced standard
+	 * "save"/"load" actions in VAB/SPH. I do not want to replace such important functionalities with custom, own functions so
+	 * everything is a little hacky to workaround it. See EditorListenerService for details.
+	 * <p>
+	 * Test scenarios:
+	 *
+	 * - Create new craft, save it, assign tags. The tags should be written on disk.
+	 * - Create new craft, assign tags, save it. The tags should be written on disk.
+	 * - Load existing craft, assign tags. Tags should be written.
+	 * - Load existing craft, modify it, assign tags. Tags should be written.
+	 * - Load existing craft, rename it, assign tags, save. The tags should be written only to new craft name.
+	 * - Load existing craft, rename it to the name of some other existing craft, assign tags, rename again to old name, save. The tags should be written only to old craft.
+	 * - Load existing craft, rename it to the name of some other existing craft, try to save but after question if craft should be overwritten click "cancel". Tags should NOT be written.
+	 * - Load existing craft, rename it to the name of some other existing craft, try to save and after question if craft should be overwritten click "Overwrite". Tags should be written.
+	 * - Load existing craft, renamie it, assign tags, launch, revert to VAB, save. Tags should be written.
+	 */
 	public class CurrentCraftTagsWindow : BaseWindow {
 		private static readonly int WINDOW_WIDTH = 500;
 
@@ -18,8 +36,6 @@ namespace KspCraftOrganizer {
 
 		override public void displayWindow() {
 			base.displayWindow();
-			//model = new CurrentCraftTagsController();
-			model.clearCache();
 			model.resetToLastlyEditied();
 		}
 

@@ -5,7 +5,9 @@ using KspNalCommon;
 
 namespace KspCraftOrganizer {
 	public class OrganizerWindow : BaseWindow, IGuiOverlayContainer {
-
+		private static readonly string UP_ARROW_STRING = "\u02C4";
+		private static readonly string DOWN_ARROW_STRING = "\u02C5";
+		
 		private static readonly string[] SPH_VAB = { "VAB", "SPH" };
 		private static readonly CraftType[] SPH_VAB_STATES = { CraftType.VAB, CraftType.SPH };
 
@@ -64,7 +66,24 @@ namespace KspCraftOrganizer {
 			this.chooseSaveName = new DropDownList<string>(model.availableSaveNames, t => t);
 			chooseSaveName.selectedItem = model.currentSave;
 
-			sortingModeDropDown = new DropDownList<CraftSortData>(new CraftSortData[0], t => t.name);
+			sortingModeDropDown = new DropDownList<CraftSortData>(new CraftSortData[0], t =>
+			{
+				if (t.function.isSame(model.getCraftSortingFunction()))
+				{
+					if (model.getCraftSortingFunction().isReversed)
+					{
+						return UP_ARROW_STRING + " " + t.name;
+					}
+					else
+					{
+						return DOWN_ARROW_STRING + " " + t.name;
+					}
+				}
+				else
+				{
+					return t.name;
+				}
+			});
 			sortingModeDropDown.selectedItemIndex = 0;
 		}
 
@@ -90,7 +109,7 @@ namespace KspCraftOrganizer {
 			base.update();
 			if (windowDisplayed) {
 				List<CraftSortData> sortingFields = new List<CraftSortData>(new CraftSortData[] { 
-					new CraftSortData("name", CraftSortFunction.SORT_CRAFTS_BY_NAME), 
+					new CraftSortData("name", CraftSortFunction.SORT_CRAFTS_BY_NAME), 	
 					new CraftSortData("parts", CraftSortFunction.SORT_CRAFTS_BY_PARTS_COUNT), 
 					new CraftSortData("mass", CraftSortFunction.SORT_CRAFTS_BY_MASS), 
 					new CraftSortData("stages", CraftSortFunction.SORT_CRAFTS_BY_STAGES), 

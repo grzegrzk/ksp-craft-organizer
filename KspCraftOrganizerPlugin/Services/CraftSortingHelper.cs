@@ -164,9 +164,15 @@ namespace KspCraftOrganizer {
 			if (object.ReferenceEquals(c2Objs, null)) {
 				return false;
 			}
-			ReversedCraftSortingFunction c2Reversed = c2Objs as ReversedCraftSortingFunction;
-			if (!object.ReferenceEquals(c2Reversed, null)) {
-				c2Objs = c2Reversed.inner;
+			while(true){
+				ReversedCraftSortingFunction c2Reversed = c2Objs as ReversedCraftSortingFunction;
+				if (!object.ReferenceEquals(c2Reversed, null)) {
+					c2Objs = c2Reversed.inner;
+				}
+				else
+				{
+					break;
+				}
 			}
 			CraftSortFunction c2 = c2Objs as CraftSortFunction;
 			CraftSortFunction c2Tag = c2Objs as CraftSortFunctionByTag;
@@ -206,6 +212,16 @@ namespace KspCraftOrganizer {
 			public override bool Equals(object c2Objs) {
 				if (c2Objs == null) {
 					return false;
+				}
+				while(true){
+					ReversedCraftSortingFunction c2Reversed = c2Objs as ReversedCraftSortingFunction;
+					if (!object.ReferenceEquals(c2Reversed, null)) {
+						c2Objs = c2Reversed.inner;
+					}
+					else
+					{
+						break;
+					}
 				}
 				CraftSortFunctionByTag c2 = c2Objs as CraftSortFunctionByTag;
 				if (c2 == null) {
@@ -316,7 +332,14 @@ namespace KspCraftOrganizer {
 				return true;
 			} else {
 				stateManager.removeLastSortingFunction();
-				stateManager.addCraftSortingFunction(new ReversedCraftSortingFunction(lastSortFunction));
+				if (lastSortFunction.isReversed)
+				{
+					stateManager.addCraftSortingFunction(function);
+				}
+				else
+				{
+					stateManager.addCraftSortingFunction(new ReversedCraftSortingFunction(function));	
+				}
 				return true;
 			}
 		}

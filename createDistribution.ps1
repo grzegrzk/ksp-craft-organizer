@@ -1,5 +1,33 @@
+param (
+    [Parameter(Mandatory=$true)][string]$version
+)
+$versionElements = $version -split '\.'
+$major=$versionElements[0]
+$minor=$versionElements[1]
+$patch=$versionElements[2]
+
+$versionFile = Get-Content 'KspCraftOrganizer.version' -raw | ConvertFrom-Json
+
+Write-Host "Old Version: $($versionFile.VERSION.MAJOR) $($versionFile.VERSION.MINOR) $($versionFile.VERSION.PATCH)"
+Write-Host "New Version: $($major).$($minor).$patch"
+
+$continue = $( Read-Host "Type 'y' to continue" )
+If($continue -ne "y"){
+	Write-Host "Exiting"
+	exit 
+}
+
 $msBuildDir="C:\Windows\Microsoft.NET\Framework64\v4.0.30319"
 $basePluginDir=".\dist\KspCraftOrganizer"
+
+Write-Host "Updating version file"
+$versionFile.VERSION.MAJOR = $major
+$versionFile.VERSION.MINOR = $minor
+$versionFile.VERSION.PATCH = $patch
+$versionFile | ConvertTo-Json -Depth 20  | set-content 'KspCraftOrganizer.version'
+
+$KspCraftOrganizerVersionCsPath='.\KspCraftOrganizerPlugin\KspCraftOrganizerVersion.cs'
+(Get-Content $KspCraftOrganizerVersionCsPath) -replace 'public const string Version = ".*"', "public const string Version = ""$major.$minor.$patch""" | Set-Content $KspCraftOrganizerVersionCsPath
 
 Write-Host "Removing old distribution"
 Remove-Item -Path ".\dist" -Recurse
