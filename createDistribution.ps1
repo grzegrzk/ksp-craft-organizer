@@ -46,6 +46,7 @@ Get-ChildItem .\icons\ -Include *.png -Recurse | % {Copy-Item $_ "$basePluginDir
 Copy-Item .\KspCraftOrganizerPlugin\bin\ReleaseWindows\KspCraftOrganizerPlugin.dll $basePluginDir\Plugins
 
 Copy-Item .\LICENSE $basePluginDir\LICENSE.txt
+Copy-Item .\KspCraftOrganizer.version $basePluginDir\KspCraftOrganizer.version
 
 Write-Host "Creating distribution archive"
 #Compress-Archive creates archive incompatible with osx :/
