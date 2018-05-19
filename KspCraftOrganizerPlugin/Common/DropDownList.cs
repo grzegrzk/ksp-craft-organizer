@@ -140,7 +140,7 @@ namespace KspNalCommon {
 			GUIStyle listStyle = GUI.skin.window;
 
 			GUI.Box(openedListRect, "", listStyle);
-			using (var scrollViewScrope = new GUI.ScrollViewScope(openedListRect, openedListScrollPosition, openedListViewRect)) {
+			using (GUI.ScrollViewScope scrollViewScrope = new GUI.ScrollViewScope(openedListRect, openedListScrollPosition, openedListViewRect)) {
 
 				openedListScrollPosition = scrollViewScrope.scrollPosition;
 

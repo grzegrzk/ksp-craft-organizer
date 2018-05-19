@@ -438,7 +438,9 @@ namespace KspCraftOrganizer
 
 			ConfigNode nodes = ConfigNode.Load(craftFile);
 			nodes.SetValue("ship", newName);
+			DateTime lastWriteTIme = File.GetLastWriteTime(craftFile);
 			saveNode(nodes, craftFile);
+			File.SetLastWriteTime(craftFile, lastWriteTIme);
 		}
 
 		public void writeCraftSettings(string fileName, CraftSettingsDto settings){

@@ -168,7 +168,7 @@ namespace KspCraftOrganizer {
 				}
 			}
 
-			foreach (var tag in tagsToRemove) {
+			foreach (KeyValuePair<string, TagInGroup<T>> tag in tagsToRemove) {
 				if (_tagGroups.ContainsKey(tag.Value.groupName)) {
 					_tagGroups[tag.Value.groupName].removeTagIfExists(tag.Value);
 				}
@@ -178,7 +178,7 @@ namespace KspCraftOrganizer {
 			}
 
 			List<string> groupsToRemove = new List<string>();
-			foreach (var tagGroup in _tagGroups) {
+			foreach (KeyValuePair<string, G> tagGroup in _tagGroups) {
 				if (tagGroup.Value.tags.Count == 0) {
 					groupsToRemove.Add(tagGroup.Key);
 				}

@@ -1,5 +1,7 @@
 TODO:
  - Store craft history?
+ - Cache all craft data (not only the one used for riletering)
+ 
  
  - check EditorTooltip.Instance.enabled
  - Add possibility to edit default tags
@@ -13,6 +15,7 @@ TODO:
  - Add "hide" button next to each tag group + "hidden tags" in craft list
  
 Cancelled or far future:
+ - Regenerate craft thumbnails - very hard/impossible :(. We would need to load craft to editor, generate thumbnail and then load again old ship.
  - Create a list of non-default selected tags with possibility to clear them (show it above the craft list), like:
  	Bodies: [Eve x] [Duna x] BuildingStage: [Final x] [Clear All] [>>]
  - Add button "move to SPH"/"move to VAB"
@@ -27,6 +30,7 @@ Cancelled or far future:
  
  
 Done:
+ - When file is renamed do not change timestamp of the file
  - add .version file
  - check assigment of tags to local craft and write comment how to test it in the future 
  - Add arrow with indication what is current sort order
