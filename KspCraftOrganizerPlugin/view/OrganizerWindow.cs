@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System;
 using KspNalCommon;
+using UnityEngine.UI;
 
 namespace KspCraftOrganizer {
 	public class OrganizerWindow : BaseWindow, IGuiOverlayContainer {
@@ -186,6 +187,13 @@ namespace KspCraftOrganizer {
 							}
 							sortingModeDropDown.onGui(this, showManageTagsToolbar ? 100 : 200);
 						}
+						if (model.filteredCrafts.Length > 50)
+						{
+							GUILayout.Label(
+								"There are more than 50 crafts displayed at once (currently " + model.filteredCrafts.Length + "). Try to filter crafts to increase performance. You can also archive some crafts.",
+								warningLabelStyle
+							);
+						}
 						craftList.drawCraftsList();
 					}
 
@@ -266,17 +274,22 @@ namespace KspCraftOrganizer {
 
 		}
 
-		void drawCraftsFilteredWarning() {
+		void drawCraftsFilteredWarning()
+		{
 			bool displayCraftsFilteredWarning = model.craftsAreFiltered;
-			if (!displayCraftsFilteredWarning) {
+			if (!displayCraftsFilteredWarning)
+			{
 				GUI.BeginClip(Globals.ZERO_RECT);
 			}
+
 			GUILayout.Label("The filter modifies craft list", warningLabelStyle, GUILayout.ExpandWidth(false));
-			if (GUILayout.Button("Clear filter", GUILayout.ExpandWidth(false))) {
+			if (GUILayout.Button("Clear filter", GUILayout.ExpandWidth(false)))
+			{
 				clearFilters();
 			}
 
-			if (!displayCraftsFilteredWarning) {
+			if (!displayCraftsFilteredWarning)
+			{
 				GUI.EndClip();
 			}
 		}
