@@ -211,8 +211,7 @@ namespace KspCraftOrganizer {
 
 		public void renameCraft(OrganizerCraftEntity model, string newName) {
 			string newFile = fileLocationService.renameCraft(model.craftFile, newName);
-			model.setCraftFileInternal(newFile);
-			model.craftDto.name = newName;
+			model.renameCraft(newName, newFile);
 		}
 
 		public List<OrganizerCraftEntity> availableCrafts {

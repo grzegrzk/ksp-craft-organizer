@@ -43,7 +43,7 @@ namespace KspCraftOrganizer
 		private bool duringCreation;
 		private CraftDaoDto craftDtoLazy;
 
-		public CraftDaoDto craftDto {
+		private CraftDaoDto craftDto {
 			get {
 				if (craftDtoLazy == null) {
 					craftDtoLazy = service.getCraftInfo(_craftFile);
@@ -58,6 +58,15 @@ namespace KspCraftOrganizer
 				return craftDtoLazy;
 			}}
 
+		public void renameCraft(string newName, string newFile)
+		{
+			if (craftDtoLazy != null)
+			{
+				craftDtoLazy.name = newName;
+			}
+			setCraftFileInternal(newFile);
+		}
+		
 		public CraftTagsGrouper groupedTags {
 			get {
 				if (_groupedTagsCache == null) {

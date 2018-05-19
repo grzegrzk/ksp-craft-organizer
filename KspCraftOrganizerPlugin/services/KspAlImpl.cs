@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
+using System.Security.Cryptography;
 using KspNalCommon;
+using UniLinq;
+using UnityEngine.Analytics.Experimental;
 
 namespace KspCraftOrganizer
 {
@@ -129,8 +132,18 @@ namespace KspCraftOrganizer
 			return editorFacility == EditorFacility.SPH ? CraftType.SPH : CraftType.VAB;
 		}
 
-		public CraftDaoDto getCraftInfo(string craftFile){
+		public CraftDaoDto getCraftInfo(CraftDataCacheContext craftDataCacheContext, string craftFile, string settingsFile){
 			PluginLogger.logTrace ("reading craft file from '" + craftFile + "'");
+
+			string fileChecksum = CalculateMD5(craftFile);
+			PluginLogger.logTrace ("Calculated MD5 checksum: " + fileChecksum);
+			CraftDaoDto mayabeCraftDaoFromCache =
+				CacheNodeToMaybeCraftDaoDto(craftDataCacheContext, getCacheNodeFromSettings(settingsFile), fileChecksum);
+			if (mayabeCraftDaoFromCache != null)
+			{
+				PluginLogger.logTrace("Craft data has been successfully read from cache");
+				return mayabeCraftDaoFromCache;
+			}
 
 			System.Random r = new System.Random(craftFile.GetHashCode());
 			CraftDaoDto toRet = new CraftDaoDto();
@@ -148,6 +161,7 @@ namespace KspCraftOrganizer
 			float massSum = 0, costSum = 0;
 			bool available = true;
 			bool notEnoughScience = false;
+			List<string> partNames = new List<string>();
 			foreach (ConfigNode part in parts)
 			{
 				String stageString = part.GetValue("istg");
@@ -159,6 +173,7 @@ namespace KspCraftOrganizer
 						stagesCount = partStage;
 					}
 				}
+				partNames.Add(getPartName(part));
 				AvailablePart availablePart = getAvailablePartFor(part);
 
 				if (availablePart == null)
@@ -175,23 +190,114 @@ namespace KspCraftOrganizer
 					//COLogger.Log("For part" + getPartName(part)  + " dry cost: " + dryCost + ", fuelCost: " + fuelCost + ", smth: " + partCostsSmth);
 					costSum += dryCost + fuelCost;
 					massSum += dryMass + fuelMass;
-					if (!ResearchAndDevelopment.PartTechAvailable(availablePart)) {
+					if (PartTechAvailable(craftDataCacheContext, getPartName(part))) {
 						notEnoughScience = true;
 					}
 				}
 			}
-			toRet.name = guardedGedNode(nodes, "ship", craftFile);
-			toRet.description = guardedGedNode(nodes, "description", craftFile);
+			partNames = partNames.Distinct().ToList();
+			
+			toRet.name = guardedGetStringValue(nodes, "ship", craftFile);
+			toRet.description = guardedGetStringValue(nodes, "description", craftFile);
 			toRet.stagesCount = stagesCount;
 			toRet.partCount = parts.Length;
 			toRet.mass = massSum;
 			toRet.cost = costSum;
 			toRet.containsMissedParts = available;
 			toRet.notEnoughScience = notEnoughScience;
+			writeCraftSettings(settingsFile, readCraftSettings(settingsFile), craftDaoDtoToCacheNode(toRet, partNames, fileChecksum));
 			return toRet;
 		}
 
-		string guardedGedNode(ConfigNode nodes, String propertyName, String fileName) {
+		private string CalculateMD5(string filename)
+		{
+			using (var md5 = MD5.Create())
+			{
+				using (var stream = File.OpenRead(filename))
+				{
+					var hash = md5.ComputeHash(stream);
+					return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+				}
+			}
+		}
+		
+		private ConfigNode craftDaoDtoToCacheNode(CraftDaoDto craftDaoDto, List<string> partNames, string fileChecksum)
+		{
+			ConfigNode toRet = new ConfigNode();
+
+			toRet.AddValue("origChecksum", fileChecksum);
+			toRet.AddValue("cacheVersion", "1");
+			toRet.AddValue("name", craftDaoDto.name);
+			toRet.AddValue("stagesCount", craftDaoDto.stagesCount);
+			toRet.AddValue("cost", craftDaoDto.cost);
+			toRet.AddValue("partCount", craftDaoDto.partCount);
+			toRet.AddValue("mass", craftDaoDto.mass);
+			toRet.AddValue("description", craftDaoDto.description);
+			writeAsListOfStrings(toRet, "partNames", partNames);
+
+			return toRet;
+		}
+
+		private CraftDaoDto CacheNodeToMaybeCraftDaoDto(CraftDataCacheContext craftDataCacheContext, ConfigNode cacheConfigNode, string expectedChecksum)
+		{
+			if (cacheConfigNode == null)
+			{
+				return null;
+			}
+
+			string cacheVersion = cacheConfigNode.GetValue("cacheVersion");
+			if (cacheVersion != "1")
+			{
+				return null;
+			}
+			string actualChecksum = cacheConfigNode.GetValue("origChecksum");
+			if (actualChecksum != expectedChecksum)
+			{
+				return null;
+			}
+
+			CraftDaoDto toRet = new CraftDaoDto();
+			toRet.name = cacheConfigNode.GetValue("name");
+			toRet.stagesCount = int.Parse(cacheConfigNode.GetValue("stagesCount"));
+			toRet.cost = float.Parse(cacheConfigNode.GetValue("cost"));
+			toRet.partCount = int.Parse(cacheConfigNode.GetValue("partCount"));
+			toRet.mass = float.Parse(cacheConfigNode.GetValue("mass"));
+			toRet.description = cacheConfigNode.GetValue("description");
+
+			List<string> partNames = readAsListOfStrings(cacheConfigNode, "partNames");
+
+			toRet.containsMissedParts = false;
+			toRet.notEnoughScience = false;
+			foreach (string partName in partNames)
+			{
+				AvailablePart availablePart = getAvailablePartFor(partName);
+				if (availablePart == null)
+				{
+					toRet.containsMissedParts = true;
+				}
+				else if (!PartTechAvailable(craftDataCacheContext, partName))
+				{
+					toRet.notEnoughScience = true;
+				}
+			}
+
+			return toRet;
+		}
+
+		private bool PartTechAvailable(CraftDataCacheContext craftDataCacheContext, string partName)
+		{
+			if (craftDataCacheContext.PartTechIsAvailable.ContainsKey(partName))
+			{
+				return craftDataCacheContext.PartTechIsAvailable[partName];
+			}
+
+			bool toRet =  ResearchAndDevelopment.PartTechAvailable(getAvailablePartFor(partName));
+			craftDataCacheContext.PartTechIsAvailable[partName] = toRet;
+
+			return toRet;
+		}
+		
+		string guardedGetStringValue(ConfigNode nodes, String propertyName, String fileName) {
 			String v = nodes.GetValue(propertyName);
 			if (v == null) {
 				PluginLogger.logDebug("Value of '" + propertyName + "' is null in '" + fileName + "', coercing it to empty string.");
@@ -208,6 +314,11 @@ namespace KspCraftOrganizer
 		private AvailablePart getAvailablePartFor(ConfigNode part)
 		{
 			string partName = getPartName(part);
+			return getAvailablePartFor(partName);
+		}
+
+		private AvailablePart getAvailablePartFor(string partName)
+		{
 			//COLogger.Log("Finding part '" + partName + "'");
 			if (availablePartCache.ContainsKey(partName))
 			{
@@ -217,7 +328,7 @@ namespace KspCraftOrganizer
 			PluginLogger.logTrace("Part '" + partName + "' not found");
 			return null;
 		}
-
+		
 		private string getPartName(ConfigNode part)
 		{
 			return part.GetValue("part").Split('_')[0];
@@ -443,7 +554,20 @@ namespace KspCraftOrganizer
 			File.SetLastWriteTime(craftFile, lastWriteTIme);
 		}
 
-		public void writeCraftSettings(string fileName, CraftSettingsDto settings){
+		ConfigNode getCacheNodeFromSettings(string settingsFilePath)
+		{
+			
+			ConfigNode settingsNode = ConfigNode.Load(settingsFilePath);
+			if (settingsNode != null)
+			{
+				return settingsNode.GetNode("cachedCraftData");
+			}
+
+			return null;
+		}
+
+		public void writeCraftSettings(string fileName, CraftSettingsDto settings, ConfigNode cachedCraftData)
+		{
 			PluginLogger.logDebug("Writing craft " + settings.craftName + " settings to '" + fileName + "'");
 			ConfigNode node = new ConfigNode();
 			foreach (string tag in settings.tags)
@@ -451,11 +575,19 @@ namespace KspCraftOrganizer
 				node.AddValue("tag", tag);
 			}
 			node.AddValue("craftName", settings.craftName);
-			saveNode(node, fileName);
+			if (cachedCraftData != null)
+			{
+				node.AddNode("cachedCraftData", cachedCraftData);
+			}
 
+			saveNode(node, fileName);
 		}
 
-		public CraftSettingsDto readCraftSettings(string fileName ){
+		public void writeCraftSettings(string fileName, CraftSettingsDto settings){
+			writeCraftSettings(fileName, settings, getCacheNodeFromSettings(fileName));
+		}
+
+		public CraftSettingsDto readCraftSettings(string fileName){
 			PluginLogger.logTrace ("reading craft settings from '" + fileName + "'");
 			CraftSettingsDto settings = new CraftSettingsDto ();
 

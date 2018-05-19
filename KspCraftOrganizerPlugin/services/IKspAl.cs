@@ -11,7 +11,6 @@ namespace KspCraftOrganizer {
 		public float cost { get; set; }
 		public int partCount { get; set; }
 		public float mass { get; set; }
-		public bool isStock { get; set; }
 		public bool containsMissedParts { get; set; }
 		public bool notEnoughScience { get; set; }
 		public string description { get; internal set; }
@@ -94,6 +93,11 @@ namespace KspCraftOrganizer {
 		public string craftName { get; set; }
 	}
 
+	public class CraftDataCacheContext
+	{
+		public Dictionary<string, bool> PartTechIsAvailable = new Dictionary<string, bool>();
+	}
+
 	public static class IKspAlProvider{
 		private static IKspAl _instance;
 
@@ -109,8 +113,7 @@ namespace KspCraftOrganizer {
 						_instance = (IKspAl)Activator.CreateInstance (type);
 						PluginLogger.logDebug("Dao created");
 					}catch(Exception ex){
-						PluginLogger.logDebug("Cannot create instance of DAO, creating mock instead " + ex.Message);
-						_instance = new KspAlMock ();
+						throw new Exception("Cannot create instance of DAO", ex);
 					}
 				}
 				return _instance;
@@ -138,7 +141,7 @@ namespace KspCraftOrganizer {
 
 		CraftType getCurrentEditorFacilityType ();
 
-		CraftDaoDto getCraftInfo (string craftFile);
+		CraftDaoDto getCraftInfo (CraftDataCacheContext cacheContext, string craftFile, string settingsFile);
 
 		ProfileSettingsDto readProfileSettings (string fileName, ICollection<string> defaultTags);
 

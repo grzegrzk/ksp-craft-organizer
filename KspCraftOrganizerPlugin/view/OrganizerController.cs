@@ -26,6 +26,8 @@ namespace KspCraftOrganizer {
 
 		public string currentSave { get; private set; }
 
+		private CraftDataCacheContext craftCacheContext;
+
 
 		public OrganizerController() {
 			currentSave = ksp.getNameOfSaveFolder();
@@ -35,6 +37,7 @@ namespace KspCraftOrganizer {
 			this.craftList = new OrganizerControllerCraftList(this);
 			this.filter = new OrganizerControllerFilter(this);
 			this.defaultTagsToAdd = new Dictionary<string, bool>();
+			this.craftCacheContext = new CraftDataCacheContext();
 
 			this.filter.init();
 		}
@@ -133,7 +136,7 @@ namespace KspCraftOrganizer {
 		public bool doNotWriteTagSettingsToDisk { get; set; }
 
 		public CraftDaoDto getCraftInfo(string craftFilePath) {
-			return ksp.getCraftInfo(craftFilePath);
+			return ksp.getCraftInfo(craftCacheContext, craftFilePath, fileLocationService.getCraftSettingsFileForCraftFile(craftFilePath));
 		}
 
 

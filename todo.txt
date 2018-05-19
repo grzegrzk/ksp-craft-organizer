@@ -1,7 +1,7 @@
 TODO:
  - Store craft history?
- - Cache all craft data (not only the one used for riletering)
- 
+ - Display craft history?
+ - Load crafts asynchronously?
  
  - check EditorTooltip.Instance.enabled
  - Add possibility to edit default tags
@@ -30,6 +30,7 @@ Cancelled or far future:
  
  
 Done:
+ - Cache all craft data (not only the one used for filtering)
  - When file is renamed do not change timestamp of the file
  - add .version file
  - check assigment of tags to local craft and write comment how to test it in the future 

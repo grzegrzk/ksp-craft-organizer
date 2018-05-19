@@ -111,7 +111,6 @@
     <Compile Include="Services\FileLocationService.cs" />
     <Compile Include="Services\IKspAl.cs" />
     <Compile Include="Services\KspAlImpl.cs" />
-    <Compile Include="Services\KspALMock.cs" />
     <Compile Include="Services\SettingsService.cs" />
     <Compile Include="TagsGrouper\CraftTagsGrouper.cs" />
     <Compile Include="TagsGrouper\FilterTagsGrouper.cs" />
