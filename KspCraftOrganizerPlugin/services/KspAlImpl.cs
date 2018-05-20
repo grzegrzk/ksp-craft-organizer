@@ -203,7 +203,7 @@ namespace KspCraftOrganizer
 			toRet.partCount = parts.Length;
 			toRet.mass = massSum;
 			toRet.cost = costSum;
-			toRet.containsMissedParts = available;
+			toRet.allPartsAvailable = available;
 			toRet.notEnoughScience = notEnoughScience;
 			writeCraftSettings(settingsFile, readCraftSettings(settingsFile), craftDaoDtoToCacheNode(toRet, partNames, fileChecksum));
 			return toRet;
@@ -266,21 +266,20 @@ namespace KspCraftOrganizer
 
 			List<string> partNames = readAsListOfStrings(cacheConfigNode, "partNames");
 
-			toRet.containsMissedParts = false;
+			toRet.allPartsAvailable = true;
 			toRet.notEnoughScience = false;
 			foreach (string partName in partNames)
 			{
 				AvailablePart availablePart = getAvailablePartFor(partName);
 				if (availablePart == null)
 				{
-					toRet.containsMissedParts = true;
+					toRet.allPartsAvailable = false;
 				}
 				else if (!PartTechAvailable(craftDataCacheContext, partName))
 				{
 					toRet.notEnoughScience = true;
 				}
 			}
-
 			return toRet;
 		}
 

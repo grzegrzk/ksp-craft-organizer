@@ -122,7 +122,7 @@ namespace KspCraftOrganizer {
 						// - Last modification time
 						// - Warning label for missed parts / not enough science
 						craft.guiHeight = 20 + 60 + craft.tagsHeight;
-						if (!craft.containsMissedParts || craft.notEnoughScience) {
+						if (!craft.allPartsAvailable || craft.notEnoughScience) {
 							craft.guiHeight += 20;
 						}
 					}
@@ -180,7 +180,7 @@ namespace KspCraftOrganizer {
 					nextTop += 20;
 					drawLabel(parent.skin.label, firstRowsLeftOffset, nextTop, "Last modification time: " + craft.lastWriteTime.ToString("yyyy/MM/dd HH:mm:ss"));
 					nextTop += 20;
-					if (!craft.containsMissedParts) {
+					if (!craft.allPartsAvailable) {
 						drawLabel(parent.warningLabelStyle, leftOffset, nextTop, "*The craft contains missed or invalid parts*");
 						nextTop += 20;
 					} else if (craft.notEnoughScience) {
