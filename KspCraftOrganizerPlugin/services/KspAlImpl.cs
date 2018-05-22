@@ -190,7 +190,7 @@ namespace KspCraftOrganizer
 					//COLogger.Log("For part" + getPartName(part)  + " dry cost: " + dryCost + ", fuelCost: " + fuelCost + ", smth: " + partCostsSmth);
 					costSum += dryCost + fuelCost;
 					massSum += dryMass + fuelMass;
-					if (PartTechAvailable(craftDataCacheContext, getPartName(part))) {
+					if (!PartTechAvailable(craftDataCacheContext, getPartName(part))) {
 						notEnoughScience = true;
 					}
 				}
