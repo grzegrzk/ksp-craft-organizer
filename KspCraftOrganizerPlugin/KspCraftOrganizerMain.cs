@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
-using System.IO;
 using KSP.UI.Screens;
 using KspNalCommon;
 using System;
+using KSP.UI;
 
 namespace KspCraftOrganizer {
 	public class KspCraftOrganizerProperties : CommonPluginProperties {
@@ -85,7 +85,7 @@ namespace KspCraftOrganizer {
 				}, null, null, null, null, null,
 				ApplicationLauncher.AppScenes.VAB | ApplicationLauncher.AppScenes.SPH, texture);
 			appLauncherButtons.Add(button);
-			
+
 		}
 
 		private T addWindow<T>(T newWindow) where T : BaseWindow  {

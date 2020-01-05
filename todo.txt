@@ -1,4 +1,13 @@
 TODO:
+ - Localize stock craft names
+ - Avoid exceptions in Making History expansion
+ - Apply tags immediately when modified in current craft (if .craft file exists)
+ - Save tags to .craft file, see BetterCrewAssignment how they store data in crafts
+ - All tags should be stored in single craft-manager.cache file. The cache should be updated basing on timestamp of the .craft file modification.
+ - Available tags should be stored in main save file. How to do it?
+
+ 
+Cancelled or far future:
  - Store craft history?
  - Display craft history?
  - Load crafts asynchronously?
@@ -14,7 +23,7 @@ TODO:
  - Add dropdown box for each tag that will allow it to be changed to different one in the same category
  - Add "hide" button next to each tag group + "hidden tags" in craft list
  
-Cancelled or far future:
+ 
  - Regenerate craft thumbnails - very hard/impossible :(. We would need to load craft to editor, generate thumbnail and then load again old ship.
  - Create a list of non-default selected tags with possibility to clear them (show it above the craft list), like:
  	Bodies: [Eve x] [Duna x] BuildingStage: [Final x] [Clear All] [>>]
@@ -30,6 +39,7 @@ Cancelled or far future:
  
  
 Done:
+ - Fix craft renaming: after rename window needs to be reopened + thumbnail is not renamed
  - Cache all craft data (not only the one used for filtering)
  - When file is renamed do not change timestamp of the file
  - add .version file

@@ -5,7 +5,6 @@ using System.IO;
 using System.Security.Cryptography;
 using KspNalCommon;
 using UniLinq;
-using UnityEngine.Analytics.Experimental;
 
 namespace KspCraftOrganizer
 {

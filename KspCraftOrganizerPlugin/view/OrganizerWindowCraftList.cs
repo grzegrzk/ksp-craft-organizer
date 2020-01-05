@@ -47,7 +47,7 @@ namespace KspCraftOrganizer {
 						GUILayout.Space(20);
 					}
 				}
-				if (Event.current.type == EventType.repaint) {
+				if (Event.current.type == EventType.Repaint) {
 					shipsRect = GUILayoutUtility.GetLastRect();
 				}
 

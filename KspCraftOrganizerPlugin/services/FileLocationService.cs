@@ -35,9 +35,9 @@ namespace KspCraftOrganizer {
 			// - the translation is done by KSP itself.
 			String kraftPathProvidedByKsp = ksp.getSavePathForCraftName(shipName);
 			String fileName = Path.GetFileName(kraftPathProvidedByKsp);
-			PluginLogger.logDebug("Craft name: " + shipName + ", file path provided by KSP: "+ kraftPathProvidedByKsp + ", final file name: " + fileName);
+			PluginLogger.logDebug("getCraftFilePathFromPathAndCraftName. Craft name: " + shipName + ", file path provided by KSP: "+ kraftPathProvidedByKsp + ", final file name: " + fileName);
 			String finalPath = Path.Combine(path, fileName);
-			PluginLogger.logDebug("Final path: " + finalPath);
+			PluginLogger.logDebug("getCraftFilePathFromPathAndCraftName. Final path: " + finalPath);
 			return finalPath;
 		}
 
@@ -56,10 +56,10 @@ namespace KspCraftOrganizer {
 
 		public string getCraftSettingsFileForCraftFile(string craftFile) {
 			string saveFolder;
-			if (craftFile.StartsWith(getStockCraftDirectoryForCraftType(CraftType.SPH))) {
+			if (isPathInside(craftFile, getStockCraftDirectoryForCraftType(CraftType.SPH))) {
 				saveFolder = Globals.combinePaths(ksp.getApplicationRootPath(), "saves", ksp.getNameOfSaveFolder(), "stock_ships_settings", CraftType.SPH.directoryName);
 			}
-			else if (craftFile.StartsWith(getStockCraftDirectoryForCraftType(CraftType.VAB))) {
+			else if (isPathInside(craftFile, getStockCraftDirectoryForCraftType(CraftType.VAB))) {
 				saveFolder = Globals.combinePaths(ksp.getApplicationRootPath(), "saves", ksp.getNameOfSaveFolder(), "stock_ships_settings", CraftType.VAB.directoryName);
 			} else {
 				saveFolder = Path.GetDirectoryName(craftFile);
@@ -94,15 +94,18 @@ namespace KspCraftOrganizer {
 		}
 
 		public string renameCraft(string oldFile, string newName) {
-			
+			PluginLogger.logDebug("renameCraft");
+
 			string newFile =  getCraftFilePathFromPathAndCraftName(Path.GetDirectoryName(oldFile), newName);
 
 			File.Move(oldFile, newFile);
 			ksp.renameCraftInsideFile(newFile, newName);
 
 			string oldSettingsFile = getCraftSettingsFileForCraftFile(oldFile);
-			if (File.Exists(oldSettingsFile)) {
+			if (File.Exists(oldSettingsFile))
+			{
 				string newSettingsFile = getCraftSettingsFileForCraftFile(newFile);
+				PluginLogger.logDebug("renameCraft. Old settings file exists, renaming it. Old name: " + oldSettingsFile + ", new name: " + newSettingsFile);
 				File.Move(oldSettingsFile, newSettingsFile);
 				CraftSettingsDto craftSettings = ksp.readCraftSettings(newSettingsFile);
 				craftSettings.craftName = newName;
@@ -112,6 +115,7 @@ namespace KspCraftOrganizer {
 			string oldThumbPath = getThumbPath(oldFile);
 			if (File.Exists(oldThumbPath)) {
 				string newThumbPath = getThumbPath(newFile);
+				PluginLogger.logDebug("renameCraft. Old thumb file exists, renaming it. Old name: " + oldThumbPath + ", new name: " + newThumbPath);
 				File.Move(oldThumbPath, newThumbPath);
 			}
 
@@ -144,21 +148,27 @@ namespace KspCraftOrganizer {
 		}
 
 		public string getThumbUrl(string craftPath) {
-			if (craftPath.StartsWith(getStockCraftDirectoryForCraftType(CraftType.SPH))) {
+			PluginLogger.logDebug(String.Format("getThumbUrl: craftPath {0}", craftPath));
+			if (isPathInside(craftPath, getStockCraftDirectoryForCraftType(CraftType.SPH))) {
 				return "/Ships/@thumbs/SPH/" + Path.GetFileNameWithoutExtension(craftPath);
 			}
-			if (craftPath.StartsWith(getStockCraftDirectoryForCraftType(CraftType.VAB))) {
+			if (isPathInside(craftPath, getStockCraftDirectoryForCraftType(CraftType.VAB))) {
 				return "/Ships/@thumbs/VAB/" + Path.GetFileNameWithoutExtension(craftPath);
 			}
 			string saveName = extractSaveNameFromCraftPath(craftPath);
-			if (craftPath.StartsWith(getCraftDirectoryForCraftType(saveName, CraftType.SPH))) {
+			if (isPathInside(craftPath, getCraftDirectoryForCraftType(saveName, CraftType.SPH))) {
 				return "/thumbs/" + saveName + "_SPH_" + Path.GetFileNameWithoutExtension(craftPath);
 			}
-			if (craftPath.StartsWith(getCraftDirectoryForCraftType(saveName, CraftType.VAB))) {
+			if (isPathInside(craftPath, getCraftDirectoryForCraftType(saveName, CraftType.VAB))) {
 				return "/thumbs/" + saveName + "_VAB_" + Path.GetFileNameWithoutExtension(craftPath);
 			}
 			return "";
 
+		}
+
+		public bool isPathInside(String path, String pathSupposelyInside)
+		{
+			return Path.GetFullPath(path).StartsWith(Path.GetFullPath(pathSupposelyInside));
 		}
 
 		string extractSaveNameFromCraftPath(string craftPath) {
