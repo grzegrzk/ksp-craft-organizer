@@ -205,9 +205,24 @@ namespace KspCraftOrganizer
 			toRet.allPartsAvailable = available;
 			toRet.notEnoughScience = notEnoughScience;
 			writeCraftSettings(settingsFile, readCraftSettings(settingsFile), craftDaoDtoToCacheNode(toRet, partNames, fileChecksum));
+
+			toRet.name = maybeLocalize(toRet.name);
+			toRet.description = maybeLocalize(toRet.description);
+
 			return toRet;
 		}
 
+		private string maybeLocalize(string toLocalize)
+		{
+			if (toLocalize.StartsWith("#autoLOC"))
+			{
+				return KSP.Localization.Localizer.Format(toLocalize);
+			}
+			else
+			{
+				return toLocalize;
+			}
+		}
 		private string CalculateMD5(string filename)
 		{
 			using (var md5 = MD5.Create())
@@ -225,7 +240,7 @@ namespace KspCraftOrganizer
 			ConfigNode toRet = new ConfigNode();
 
 			toRet.AddValue("origChecksum", fileChecksum);
-			toRet.AddValue("cacheVersion", "1");
+			toRet.AddValue("cacheVersion", "2");
 			toRet.AddValue("name", craftDaoDto.name);
 			toRet.AddValue("stagesCount", craftDaoDto.stagesCount);
 			toRet.AddValue("cost", craftDaoDto.cost);
@@ -245,7 +260,7 @@ namespace KspCraftOrganizer
 			}
 
 			string cacheVersion = cacheConfigNode.GetValue("cacheVersion");
-			if (cacheVersion != "1")
+			if (cacheVersion != "2")
 			{
 				return null;
 			}
@@ -256,12 +271,12 @@ namespace KspCraftOrganizer
 			}
 
 			CraftDaoDto toRet = new CraftDaoDto();
-			toRet.name = cacheConfigNode.GetValue("name");
+			toRet.name = maybeLocalize(cacheConfigNode.GetValue("name"));
 			toRet.stagesCount = int.Parse(cacheConfigNode.GetValue("stagesCount"));
 			toRet.cost = float.Parse(cacheConfigNode.GetValue("cost"));
 			toRet.partCount = int.Parse(cacheConfigNode.GetValue("partCount"));
 			toRet.mass = float.Parse(cacheConfigNode.GetValue("mass"));
-			toRet.description = cacheConfigNode.GetValue("description");
+			toRet.description = maybeLocalize(cacheConfigNode.GetValue("description"));
 
 			List<string> partNames = readAsListOfStrings(cacheConfigNode, "partNames");
 
@@ -315,9 +330,28 @@ namespace KspCraftOrganizer
 			return getAvailablePartFor(partName);
 		}
 
-		private AvailablePart getAvailablePartFor(string partName)
+		private AvailablePart getAvailablePartFor(string originalPartName)
 		{
 			//COLogger.Log("Finding part '" + partName + "'");
+
+			string partName;
+			if (availablePartCache.ContainsKey(originalPartName))
+			{
+				partName = originalPartName;
+			}
+			else
+			{
+				string replacementName = PartLoader.GetPartReplacementName(originalPartName);
+				if(replacementName != null && replacementName.Length > 0)
+				{
+					partName = replacementName;
+				}
+				else
+				{
+					partName = originalPartName;
+				}
+			}
+
 			if (availablePartCache.ContainsKey(partName))
 			{
 				return availablePartCache[partName];
