@@ -8,7 +8,7 @@ $patch=$versionElements[2]
 
 $versionFile = Get-Content 'KspCraftOrganizer.version' -raw | ConvertFrom-Json
 
-Write-Host "Old Version: $($versionFile.VERSION.MAJOR) $($versionFile.VERSION.MINOR) $($versionFile.VERSION.PATCH)"
+Write-Host "Old Version: $($versionFile.VERSION.MAJOR).$($versionFile.VERSION.MINOR).$($versionFile.VERSION.PATCH)"
 Write-Host "New Version: $($major).$($minor).$patch"
 
 $continue = $( Read-Host "Type 'y' to continue" )

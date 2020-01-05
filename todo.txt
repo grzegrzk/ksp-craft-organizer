@@ -1,4 +1,5 @@
 TODO:
+ - Solve problem with FerramAerospaceResearch, ProceduralParts
  - Avoid exceptions in Making History expansion
  - Apply tags immediately when modified in current craft (if .craft file exists)
  - Save tags to .craft file, see BetterCrewAssignment how they store data in crafts
