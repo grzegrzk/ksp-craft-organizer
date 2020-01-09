@@ -17,7 +17,7 @@ Get newest release from https://github.com/grzegrzk/ksp-craft-organizer/releases
 - Build locally Kramax Plugin Reload from https://github.com/grzegrzk/KramaxPluginReload
 - Copy built .dlls from Kramax Plugin Reload to `$(KspDirectory)/GameData/KramaxPluginReload`
 - In `$(KspDirectory)/GameData/KramaxPluginReload` create file `Settings.cfg` (If necessary change the `path` part):
-"""
+```
 windowsSdkBinPath=C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.8 Tools\
 dotFrameworkBinPath=C:\Windows\Microsoft.NET\Framework\v4.0.30319\
 PluginSetting
@@ -26,11 +26,11 @@ PluginSetting
 	path = C:\projects\ksp-craft-organizer\KspCraftOrganizerPlugin\bin\DebugWindows\KspCraftOrganizerPlugin.dll
 	loadOnce = false
 	methodsAllowedToFail = false
-}"""
+}
+```
 - If necessary define environment variable KspPath, by default it will be `C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program-mod-dev`
 - Build `Ksp Craft Organizer` in Debug mode
-- Create `$(KspDirectory)/GameData/KspCraftOrganizer` and copy there:
-  - `icons` directory
+- Create `$(KspDirectory)/GameData/KspCraftOrganizer` and copy there `icons` directory
 - Threre CANNOT be plugin .dll in `$(KspDirectory)/GameData/KspCraftOrganizer/Plugins`
 - Run KSP
 - Click "Reload Plugins" button when you want to reload plugin after project is rebuilt in IDE
