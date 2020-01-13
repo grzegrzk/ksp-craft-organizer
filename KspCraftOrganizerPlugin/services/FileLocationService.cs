@@ -194,10 +194,13 @@ namespace KspCraftOrganizer {
 			// - craft path: C:/Program Files (x86)/Steam/steamapps/common/Kerbal Space Program-mod-dev/KSP_x64_Data/../saves\career-1_8_1\Ships\VAB\Auto-Saved Ship.craft
 			//   save name: career-1_8_1
 			string toRet = Globals.normalizePath(getPathRelativeTo(craftPath, Globals.combinePaths(ksp.getApplicationRootPath(), "saves")));
-			string endToReplace = "/Ships/VAB/" + Path.GetFileName(craftPath);
-			if (toRet.EndsWith(endToReplace))
-			{
-				toRet = toRet.Substring(0, toRet.Length - endToReplace.Length);
+			string[] endsToReplace = new string[] { "/Ships/VAB/" + Path.GetFileName(craftPath), "/Ships/SPH/" + Path.GetFileName(craftPath) };
+			foreach(string endToReplace in endsToReplace){
+				if (toRet.EndsWith(endToReplace))
+				{
+					toRet = toRet.Substring(0, toRet.Length - endToReplace.Length);
+					break;
+				}
 			}
 			PluginLogger.logDebug(String.Format("extractSaveNameFromCraftPath '{0}', result '{1}'", craftPath, toRet));
 			return toRet;

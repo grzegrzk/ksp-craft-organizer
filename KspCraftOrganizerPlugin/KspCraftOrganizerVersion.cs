@@ -4,6 +4,6 @@ namespace KspCraftOrganizer
 {
     public class KspCraftOrganizerVersion
     {
-        public const string Version = "1.6.0";
+        public const string Version = "1.6.1";
     }
 }
