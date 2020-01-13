@@ -20,6 +20,11 @@ namespace KspNalCommon
 			return toRet;
 		}
 
+		public static string normalizePath(string path)
+		{
+			return path.Replace("\\", "/");
+		}
+
 		public static string join(ICollection<string> collection, string separator) {
 			return join(collection, s => s, separator);
 		}

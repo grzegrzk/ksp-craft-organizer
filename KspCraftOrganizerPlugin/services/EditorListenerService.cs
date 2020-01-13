@@ -57,6 +57,7 @@ namespace KspCraftOrganizer {
 		public void start() {
 			GameEvents.onEditorStarted.Add(this.processOnEditorStarted);
 			GameEvents.onEditorLoad.Add(this.processOnEditorLoaded);
+			//TODO: maybe below we should listen to GameEvents.OnEditorVesselNamingChanged?
 			EditorLogic.fetch.shipNameField.onValueChanged.AddListener(this.processOnShipNameChanged);
 
 			GameEvents.onEditorShipModified.Add(this.onEditorShipModified);

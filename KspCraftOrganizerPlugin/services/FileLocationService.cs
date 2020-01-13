@@ -69,14 +69,28 @@ namespace KspCraftOrganizer {
 
 		public ICollection<string> getAvailableSaveNames() {
 			string savesFolder = Globals.combinePaths(ksp.getApplicationRootPath(), "saves");
-			string[] directories = Directory.GetDirectories(savesFolder);
+			string[] directories = Directory.GetDirectories(savesFolder, "Ships", SearchOption.AllDirectories);
 			List<string> toRet = new List<string>();
-			foreach (string dir in directories) {
-				if (Directory.Exists(Globals.combinePaths(dir, "Ships"))) {
-					toRet.Add(Path.GetFileName(dir));
-				}
+			foreach (string dirAsReturned in directories) {
+				string notNormalized = getPathRelativeTo(Path.GetDirectoryName(dirAsReturned), savesFolder);
+				toRet.Add(Globals.normalizePath(notNormalized)); // +1 to get rid of trailing slash
 			}
+			toRet.Sort();
 			return toRet;
+		}
+
+		public string getPathRelativeTo(string path, string basePath)
+		{
+			string pathFullPath = Path.GetFullPath(path);
+			string basePathFullPath = Path.GetFullPath(basePath);
+			if (pathFullPath.StartsWith(basePathFullPath))
+			{
+				return pathFullPath.Substring(basePathFullPath.Length + 1);
+			}
+			else
+			{
+				return pathFullPath;
+			}
 		}
 
 
@@ -149,20 +163,22 @@ namespace KspCraftOrganizer {
 
 		public string getThumbUrl(string craftPath) {
 			PluginLogger.logDebug(String.Format("getThumbUrl: craftPath {0}", craftPath));
+			string toRet = "";
 			if (isPathInside(craftPath, getStockCraftDirectoryForCraftType(CraftType.SPH))) {
-				return "/Ships/@thumbs/SPH/" + Path.GetFileNameWithoutExtension(craftPath);
+				toRet =  "/Ships/@thumbs/SPH/" + Path.GetFileNameWithoutExtension(craftPath);
 			}
 			if (isPathInside(craftPath, getStockCraftDirectoryForCraftType(CraftType.VAB))) {
-				return "/Ships/@thumbs/VAB/" + Path.GetFileNameWithoutExtension(craftPath);
+				toRet = "/Ships/@thumbs/VAB/" + Path.GetFileNameWithoutExtension(craftPath);
 			}
 			string saveName = extractSaveNameFromCraftPath(craftPath);
 			if (isPathInside(craftPath, getCraftDirectoryForCraftType(saveName, CraftType.SPH))) {
-				return "/thumbs/" + saveName + "_SPH_" + Path.GetFileNameWithoutExtension(craftPath);
+				toRet = "/thumbs/" + saveName + "_SPH_" + Path.GetFileNameWithoutExtension(craftPath);
 			}
 			if (isPathInside(craftPath, getCraftDirectoryForCraftType(saveName, CraftType.VAB))) {
-				return "/thumbs/" + saveName + "_VAB_" + Path.GetFileNameWithoutExtension(craftPath);
+				toRet = "/thumbs/" + saveName + "_VAB_" + Path.GetFileNameWithoutExtension(craftPath);
 			}
-			return "";
+			PluginLogger.logDebug(String.Format("getThumbUrl, result: {0}", toRet));
+			return toRet;
 
 		}
 
@@ -172,13 +188,19 @@ namespace KspCraftOrganizer {
 		}
 
 		string extractSaveNameFromCraftPath(string craftPath) {
-			string[] pathElements = 
-				craftPath.Split(new char[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
-			if (pathElements.Length >= 4) {
-				return pathElements[pathElements.Length - 4];
-			} else {
-				return "";
+			//save name is everything between "saves" in path and "Ships". Example:
+			// - craft path: C:/Program Files (x86)/Steam/steamapps/common/Kerbal Space Program-mod-dev/KSP_x64_Data/../saves\test_missions/New Mission\Ships\VAB\dasdf.craft
+			//   save name: test_missions/New Mission
+			// - craft path: C:/Program Files (x86)/Steam/steamapps/common/Kerbal Space Program-mod-dev/KSP_x64_Data/../saves\career-1_8_1\Ships\VAB\Auto-Saved Ship.craft
+			//   save name: career-1_8_1
+			string toRet = Globals.normalizePath(getPathRelativeTo(craftPath, Globals.combinePaths(ksp.getApplicationRootPath(), "saves")));
+			string endToReplace = "/Ships/VAB/" + Path.GetFileName(craftPath);
+			if (toRet.EndsWith(endToReplace))
+			{
+				toRet = toRet.Substring(0, toRet.Length - endToReplace.Length);
 			}
+			PluginLogger.logDebug(String.Format("extractSaveNameFromCraftPath '{0}', result '{1}'", craftPath, toRet));
+			return toRet;
 		}
 
 		public string getAutoSaveShipPath() {

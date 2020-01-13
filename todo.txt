@@ -1,13 +1,16 @@
 TODO:
- - Solve problem with FerramAerospaceResearch, ProceduralParts
- - Avoid exceptions in Making History expansion
- - Apply tags immediately when modified in current craft (if .craft file exists)
+ - Colorize current tags button according to save status
+ - maybe tags should be saved in event onAboutToSaveShip?
  - Save tags to .craft file, see BetterCrewAssignment how they store data in crafts
- - All tags should be stored in single craft-manager.cache file. The cache should be updated basing on timestamp of the .craft file modification.
+	- Also see: onEditorPartEvent.PartRootSelected or onEditorPodSelected
+ - Apply tags immediately when modified in current craft (if .craft file exists)
  - Available tags should be stored in main save file. How to do it?
+	- See onGameStateSave/onGameStateLoad
+ - All tags should be stored in single craft-manager.cache file. The cache should be updated basing on timestamp of the .craft file modification.
  
  
 Done:
+ - Avoid exceptions in Making History expansion
  - Take into account that there maybe replacement parts - vehicles with such parts should not be marked as unavailable
  - Localize stock craft names
  - Fix craft renaming: after rename window needs to be reopened + thumbnail is not renamed

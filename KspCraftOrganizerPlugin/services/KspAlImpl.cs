@@ -113,8 +113,9 @@ namespace KspCraftOrganizer
 			return KSPUtil.ApplicationRootPath;
 		}
 
-		public string getNameOfSaveFolder() {
-			return HighLogic.SaveFolder;
+		public string getNameOfSaveFolder()
+		{
+			return Globals.normalizePath(HighLogic.SaveFolder);
 		}
 
 		public string getStockCraftDirectory()
