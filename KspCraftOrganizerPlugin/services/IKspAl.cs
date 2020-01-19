@@ -104,19 +104,19 @@ namespace KspCraftOrganizer {
 		public static IKspAl instance {
 			get {
 				if (_instance == null) {
-					Type type = Type.GetType ("KspCraftOrganizer.KspAlImpl");
-					if (type == null) {
-						type  = Type.GetType ("KspCraftOrganizer.KspAlMock");
+					try
+					{
+						instance = new KspAlImpl();
 					}
-					PluginLogger.logDebug("Using dao " + type);
-					try{
-						_instance = (IKspAl)Activator.CreateInstance (type);
-						PluginLogger.logDebug("Dao created");
-					}catch(Exception ex){
+					catch(Exception ex){
 						throw new Exception("Cannot create instance of DAO", ex);
 					}
 				}
 				return _instance;
+			}
+			set
+			{
+				_instance = value;
 			}
 		}
 	}
@@ -128,6 +128,8 @@ namespace KspCraftOrganizer {
 	 * make it possible to test the solution in bare Unity runner. Later it turned out that Kramax Plugin Reloader works quite well
 	 * so it is possible to change code on the fly without problems inside KSP. Because of that later there were introduced some 
 	 * direct dependicies to KSP in other parts of the code as well, but for now this interface stays as a primary separation layer.
+	 * 
+	 * It is also used as interface to mock in order to run unit tests without unity runner.
 	 */
 	public interface IKspAl{
 
@@ -137,9 +139,9 @@ namespace KspCraftOrganizer {
 
 		PluginSettings getPluginSettings(string fileName);
 
-		string getBaseCraftDirectory ();
+		string BaseCraftDirectory { get; }
 
-		CraftType getCurrentEditorFacilityType ();
+		CraftType CurrentEditorFacilityType { get; }
 
 		CraftDaoDto getCraftInfo (CraftDataCacheContext cacheContext, string craftFile, string settingsFile);
 
@@ -169,19 +171,18 @@ namespace KspCraftOrganizer {
 
 		bool isShowStockCrafts();
 
-		string getStockCraftDirectory();
+		string StockCraftDirectory { get; }
 
 		string getAutoSaveCraftName();
 
-		string getNameOfSaveFolder();
-
-		string getApplicationRootPath();
+		string NameOfSaveFolder { get; }
+		string ApplicationRootPath { get; }
 
 		Texture2D getThumbnail(string url);
 
 		string getCurrentCraftName();
 
-		string getSavePathForCraftName(string shipName);
+		string GetSavePathForCraftName(string shipName);
 
 		void saveCurrentCraft();
 

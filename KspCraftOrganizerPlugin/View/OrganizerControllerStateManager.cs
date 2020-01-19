@@ -249,7 +249,7 @@ namespace KspCraftOrganizer {
 			this.craftNameFilter.current = craftNameFilter;
 		}
 
-		public CraftType currentFacility { get { return ksp.getCurrentEditorFacilityType(); } }
+		public CraftType currentFacility { get { return ksp.CurrentEditorFacilityType; } }
 
 
 		public CraftType selectedCraftType { get { return parent.craftType; } }
@@ -258,7 +258,7 @@ namespace KspCraftOrganizer {
 		void readPrimarySaveSettings() {
 			lockMarkingPrimarySettingsAsChanged = true;
 			try {
-				ProfileSettingsDto dto = settingsService.readProfileSettings(ksp.getNameOfSaveFolder());
+				ProfileSettingsDto dto = settingsService.readProfileSettings(ksp.NameOfSaveFolder);
 
 				this.craftSortingFunctions = readCraftSortingfunctions(dto.craftSorting);
 
@@ -320,7 +320,7 @@ namespace KspCraftOrganizer {
 
 		public void writeAllDirtySettings(bool doNotWriteTagSettingsToDisk) {
 			if (primarySettingsChanged) {
-				ProfileSettingsDto dto = settingsService.readProfileSettings(ksp.getNameOfSaveFolder());//new ProfileSettingsDto ();
+				ProfileSettingsDto dto = settingsService.readProfileSettings(ksp.NameOfSaveFolder);//new ProfileSettingsDto ();
 
 				ProfileAllFilterSettingsDto allFilter = new ProfileAllFilterSettingsDto();
 				saveFilterSettings(allFilter, CraftType.SPH, CraftType.VAB);
@@ -332,7 +332,7 @@ namespace KspCraftOrganizer {
 				dto.selectedGuiStyle = this.selectedGuiStyle;
 				dto.craftSorting = createCraftSortingSettings();
 
-				settingsService.writeProfileSettings(ksp.getNameOfSaveFolder(), dto);
+				settingsService.writeProfileSettings(ksp.NameOfSaveFolder, dto);
 			}
 
 			if (!doNotWriteTagSettingsToDisk) {

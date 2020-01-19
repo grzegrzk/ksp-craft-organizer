@@ -65,7 +65,7 @@ namespace KspCraftOrganizer
 		internal void userAddAvailableTag(string newTagText) {
 			ensureTagsCacheLoaded();
 			if (!_availableTagsCache.ContainsKey(newTagText)) {
-				settingsService.addAvailableTag(ksp.getNameOfSaveFolder(), newTagText);
+				settingsService.addAvailableTag(ksp.NameOfSaveFolder, newTagText);
 				addTagIfNeeded(newTagText);
 			}
 		}
@@ -114,7 +114,7 @@ namespace KspCraftOrganizer
 		private void ensureTagsCacheLoaded() {
 			if (_availableTagsCache == null) {
 				_availableTagsCache = new SortedDictionary<string, CurrentCraftTagEntity>();
-				foreach (string tag in settingsService.readProfileSettings(ksp.getNameOfSaveFolder()).availableTags) {
+				foreach (string tag in settingsService.readProfileSettings(ksp.NameOfSaveFolder).availableTags) {
 					addTagIfNeeded(tag);
 				}
 

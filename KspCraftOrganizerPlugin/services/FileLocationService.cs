@@ -20,7 +20,8 @@ namespace KspCraftOrganizer {
 			}
 		}
 
-		private IKspAl ksp = IKspAlProvider.instance;
+		public IKspAl ksp { get => ksp_; set => ksp_ = value; }
+		private IKspAl ksp_ = IKspAlProvider.instance;
 
 		public string getCraftSaveFilePathForCurrentShip() {
 			return getCraftSaveFilePathForShipName(ksp.getCurrentCraftName());
@@ -33,7 +34,7 @@ namespace KspCraftOrganizer {
 		private string getCraftFilePathFromPathAndCraftName(string path, string shipName) {
 			//we do not use shipName directly because it may contain special characters. We use translated file name
 			// - the translation is done by KSP itself.
-			String kraftPathProvidedByKsp = ksp.getSavePathForCraftName(shipName);
+			String kraftPathProvidedByKsp = ksp.GetSavePathForCraftName(shipName);
 			String fileName = Path.GetFileName(kraftPathProvidedByKsp);
 			PluginLogger.logDebug("getCraftFilePathFromPathAndCraftName. Craft name: " + shipName + ", file path provided by KSP: "+ kraftPathProvidedByKsp + ", final file name: " + fileName);
 			String finalPath = Path.Combine(path, fileName);
@@ -51,16 +52,16 @@ namespace KspCraftOrganizer {
 		}
 
 		public string getCraftSaveDirectory() {
-			return Path.Combine(ksp.getBaseCraftDirectory(), ksp.getCurrentEditorFacilityType().directoryName);
+			return Path.Combine(ksp.BaseCraftDirectory, ksp.CurrentEditorFacilityType.directoryName);
 		}
 
 		public string getCraftSettingsFileForCraftFile(string craftFile) {
 			string saveFolder;
 			if (isPathInside(craftFile, getStockCraftDirectoryForCraftType(CraftType.SPH))) {
-				saveFolder = Globals.combinePaths(ksp.getApplicationRootPath(), "saves", ksp.getNameOfSaveFolder(), "stock_ships_settings", CraftType.SPH.directoryName);
+				saveFolder = Globals.combinePaths(ksp.ApplicationRootPath, "saves", ksp.NameOfSaveFolder, "stock_ships_settings", CraftType.SPH.directoryName);
 			}
 			else if (isPathInside(craftFile, getStockCraftDirectoryForCraftType(CraftType.VAB))) {
-				saveFolder = Globals.combinePaths(ksp.getApplicationRootPath(), "saves", ksp.getNameOfSaveFolder(), "stock_ships_settings", CraftType.VAB.directoryName);
+				saveFolder = Globals.combinePaths(ksp.ApplicationRootPath, "saves", ksp.NameOfSaveFolder, "stock_ships_settings", CraftType.VAB.directoryName);
 			} else {
 				saveFolder = Path.GetDirectoryName(craftFile);
 			}	
@@ -68,7 +69,7 @@ namespace KspCraftOrganizer {
 		}
 
 		public ICollection<string> getAvailableSaveNames() {
-			string savesFolder = Globals.combinePaths(ksp.getApplicationRootPath(), "saves");
+			string savesFolder = Globals.combinePaths(ksp.ApplicationRootPath, "saves");
 			string[] directories = Directory.GetDirectories(savesFolder, "Ships", SearchOption.AllDirectories);
 			List<string> toRet = new List<string>();
 			foreach (string dirAsReturned in directories) {
@@ -95,16 +96,16 @@ namespace KspCraftOrganizer {
 
 
 		public string getCraftDirectoryForCraftType(string saveName, CraftType type) {
-			return Globals.combinePaths(ksp.getApplicationRootPath(), "saves", saveName, "Ships", type.directoryName);
+			return Globals.combinePaths(ksp.ApplicationRootPath, "saves", saveName, "Ships", type.directoryName);
 		}
 
 
 		public string getStockCraftDirectoryForCraftType(CraftType type) {
-			return Path.Combine(ksp.getStockCraftDirectory(), type.directoryName);
+			return Path.Combine(ksp.StockCraftDirectory, type.directoryName);
 		}
 
 		public string getProfileSettingsFile(string saveName) { 
-			return Globals.combinePaths(ksp.getApplicationRootPath(), "saves", saveName, "profile_settings.pcrmgr");  
+			return Globals.combinePaths(ksp.ApplicationRootPath, "saves", saveName, "profile_settings.pcrmgr");  
 		}
 
 		public string renameCraft(string oldFile, string newName) {
@@ -156,7 +157,7 @@ namespace KspCraftOrganizer {
 			if (thumbUrl == "") {
 				return "";
 			} else {
-				return Path.Combine(ksp.getApplicationRootPath(), thumbUrl.Substring(1)) + ".png";
+				return Path.Combine(ksp.ApplicationRootPath, thumbUrl.Substring(1)) + ".png";
 			}
 
 		}
@@ -193,7 +194,7 @@ namespace KspCraftOrganizer {
 			//   save name: test_missions/New Mission
 			// - craft path: C:/Program Files (x86)/Steam/steamapps/common/Kerbal Space Program-mod-dev/KSP_x64_Data/../saves\career-1_8_1\Ships\VAB\Auto-Saved Ship.craft
 			//   save name: career-1_8_1
-			string toRet = Globals.normalizePath(getPathRelativeTo(craftPath, Globals.combinePaths(ksp.getApplicationRootPath(), "saves")));
+			string toRet = Globals.normalizePath(getPathRelativeTo(craftPath, Globals.combinePaths(ksp.ApplicationRootPath, "saves")));
 			string[] endsToReplace = new string[] { "/Ships/VAB/" + Path.GetFileName(craftPath), "/Ships/SPH/" + Path.GetFileName(craftPath) };
 			foreach(string endToReplace in endsToReplace){
 				if (toRet.EndsWith(endToReplace))
@@ -211,7 +212,7 @@ namespace KspCraftOrganizer {
 		}
 
 		public string getThisPluginDirectory() {
-			return Globals.combinePaths(ksp.getApplicationRootPath(), "GameData", "KspCraftOrganizer");
+			return Globals.combinePaths(ksp.ApplicationRootPath, "GameData", "KspCraftOrganizer");
 		}
 
 		public string getPluginSettingsPath() {

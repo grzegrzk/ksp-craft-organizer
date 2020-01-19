@@ -1,4 +1,5 @@
 TODO:
+ - Add unit tests to location service
  - Colorize current tags button according to save status
  - maybe tags should be saved in event onAboutToSaveShip?
  - Save tags to .craft file, see BetterCrewAssignment how they store data in crafts

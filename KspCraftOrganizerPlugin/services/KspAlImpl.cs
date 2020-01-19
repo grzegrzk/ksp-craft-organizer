@@ -104,33 +104,21 @@ namespace KspCraftOrganizer
 			}	
 		}
 
-		public string getBaseCraftDirectory(){
-			return Globals.combinePaths(getApplicationRootPath(), "saves", getNameOfSaveFolder(), "Ships");
-		}
+		public string BaseCraftDirectory => Globals.combinePaths(ApplicationRootPath, "saves", NameOfSaveFolder, "Ships");
 
 
-		public string getApplicationRootPath() {
-			return KSPUtil.ApplicationRootPath;
-		}
+		public string ApplicationRootPath => KSPUtil.ApplicationRootPath;
 
-		public string getNameOfSaveFolder()
-		{
-			return Globals.normalizePath(HighLogic.SaveFolder);
-		}
+		public string NameOfSaveFolder => Globals.normalizePath(HighLogic.SaveFolder);
 
-		public string getStockCraftDirectory()
-		{
-			return Path.Combine(KSPUtil.ApplicationRootPath, "Ships");
-		}
+		public string StockCraftDirectory => Path.Combine(KSPUtil.ApplicationRootPath, "Ships");
 
 		public bool isShowStockCrafts()
 		{
 			return HighLogic.CurrentGame.Parameters.Difficulty.AllowStockVessels;
 		}
 
-		public CraftType getCurrentEditorFacilityType(){
-			return editorFacility == EditorFacility.SPH ? CraftType.SPH : CraftType.VAB;
-		}
+		public CraftType CurrentEditorFacilityType => editorFacility == EditorFacility.SPH ? CraftType.SPH : CraftType.VAB;
 
 		public CraftDaoDto getCraftInfo(CraftDataCacheContext craftDataCacheContext, string craftFile, string settingsFile){
 			PluginLogger.logTrace ("reading craft file from '" + craftFile + "'");
@@ -686,7 +674,7 @@ namespace KspCraftOrganizer
 			return EditorLogic.fetch.ship.shipName;
 		}
 
-		public string getSavePathForCraftName(string shipName) {
+		public string GetSavePathForCraftName(string shipName) {
 			return ShipConstruction.GetSavePath(shipName);
 		}
 

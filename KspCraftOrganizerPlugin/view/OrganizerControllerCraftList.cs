@@ -117,7 +117,7 @@ namespace KspCraftOrganizer {
 		public OrganizerControllerCraftList(OrganizerController parent) {
 			this.parent = parent;
 			this.sortingHelper = new CraftSortingHelper(parent.stateManager);
-			_craftType = ksp.getCurrentEditorFacilityType();
+			_craftType = ksp.CurrentEditorFacilityType;
 		}
 
 		public bool selectAllFiltered {

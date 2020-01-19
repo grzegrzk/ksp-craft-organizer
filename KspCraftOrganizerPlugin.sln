@@ -1,23 +1,41 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29613.14
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KspCraftOrganizerPlugin", "KspCraftOrganizerPlugin\KspCraftOrganizerPlugin.csproj", "{F74B58A2-814B-4572-B886-E7F3C0ADDD2A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KspCraftOrganizerPluginTests", "KspCraftOrganizerPluginTests\KspCraftOrganizerPluginTests.csproj", "{883A1953-0946-44ED-A079-174984FF173A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
-		Release|Any CPU = Release|Any CPU
 		DebugWindows|Any CPU = DebugWindows|Any CPU
+		Release|Any CPU = Release|Any CPU
 		ReleaseWindows|Any CPU = ReleaseWindows|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{F74B58A2-814B-4572-B886-E7F3C0ADDD2A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F74B58A2-814B-4572-B886-E7F3C0ADDD2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F74B58A2-814B-4572-B886-E7F3C0ADDD2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F74B58A2-814B-4572-B886-E7F3C0ADDD2A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F74B58A2-814B-4572-B886-E7F3C0ADDD2A}.DebugWindows|Any CPU.ActiveCfg = DebugWindows|Any CPU
 		{F74B58A2-814B-4572-B886-E7F3C0ADDD2A}.DebugWindows|Any CPU.Build.0 = DebugWindows|Any CPU
+		{F74B58A2-814B-4572-B886-E7F3C0ADDD2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F74B58A2-814B-4572-B886-E7F3C0ADDD2A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F74B58A2-814B-4572-B886-E7F3C0ADDD2A}.ReleaseWindows|Any CPU.ActiveCfg = ReleaseWindows|Any CPU
 		{F74B58A2-814B-4572-B886-E7F3C0ADDD2A}.ReleaseWindows|Any CPU.Build.0 = ReleaseWindows|Any CPU
+		{883A1953-0946-44ED-A079-174984FF173A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{883A1953-0946-44ED-A079-174984FF173A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{883A1953-0946-44ED-A079-174984FF173A}.DebugWindows|Any CPU.ActiveCfg = Debug|Any CPU
+		{883A1953-0946-44ED-A079-174984FF173A}.DebugWindows|Any CPU.Build.0 = Debug|Any CPU
+		{883A1953-0946-44ED-A079-174984FF173A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{883A1953-0946-44ED-A079-174984FF173A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{883A1953-0946-44ED-A079-174984FF173A}.ReleaseWindows|Any CPU.ActiveCfg = Release|Any CPU
+		{883A1953-0946-44ED-A079-174984FF173A}.ReleaseWindows|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D982CF88-EF91-4C3C-B769-82DBDC871AD4}
 	EndGlobalSection
 EndGlobal

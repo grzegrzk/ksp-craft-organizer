@@ -1,0 +1,55 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+
+    <IsPackable>false</IsPackable>
+
+    <KspPath Condition=" '$(KspPath)' == '' ">C:\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program-mod-dev</KspPath>
+    <KspDllPath Condition=" '$(KspDllPath)' == '' ">$(KspPath)\KSP_x64_Data\Managed</KspDllPath>
+    <KspPluginPath Condition=" '$(KspPluginPath)' == '' ">$(KspPath)\GameData</KspPluginPath>
+    <AssemblySearchPaths> $(KspPluginPath) ; $(KspDllPath) ; $(AssemblySearchPaths) </AssemblySearchPaths>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.2.0" />
+    <PackageReference Include="MSTest.TestAdapter" Version="2.0.0" />
+    <PackageReference Include="MSTest.TestFramework" Version="2.0.0" />
+    <PackageReference Include="coverlet.collector" Version="1.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Assembly-CSharp">
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+    </Reference>
+    <Reference Include="UnityEngine.IMGUIModule">
+    </Reference>
+    <Reference Include="UnityEngine.TextRenderingModule">
+    </Reference>
+    <Reference Include="UnityEngine.ImageConversionModule">
+    </Reference>
+    <Reference Include="UnityEngine.AnimationModule">
+    </Reference>
+    <Reference Include="UnityEngine">
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+    </Reference>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\KspCraftOrganizerPlugin\KspCraftOrganizerPlugin.csproj" />
+  </ItemGroup>
+
+  <!--<Target Name="AfterBuild">
+    <Copy SourceFiles="$(ProjectDir)ksp-test-instances" DestinationFolder="$(ProjectDir)$(OutDir)" ContinueOnError="true" />
+  </Target>-->
+
+  <ItemGroup>
+    <Content Include="test-resources\**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>%(Filename)</TargetPath>
+    </Content>
+  </ItemGroup>
+ 
+</Project>

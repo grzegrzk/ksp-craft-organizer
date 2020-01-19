@@ -30,7 +30,7 @@ namespace KspCraftOrganizer {
 
 
 		public OrganizerController() {
-			currentSave = ksp.getNameOfSaveFolder();
+			currentSave = ksp.NameOfSaveFolder;
 
 			this.stateManager = new OrganizerControllerStateManager(this);
 			this.managementTagsGroups = new ManagementTagsGrouper(this);
@@ -316,7 +316,7 @@ namespace KspCraftOrganizer {
 
 		public bool thisIsPrimarySave {
 			get {
-				return currentSave == ksp.getNameOfSaveFolder();
+				return currentSave == ksp.NameOfSaveFolder;
 			}
 		}
 	}
